@@ -335,10 +335,19 @@
                     osc.frequency.setValueAtTime(659, now); gain.gain.setValueAtTime(0, now);
                     gain.gain.linearRampToValueAtTime(0.3, now + 0.01); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
                     osc.start(now); osc.stop(now + 0.6);
+                } else if (type === 'error') {
+                    // Buzz for error
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now); // Low pitch
+                    osc.frequency.linearRampToValueAtTime(100, now + 0.3); // Slide down
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
                 } else if (type === 'click') {
                     osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.1, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1); osc.start(now); osc.stop(now + 0.1);
                 } else {
+                    // Default / Confirm
                     osc.frequency.setValueAtTime(330, now); gain.gain.setValueAtTime(0, now);
                     gain.gain.linearRampToValueAtTime(0.5, now + 0.02); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
                     osc.start(now); osc.stop(now + 0.4);
@@ -412,6 +421,12 @@
 
         function setMode(mode) {
             currentMode = mode; isChallengeActive = false; challengeRowSelected = false; feedbackEl.textContent = '';
+
+            // Reset filter if leaving practice or entering challenge to clear "lit up" rows
+            if (mode === 'challenge' || mode === 'practice') {
+                currentFilterIndex = null;
+            }
+
             updateInstructions();
             if (mode === 'final') {
                 finalSet = [];
