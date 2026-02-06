@@ -527,17 +527,21 @@
 
         function init() {
             // Check if mobile and show sound-init-bar
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            if (isMobile) {
-                const bar = document.getElementById('sound-init-bar');
-                if (bar) {
-                    bar.style.display = 'block';
-                    bar.onclick = () => {
-                        resumeAudio();
-                        Utils.speak("こんにちは"); // Test speak
-                        bar.style.display = 'none';
-                    };
-                }
+            const bar = document.getElementById('sound-init-bar');
+            if (bar) {
+                bar.style.display = 'block';
+                bar.onclick = () => {
+                    resumeAudio();
+                    // Robust warm up for SpeechSynthesis on Mobile
+                    if (window.speechSynthesis) {
+                        const welcome = new SpeechSynthesisUtterance("こんにちは");
+                        welcome.lang = 'ja-JP';
+                        welcome.volume = 0; // Silent but valid utterance
+                        window.speechSynthesis.speak(welcome);
+                    }
+                    Utils.speak("こんにちは"); // Audible test
+                    bar.style.display = 'none';
+                };
             }
 
             updateInstructions();

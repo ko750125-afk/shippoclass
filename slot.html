@@ -27,11 +27,14 @@
             color: white;
             font-family: var(--font-jp);
             margin: 0;
+            padding: 0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             overflow-x: hidden;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .pachinko-frame {
@@ -294,9 +297,17 @@
         }
 
         .reel-item .kanji {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             color: #d00;
             margin-bottom: 5px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .reel-item .kana {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 2px;
         }
 
         .reel-item .meaning {
@@ -474,13 +485,26 @@
                 margin-bottom: 5px;
             }
 
-            .reel-window,
-            .reel-item {
-                height: 120px !important;
+            .reel-item .kanji {
+                font-size: 1.1rem !important;
+                /* Force smaller size on mobile */
+            }
+
+            .reel-item .kana,
+            .reel-item .meaning {
+                display: none !important;
+            }
+
+            .reel-item .kana {
+                display: none;
+                /* Hide Reading in reels to save space and avoid overlap */
             }
 
             .reel-item .kanji {
-                font-size: 1.5rem;
+                font-size: 1.1rem !important;
+                /* Smaller text for long words */
+                width: 100%;
+                word-break: break-all;
             }
 
             .reel-item .meaning {
@@ -541,15 +565,26 @@
             #result-meaning {
                 font-size: 1rem !important;
             }
+
+            .reel-item .kanji {
+                font-size: 1.4rem !important;
+                white-space: nowrap;
+            }
+
+            .reel-item .kana,
+            .reel-item .meaning {
+                display: none !important;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="container" style="padding: 0; width: 100%;">
+    <div class="container"
+        style="padding: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; margin: 0 auto; overflow: hidden;">
         <!-- Dedicated Header for Buttons to avoid overlap -->
         <div
-            style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; width: 100%; box-sizing: border-box;">
+            style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; width: 100%; max-width: 500px; box-sizing: border-box;">
             <a href="index.html" class="btn-nav neon-text-gold"
                 style="font-size: 0.9rem; padding: 5px 12px; border-width: 2px;">← LOBBY</a>
             <div class="coin-wallet-mobile" id="coin-wallet"
@@ -559,7 +594,7 @@
             </div>
         </div>
 
-        <div class="slot-machine" id="machine-frame">
+        <div class="slot-machine" id="machine-frame" style="margin: 0 auto; position: relative;">
 
 
             <!-- Shippo Character removed from here -->
