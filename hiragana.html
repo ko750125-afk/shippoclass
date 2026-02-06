@@ -422,8 +422,9 @@
         // Pre-load voices for SpeechSynthesis
         let jaVoice = null;
         function loadVoices() {
+            if (!window.speechSynthesis) return;
             const voices = window.speechSynthesis.getVoices();
-            jaVoice = voices.find(v => v.lang.includes('ja')) || null;
+            jaVoice = voices.find(v => v.lang.toLowerCase().includes('ja')) || null;
             console.log("Voices loaded:", jaVoice ? jaVoice.name : "None");
         }
         if (window.speechSynthesis) {
@@ -431,10 +432,23 @@
             loadVoices();
         }
 
+        // Global Audio Unlocker
+        function resumeAudio() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!window.hiraganaAudioCtx && AudioContext) {
+                window.hiraganaAudioCtx = new AudioContext();
+            }
+            if (window.hiraganaAudioCtx && window.hiraganaAudioCtx.state === 'suspended') {
+                window.hiraganaAudioCtx.resume();
+            }
+        }
+
         // Utils
         const Utils = {
             speak: (text) => {
                 if (!window.speechSynthesis) return;
+
+                // Android/Chrome stability delay
                 window.speechSynthesis.cancel();
                 resumeAudio();
 
@@ -442,14 +456,18 @@
                 let rate = 0.8;
                 let pitch = 1.0;
 
-                const oDan = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
-                const uDan = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
+                const oDanFixed = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', '도', '보', '포'];
+                const uDanFixed = ['우', '쿠', '스', '츠', '누', '후', '무', '유', '루', '구', '즈', '즈', '부', '푸'];
 
-                if (oDan.includes(text)) {
+                // Real Japanese set for detection
+                const oSet = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
+                const uSet = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
+
+                if (oSet.includes(text)) {
                     speechText = text + 'ーー';
                     rate = 0.5;
                     pitch = 1.3;
-                } else if (uDan.includes(text)) {
+                } else if (uSet.includes(text)) {
                     speechText = text + 'ーー';
                     rate = 0.5;
                     pitch = 1.2;
@@ -458,17 +476,16 @@
                 }
 
                 const utterance = new SpeechSynthesisUtterance(speechText);
-
-                // Use cached jaVoice or fallback
-                if (!jaVoice) loadVoices(); // Final try
+                if (!jaVoice) loadVoices();
                 if (jaVoice) utterance.voice = jaVoice;
-
                 utterance.lang = 'ja-JP';
                 utterance.rate = rate;
                 utterance.pitch = pitch;
                 utterance.volume = 1.0;
 
-                window.speechSynthesis.speak(utterance);
+                setTimeout(() => {
+                    window.speechSynthesis.speak(utterance);
+                }, 100);
             },
             // Web Audio API Sound
             playSound: (type) => {
