@@ -39,7 +39,6 @@
             box-sizing: border-box;
         }
 
-        /* Nav Buttons */
         .btn-nav {
             display: inline-block;
             padding: 10px 20px;
@@ -57,7 +56,6 @@
             border-color: var(--color-gold);
         }
 
-        /* Mode Selector */
         .mode-selector {
             display: flex;
             gap: 10px;
@@ -77,7 +75,6 @@
             transition: 0.3s;
         }
 
-        /* Hiragana Specific */
         .hiragana-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -136,7 +133,6 @@
             opacity: 0.6;
         }
 
-        /* Filter Selector */
         .column-selector {
             display: flex;
             flex-wrap: wrap;
@@ -165,7 +161,6 @@
             border-color: #fff;
         }
 
-        /* Feedback Display */
         #feedback-display {
             text-align: center;
             font-size: 1.5rem;
@@ -182,7 +177,6 @@
             color: var(--color-red);
         }
 
-        /* Final Mode Carousel */
         .final-carousel {
             display: flex;
             align-items: center;
@@ -219,7 +213,6 @@
             font-weight: bold;
         }
 
-        /* Animation */
         @keyframes pop {
             0% {
                 transform: scale(0.8);
@@ -250,7 +243,6 @@
 </head>
 
 <body>
-
     <div class="container">
         <div id="sound-init-bar"
             style="display:none; background: var(--color-gold); color: black; text-align: center; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 0 15px var(--color-gold);">
@@ -268,19 +260,12 @@
             <button class="mode-btn" id="btn-final">파이널 테스트</button>
         </div>
 
-        <div id="column-selector" class="column-selector">
-            <!-- Filter buttons will be generated here -->
-        </div>
-
+        <div id="column-selector" class="column-selector"></div>
         <div id="feedback-display"></div>
-
-        <div id="grid" class="hiragana-grid">
-            <!-- Grid items will be generated here -->
-        </div>
+        <div id="grid" class="hiragana-grid"></div>
     </div>
 
     <script>
-        // --- Audio Control ---
         let jaVoice = null;
         let hiraganaAudioCtx = null;
 
@@ -288,14 +273,9 @@
             if (!window.speechSynthesis) return;
             const voices = window.speechSynthesis.getVoices();
             if (!voices.length) return;
-
-            // Robust matching for Galaxy/Samsung: ja-JP -> ja_jp -> ja_JP -> ja
             const lowerJa = ['ja-jp', 'ja_jp', 'ja'];
             jaVoice = voices.find(v => lowerJa.includes(v.lang.toLowerCase())) ||
-                voices.find(v => v.lang.toLowerCase().startsWith('ja')) ||
-                null;
-
-            if (jaVoice) console.log("Japanese Voice Found:", jaVoice.name);
+                voices.find(v => v.lang.toLowerCase().startsWith('ja')) || null;
         }
 
         if (window.speechSynthesis) {
@@ -308,19 +288,14 @@
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) hiraganaAudioCtx = new AudioContext();
             }
-            if (hiraganaAudioCtx && hiraganaAudioCtx.state === 'suspended') {
-                hiraganaAudioCtx.resume();
-            }
+            if (hiraganaAudioCtx && hiraganaAudioCtx.state === 'suspended') hiraganaAudioCtx.resume();
         }
 
         const Utils = {
             speak: (text) => {
                 if (!window.speechSynthesis) return;
-
-                // Galaxy/Android: Avoid blocking with overlapping speech
-                if (window.speechSynthesis.speaking) {
-                    window.speechSynthesis.cancel();
-                }
+                // Galaxy Fix: Stop current speech immediately
+                window.speechSynthesis.cancel();
                 resumeAudio();
 
                 let speechText = text;
@@ -328,117 +303,52 @@
                 let pitch = 1.0;
 
                 const oSet = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
-                const uSet = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', '즈', 'づ', 'ぶ', 'ぷ'];
+                const uSet = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
 
-                if (oSet.includes(text)) {
-                    speechText = text + 'ーー';
-                    rate = 0.5;
-                    pitch = 1.3;
-                } else if (uSet.includes(text)) {
-                    speechText = text + 'ーー';
-                    rate = 0.5;
-                    pitch = 1.2;
-                } else if (text.length === 1) {
-                    speechText = text + 'ー';
-                }
+                if (oSet.includes(text)) { speechText = text + 'ーー'; rate = 0.5; pitch = 1.3; }
+                else if (uSet.includes(text)) { speechText = text + 'ーー'; rate = 0.5; pitch = 1.2; }
+                else if (text.length === 1) { speechText = text + 'ー'; }
 
-                // Small delay for Android Chrome to stabilize after cancel()
                 setTimeout(() => {
-                    const utterance = new SpeechSynthesisUtterance(speechText);
-                    // Ensure voices are loaded for Galaxy (JIT loading)
-                    if (!jaVoice) {
-                        loadVoices();
-                    }
-                    if (jaVoice) {
-                        utterance.voice = jaVoice;
-                    }
-                    // Always set lang as fallback for system default
-                    utterance.lang = 'ja-JP';
-                    utterance.rate = rate;
-                    utterance.pitch = pitch;
-                    utterance.volume = 1.0;
-                    window.speechSynthesis.speak(utterance);
+                    const u = new SpeechSynthesisUtterance(speechText);
+                    if (!jaVoice) loadVoices();
+                    if (jaVoice) u.voice = jaVoice;
+                    u.lang = 'ja-JP'; u.rate = rate; u.pitch = pitch; u.volume = 1.0;
+                    window.speechSynthesis.speak(u);
                 }, 100);
             },
-
             playSound: (type) => {
                 resumeAudio();
                 if (!hiraganaAudioCtx) return;
-                const ctx = hiraganaAudioCtx;
-                const now = ctx.currentTime;
-
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-
+                const ctx = hiraganaAudioCtx; const now = ctx.currentTime;
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
                 if (type === 'win') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(659.25, now);
-                    gain.gain.setValueAtTime(0, now);
-                    gain.gain.linearRampToValueAtTime(0.3, now + 0.01);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-                    osc.start(now);
-                    osc.stop(now + 0.6);
-
-                    const osc2 = ctx.createOscillator();
-                    const gain2 = ctx.createGain();
-                    osc2.connect(gain2); gain2.connect(ctx.destination);
-                    osc2.type = 'sine'; osc2.frequency.setValueAtTime(523.25, now + 0.3);
-                    gain2.gain.setValueAtTime(0, now + 0.3);
-                    gain2.gain.linearRampToValueAtTime(0.3, now + 0.31);
-                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
-                    osc2.start(now + 0.3); osc2.stop(now + 0.8);
+                    osc.frequency.setValueAtTime(659, now); gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.3, now + 0.01); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                    osc.start(now); osc.stop(now + 0.6);
                 } else if (type === 'click') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(800, now);
-                    gain.gain.setValueAtTime(0.1, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                    osc.start(now);
-                    osc.stop(now + 0.1);
+                    osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1); osc.start(now); osc.stop(now + 0.1);
                 } else {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(330, now);
-                    gain.gain.setValueAtTime(0, now);
-                    gain.gain.linearRampToValueAtTime(0.5, now + 0.02);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-                    osc.start(now);
-                    osc.stop(now + 0.4);
+                    osc.frequency.setValueAtTime(330, now); gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.5, now + 0.02); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now); osc.stop(now + 0.4);
                 }
             },
             randomItem: (array) => array[Math.floor(Math.random() * array.length)]
         };
 
-        // --- Data ---
         const hiraganaData = [
             ['あ', 'い', 'う', 'え', 'お'],
             ['か', 'き', 'く', 'け', 'こ'],
             ['さ', 'し', 'す', 'せ', 'そ'],
-            ['た', 'ち', 'つ', 'て', '도'],
-            ['な', '니', '누', '네', '노'],
+            ['た', 'ち', 'つ', 'て', 'と'],
+            ['な', 'に', 'ぬ', 'ね', 'の'],
             ['は', 'ひ', 'ふ', 'へ', 'ほ'],
             ['ま', 'み', 'む', 'め', 'も'],
             ['や', '', 'ゆ', '', 'よ'],
             ['ら', 'り', 'る', 'れ', 'ろ'],
-            ['わ', '', 'を', '', 'ん'],
-            ['가', '기', '구', '게', '고'],
-            ['자', '지', '즈', '제', '조'],
-            ['다', '지', '즈', '데', '도'],
-            ['바', '비', '부', '베', '보'],
-            ['파', '피', '푸', '페', '포']
-        ];
-
-        // Clean Japanese Data
-        const hiraganaDataClean = [
-            ['あ', 'い', 'う', 'え', 'お'],
-            ['か', 'き', 'く', 'け', 'こ'],
-            ['さ', 'し', 'す', 'せ', 'そ'],
-            ['た', 'ち', 'つ', 'て', 'と'],
-            ['나', '니', 'ぬ', 'ね', 'の'],
-            ['は', 'ひ', 'ふ', 'へ', 'ほ'],
-            ['ま', 'み', 'む', '메', 'も'],
-            ['や', '', 'ゆ', '', 'よ'],
-            ['ら', 'り', '루', 'れ', 'ろ'],
             ['わ', '', 'を', '', 'ん'],
             ['が', 'ぎ', 'ぐ', 'げ', 'ご'],
             ['ざ', 'じ', 'ず', 'ぜ', 'ぞ'],
@@ -446,10 +356,6 @@
             ['ば', 'び', 'ぶ', 'べ', 'ぼ'],
             ['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ']
         ];
-        // Ensure final version is clean
-        for (let i = 0; i < hiraganaDataClean.length; i++) {
-            hiraganaData[i] = hiraganaDataClean[i];
-        }
 
         const romajiData = [
             ['a', 'i', 'u', 'e', 'o'],
@@ -469,9 +375,8 @@
             ['pa', 'pi', 'pu', 'pe', 'po']
         ];
 
-        const columns = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ', 'が', 'ざ', '다', 'ば', 'ぱ'];
+        const columns = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ', 'が', 'ざ', 'だ', 'ば', 'ぱ'];
 
-        // --- State ---
         let currentMode = 'practice';
         let currentChallengeChar = null;
         let isChallengeActive = false;
@@ -484,7 +389,6 @@
         const selectorEl = document.getElementById('column-selector');
         const feedbackEl = document.getElementById('feedback-display');
 
-        // --- Logic ---
         function init() {
             const bar = document.getElementById('sound-init-bar');
             if (bar) {
@@ -493,44 +397,32 @@
                     resumeAudio();
                     if (window.speechSynthesis) {
                         window.speechSynthesis.cancel();
-                        // Galaxy Prime
-                        const prime = new SpeechSynthesisUtterance("あ");
-                        prime.volume = 0;
-                        prime.lang = 'ja-JP';
-                        window.speechSynthesis.speak(prime);
+                        const p = new SpeechSynthesisUtterance("あ"); p.volume = 0.01; p.lang = 'ja-JP';
+                        window.speechSynthesis.speak(p);
                     }
                     setTimeout(() => Utils.speak("こんにちは"), 150);
                     bar.style.display = 'none';
                 };
             }
-
             renderSelector();
             renderGrid(null);
-
-            document.getElementById('btn-practice').addEventListener('click', () => setMode('practice'));
-            document.getElementById('btn-challenge').addEventListener('click', () => startChallenge());
-            document.getElementById('btn-final').addEventListener('click', () => setMode('final'));
+            document.getElementById('btn-practice').onclick = () => setMode('practice');
+            document.getElementById('btn-challenge').onclick = () => startChallenge();
+            document.getElementById('btn-final').onclick = () => setMode('final');
         }
 
         function setMode(mode) {
-            currentMode = mode;
-            isChallengeActive = false;
-            challengeRowSelected = false;
-            feedbackEl.textContent = '';
+            currentMode = mode; isChallengeActive = false; challengeRowSelected = false; feedbackEl.textContent = '';
             updateInstructions();
-
             if (mode === 'final') {
                 finalSet = [];
-                hiraganaData.forEach(row => row.forEach(c => {
-                    if (c) finalSet.push({ char: c, romaji: '' });
-                }));
+                hiraganaData.forEach(row => row.forEach(c => { if (c) finalSet.push({ char: c, romaji: '' }); }));
                 for (let i = finalSet.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [finalSet[i], finalSet[j]] = [finalSet[j], finalSet[i]];
                 }
                 finalIdx = 0;
             }
-
             updateModeButtons();
             renderGrid(currentFilterIndex);
         }
@@ -538,8 +430,7 @@
         function updateModeButtons() {
             const btns = { practice: 'btn-practice', challenge: 'btn-challenge', final: 'btn-final' };
             Object.keys(btns).forEach(m => {
-                const el = document.getElementById(btns[m]);
-                el.style.background = currentMode === m ? "linear-gradient(180deg, #ff0000 0%, #8b0000 100%)" : "#333";
+                document.getElementById(btns[m]).style.background = currentMode === m ? "linear-gradient(180deg, #ff0000 0%, #8b0000 100%)" : "#333";
             });
         }
 
@@ -552,27 +443,19 @@
 
         function renderSelector() {
             selectorEl.innerHTML = '';
-            // "ALL" button
             const allBtn = document.createElement('button');
             allBtn.className = 'col-btn' + (currentFilterIndex === null ? ' active' : '');
             allBtn.textContent = '전체';
             allBtn.onclick = () => { currentFilterIndex = null; challengeRowSelected = false; renderSelector(); renderGrid(null); };
             selectorEl.appendChild(allBtn);
-
             columns.forEach((col, idx) => {
                 const btn = document.createElement('button');
                 btn.className = 'col-btn' + (currentFilterIndex === idx ? ' active' : '');
                 btn.textContent = col;
                 btn.onclick = () => {
-                    resumeAudio();
-                    currentFilterIndex = idx;
-                    if (currentMode === 'challenge') {
-                        challengeRowSelected = true;
-                        isChallengeActive = true;
-                        nextChallenge();
-                    }
-                    renderSelector();
-                    renderGrid(idx);
+                    resumeAudio(); currentFilterIndex = idx;
+                    if (currentMode === 'challenge') { challengeRowSelected = true; isChallengeActive = true; nextChallenge(); }
+                    renderSelector(); renderGrid(idx);
                 };
                 selectorEl.appendChild(btn);
             });
@@ -581,146 +464,80 @@
         function renderGrid(filterIdx) {
             gridEl.innerHTML = '';
             gridEl.className = (currentMode === 'final') ? 'hiragana-grid small-grid' : 'hiragana-grid';
-
-            if (currentMode === 'final') {
-                renderFinalMode();
-                return;
-            }
-
-            let dataToRender = [];
+            if (currentMode === 'final') { renderFinalMode(); return; }
+            let data = [];
             if (filterIdx === null) {
                 hiraganaData.forEach((row, rIdx) => {
-                    const separator = { type: 'separator', label: columns[rIdx] + "행" };
-                    dataToRender.push(separator);
-                    row.forEach((char, cIdx) => {
-                        const romaji = romajiData[rIdx][cIdx];
-                        if (char) dataToRender.push({ char, romaji });
-                        else dataToRender.push({ type: 'empty' });
-                    });
+                    data.push({ type: 'separator', label: columns[rIdx] + "행" });
+                    row.forEach((char, cIdx) => data.push({ char, romaji: romajiData[rIdx][cIdx], type: char ? '' : 'empty' }));
                 });
             } else {
-                hiraganaData[filterIdx].forEach((char, cIdx) => {
-                    const romaji = romajiData[filterIdx][cIdx];
-                    if (char) dataToRender.push({ char, romaji });
-                    else if (currentMode === 'practice') dataToRender.push({ type: 'empty' });
-                });
+                hiraganaData[filterIdx].forEach((char, cIdx) => data.push({ char, romaji: romajiData[filterIdx][cIdx], type: char ? '' : 'empty' }));
             }
-
             if (currentMode === 'challenge') {
-                dataToRender = dataToRender.filter(i => i.char);
-                for (let i = dataToRender.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [dataToRender[i], dataToRender[j]] = [dataToRender[j], dataToRender[i]];
+                data = data.filter(i => i.char);
+                for (let i = data.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));[data[i], data[j]] = [data[j], data[i]];
                 }
             }
-
-            dataToRender.forEach(item => {
+            data.forEach(item => {
+                const el = document.createElement('div');
                 if (item.type === 'separator') {
-                    const sep = document.createElement('div');
-                    sep.className = 'grid-separator';
-                    sep.style.gridColumn = '1 / -1';
-                    sep.style.marginTop = '15px';
-                    sep.innerHTML = `<span style="color:var(--color-gold); font-size:0.8rem;">${item.label}</span>`;
-                    gridEl.appendChild(sep);
-                    return;
+                    el.style.gridColumn = '1 / -1'; el.innerHTML = `<span style="color:var(--color-gold); font-size:0.8rem;">${item.label}</span>`;
+                } else {
+                    el.className = 'char-btn' + (item.type === 'empty' ? ' empty' : ' animate-pop');
+                    if (item.char) {
+                        el.innerHTML = `<span>${item.char}</span><span class="romaji">${item.romaji}</span>`;
+                        el.onclick = () => handleCharClick(item.char, el);
+                    }
                 }
-                const btn = document.createElement('div');
-                btn.className = 'char-btn' + (item.type === 'empty' ? ' empty' : ' animate-pop');
-                if (item.char) {
-                    btn.innerHTML = `<span>${item.char}</span><span class="romaji">${item.romaji}</span>`;
-                    btn.onclick = () => handleCharClick(item.char, btn);
-                }
-                gridEl.appendChild(btn);
+                gridEl.appendChild(el);
             });
         }
 
         function renderFinalMode() {
-            const item = finalSet[finalIdx];
-            if (!item) return;
-
-            const carousel = document.createElement('div');
-            carousel.className = 'final-carousel';
-
-            const prevBtn = document.createElement('button');
-            prevBtn.className = 'col-btn'; prevBtn.textContent = '◀';
-            prevBtn.onclick = () => { if (finalIdx > 0) { finalIdx--; renderGrid(null); } };
-
-            const card = document.createElement('div');
-            card.className = 'final-card active-slot animate-pop';
-            card.innerHTML = `<div class="char">${item.char}</div>`;
-            card.onclick = () => Utils.speak(item.char);
-
-            const nextBtn = document.createElement('button');
-            nextBtn.className = 'col-btn'; nextBtn.textContent = '▶';
-            nextBtn.onclick = () => { if (finalIdx < finalSet.length - 1) { finalIdx++; renderGrid(null); } };
-
-            carousel.appendChild(prevBtn);
-            carousel.appendChild(card);
-            carousel.appendChild(nextBtn);
-            gridEl.appendChild(carousel);
-
-            const counter = document.createElement('div');
-            counter.style.textAlign = 'center';
-            counter.textContent = `${finalIdx + 1} / ${finalSet.length}`;
-            gridEl.appendChild(counter);
+            const item = finalSet[finalIdx]; if (!item) return;
+            const container = document.createElement('div'); container.className = 'final-carousel';
+            const prev = document.createElement('button'); prev.className = 'col-btn'; prev.textContent = '◀';
+            prev.onclick = () => { if (finalIdx > 0) { finalIdx--; renderGrid(null); } };
+            const card = document.createElement('div'); card.className = 'final-card active-slot animate-pop';
+            card.innerHTML = `<div class="char">${item.char}</div>`; card.onclick = () => Utils.speak(item.char);
+            const next = document.createElement('button'); next.className = 'col-btn'; next.textContent = '▶';
+            next.onclick = () => { if (finalIdx < finalSet.length - 1) { finalIdx++; renderGrid(null); } };
+            container.appendChild(prev); container.appendChild(card); container.appendChild(next); gridEl.appendChild(container);
+            const counter = document.createElement('div'); counter.style.textAlign = 'center';
+            counter.textContent = `${finalIdx + 1} / ${finalSet.length}`; gridEl.appendChild(counter);
         }
 
         function handleCharClick(char, btn) {
-            if (currentMode === 'practice' || currentMode === 'final') {
-                Utils.speak(char);
-                highlightBtn(btn);
-            } else if (currentMode === 'challenge' && isChallengeActive) {
-                checkAnswer(char, btn);
-            }
+            if (currentMode === 'practice' || currentMode === 'final') { Utils.speak(char); highlightBtn(btn); }
+            else if (currentMode === 'challenge' && isChallengeActive) checkAnswer(char, btn);
         }
 
-        function highlightBtn(btn) {
-            btn.classList.add('active');
-            setTimeout(() => btn.classList.remove('active'), 300);
-        }
+        function highlightBtn(btn) { btn.classList.add('active'); setTimeout(() => btn.classList.remove('active'), 300); }
 
-        function startChallenge() {
-            setMode('challenge');
-            isChallengeActive = true;
-            feedbackEl.innerHTML = "행을 선택하면 문제가 시작됩니다!";
-        }
+        function startChallenge() { setMode('challenge'); isChallengeActive = true; feedbackEl.innerHTML = "행을 선택하면 문제가 시작됩니다!"; }
 
         function nextChallenge() {
-            feedbackEl.textContent = "🔊 잘 듣고 맞춰보세요!";
-            feedbackEl.className = '';
-
-            let pool = [];
-            if (currentFilterIndex === null) pool = hiraganaData.flat().filter(c => c !== '');
-            else pool = hiraganaData[currentFilterIndex].filter(c => c !== '');
-
-            currentChallengeChar = Utils.randomItem(pool);
-            setTimeout(() => Utils.speak(currentChallengeChar), 500);
+            feedbackEl.textContent = "🔊 잘 듣고 맞춰보세요!"; feedbackEl.className = '';
+            let pool = (currentFilterIndex === null) ? hiraganaData.flat().filter(c => c) : hiraganaData[currentFilterIndex].filter(c => c);
+            currentChallengeChar = Utils.randomItem(pool); setTimeout(() => Utils.speak(currentChallengeChar), 500);
         }
 
         function checkAnswer(char, btn) {
             if (char === currentChallengeChar) {
-                feedbackEl.textContent = "정답! ✨";
-                feedbackEl.className = "correct";
-                Utils.playSound('win');
-                isChallengeActive = false;
-                btn.classList.add('active');
+                feedbackEl.textContent = "정답! ✨"; feedbackEl.className = "correct"; Utils.playSound('win');
+                isChallengeActive = false; btn.classList.add('active');
                 setTimeout(() => {
                     btn.classList.remove('active');
-                    if (challengeRowSelected) {
-                        isChallengeActive = true;
-                        nextChallenge();
-                    } else {
-                        startChallenge();
-                    }
+                    if (challengeRowSelected) { isChallengeActive = true; nextChallenge(); }
+                    else startChallenge();
                 }, 1500);
             } else {
-                feedbackEl.textContent = "땡! 다시 들어보세요";
-                feedbackEl.className = "wrong";
-                Utils.playSound('error');
-                Utils.speak(currentChallengeChar);
+                feedbackEl.textContent = "땡! 다시 들어보세요"; feedbackEl.className = "wrong";
+                Utils.playSound('error'); Utils.speak(currentChallengeChar);
             }
         }
-
         window.onload = init;
     </script>
 </body>
