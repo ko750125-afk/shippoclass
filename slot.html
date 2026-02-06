@@ -641,6 +641,16 @@
 
     <!-- INLINED JS LOGIC ONLY - NO EXTERNAL SCRIPTS -->
     <script>
+        // Pre-load voices for SpeechSynthesis
+        let jaVoice = null;
+        function loadVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            jaVoice = voices.find(v => v.lang.includes('ja')) || null;
+        }
+        if (window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
         // --- Utils ---
         const Utils = {
             speak: (text) => {
@@ -654,13 +664,17 @@
                 const oDan = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
                 const uDan = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
 
-                if (oDan.includes(text)) {
-                    // O-dan: Tuning
+                const oDanFixed = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'ど', 'ぼ', 'ぽ'];
+                const uDanFixed = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
+
+                const oDanFinal = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
+                const uDanFinal = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
+
+                if (oDanFinal.includes(text)) {
                     speechText = text + 'ーー';
                     rate = 0.5;
                     pitch = 1.3;
-                } else if (uDan.includes(text)) {
-                    // U-dan: Tuning
+                } else if (uDanFinal.includes(text)) {
                     speechText = text + 'ーー';
                     rate = 0.5;
                     pitch = 1.2;
@@ -669,9 +683,12 @@
                 }
 
                 const utterance = new SpeechSynthesisUtterance(speechText);
+                if (!jaVoice) loadVoices();
+                if (jaVoice) utterance.voice = jaVoice;
                 utterance.lang = 'ja-JP';
                 utterance.rate = rate;
                 utterance.pitch = pitch;
+                utterance.volume = 1.0;
                 window.speechSynthesis.speak(utterance);
             },
             // Web Audio API Sound

@@ -295,16 +295,17 @@
     <script>
         function enterSite() {
             document.getElementById('youtube-gate').style.display = 'none';
-            localStorage.setItem('gate_passed', Date.now());
+            // Use sessionStorage to require a fresh visit every time they open the site in a new tab/window
+            sessionStorage.setItem('gate_passed_session', 'true');
         }
 
         window.onload = function () {
+            // Check if referring site is YouTube
             const isFromYoutube = document.referrer.includes('youtube.com');
-            const lastPassed = localStorage.getItem('gate_passed');
-            const oneHour = 60 * 60 * 1000;
+            const hasPassedThisSession = sessionStorage.getItem('gate_passed_session');
 
-            // If not from youtube AND haven't passed in last hour
-            if (!isFromYoutube && (!lastPassed || (Date.now() - lastPassed > oneHour))) {
+            // If not from youtube AND haven't passed in this session, show gate
+            if (!isFromYoutube && !hasPassedThisSession) {
                 document.getElementById('youtube-gate').style.display = 'flex';
             }
         }

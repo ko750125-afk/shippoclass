@@ -419,12 +419,16 @@
 
     <!-- INLINED JS ONLY - NO EXTERNAL SCRIPTS -->
     <script>
-        // Wake up speech engine for Mobile
+        // Pre-load voices for SpeechSynthesis
+        let jaVoice = null;
+        function loadVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            jaVoice = voices.find(v => v.lang.includes('ja')) || null;
+            console.log("Voices loaded:", jaVoice ? jaVoice.name : "None");
+        }
         if (window.speechSynthesis) {
-            window.speechSynthesis.getVoices();
-            if (window.speechSynthesis.onvoiceschanged !== undefined) {
-                window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-            }
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
         }
 
         // Utils
@@ -433,9 +437,6 @@
                 if (!window.speechSynthesis) return;
                 window.speechSynthesis.cancel();
                 resumeAudio();
-
-                const voices = window.speechSynthesis.getVoices();
-                const jaVoice = voices.find(v => v.lang.includes('ja')) || null;
 
                 let speechText = text;
                 let rate = 0.8;
@@ -457,15 +458,17 @@
                 }
 
                 const utterance = new SpeechSynthesisUtterance(speechText);
-                utterance.lang = jaVoice ? jaVoice.lang : 'ja-JP';
+
+                // Use cached jaVoice or fallback
+                if (!jaVoice) loadVoices(); // Final try
                 if (jaVoice) utterance.voice = jaVoice;
+
+                utterance.lang = 'ja-JP';
                 utterance.rate = rate;
                 utterance.pitch = pitch;
                 utterance.volume = 1.0;
 
-                setTimeout(() => {
-                    window.speechSynthesis.speak(utterance);
-                }, 100);
+                window.speechSynthesis.speak(utterance);
             },
             // Web Audio API Sound
             playSound: (type) => {
@@ -593,6 +596,12 @@
                 bar.style.display = 'block';
                 bar.onclick = () => {
                     resumeAudio();
+                    // iOS Unlock: Speak a silent utterance immediately inside the click handler
+                    if (window.speechSynthesis) {
+                        const silent = new SpeechSynthesisUtterance("");
+                        silent.volume = 0;
+                        window.speechSynthesis.speak(silent);
+                    }
                     Utils.speak("こんにちは"); // Warm up
                     bar.style.display = 'none';
                 };
