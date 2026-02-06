@@ -309,6 +309,27 @@
         </div>
     </div>
     <script>
+        // --- Debug Manager ---
+        const DebugManager = {
+            el: null, content: null,
+            init: function () {
+                this.el = document.getElementById('debug-console');
+                this.content = document.getElementById('debug-content');
+                if (this.el) this.el.style.display = 'block';
+                if (this.el) this.el.ondblclick = () => { this.content.innerHTML = ''; };
+                this.log("Debug Init");
+            },
+            log: function (msg, type = 'info') {
+                if (!this.content) return;
+                const div = document.createElement('div');
+                div.className = 'debug-line ' + (type === 'error' ? 'debug-error' : type === 'success' ? 'debug-success' : '');
+                div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+                this.content.prepend(div);
+                console.log(`[Debug] ${msg}`);
+            }
+        };
+
+        // --- Audio Control ---
         let jaVoice = null;
         let hiraganaAudioCtx = null;
 
