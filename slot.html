@@ -222,10 +222,11 @@
 
         .container {
             width: 100%;
-            max-width: 1200px;
-            padding: 2rem;
+            max-width: 600px;
+            /* Constrain for mobile balance */
+            padding: 1rem 0;
             box-sizing: border-box;
-            margin-top: 20px;
+            margin: 0 auto;
         }
 
         .header-title {
@@ -381,66 +382,7 @@
             text-shadow: 0 0 10px var(--color-neon-red);
         }
 
-        .character-area {
-            position: absolute;
-            top: -120px;
-            right: -10px;
-            width: 180px;
-            height: 180px;
-            background:
-                radial-gradient(circle at 50% 100%, rgba(0, 212, 255, 0.3), transparent 70%),
-                radial-gradient(circle, #111, #000);
-            border-radius: 50%;
-            border: 4px solid var(--color-neon-blue);
-            box-shadow:
-                0 0 40px rgba(0, 212, 255, 0.4),
-                inset 0 0 30px rgba(0, 212, 255, 0.2);
-            overflow: hidden;
-            /* Ensure image stays inside the circle */
-            z-index: 10;
-            animation: float 4s ease-in-out infinite;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0) scale(1) rotate(3deg);
-            }
-
-            50% {
-                transform: translateY(-20px) scale(1.05) rotate(-3deg);
-            }
-        }
-
-        .character-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            pointer-events: none;
-            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
-            z-index: 11;
-        }
-
-        .shippo-label {
-            position: absolute;
-            bottom: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(90deg, #00d4ff, #0088ff);
-            color: black;
-            padding: 5px 18px;
-            border-radius: 20px;
-            font-size: 1rem;
-            font-weight: 900;
-            box-shadow: 0 0 15px var(--color-neon-blue);
-            white-space: nowrap;
-            letter-spacing: 1px;
-            border: 2px solid white;
-        }
+        /* Shippo Character removed from Slot Page as requested */
 
         .character-area::after {
             content: '😸';
@@ -534,7 +476,7 @@
 
             .reel-window,
             .reel-item {
-                height: 120px;
+                height: 120px !important;
             }
 
             .reel-item .kanji {
@@ -620,10 +562,7 @@
         <div class="slot-machine" id="machine-frame">
 
 
-            <div class="character-area">
-                <img id="char-face" src="assets/shippo_v5.png" class="character-img" alt="Shippo">
-                <div class="shippo-label">SHIPPO</div>
-            </div>
+            <!-- Shippo Character removed from here -->
 
 
 

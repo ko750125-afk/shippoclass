@@ -175,13 +175,19 @@
         }
 
         #feedback-display {
-            font-size: 4rem;
+            font-size: 1.2rem;
+            /* Even smaller for mobile */
             font-weight: bold;
-            height: 100px;
+            min-height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-shadow: 0 0 20px white;
+            text-align: center;
+            padding: 10px;
+            pointer-events: none;
+            /* Crucial: won't block buttons underneath */
+            z-index: 5;
+            position: relative;
         }
 
         .correct {
@@ -337,6 +343,10 @@
 <body>
 
     <div class="container">
+        <div id="sound-init-bar"
+            style="display:none; background: var(--color-gold); color: black; text-align: center; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 0 15px var(--color-gold);">
+            🔊 클릭해서 소리를 켜주세요! (Sound Start)
+        </div>
         <header style="text-align: center; margin-bottom: 30px;">
             <a href="index.html" class="btn-nav" style="margin-bottom: 15px;">← 로비로</a>
             <h1 class="header-title neon-text-blue" style="margin-bottom: 10px;">HIRAGANA <span
@@ -516,6 +526,20 @@
         };
 
         function init() {
+            // Check if mobile and show sound-init-bar
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                const bar = document.getElementById('sound-init-bar');
+                if (bar) {
+                    bar.style.display = 'block';
+                    bar.onclick = () => {
+                        resumeAudio();
+                        Utils.speak("こんにちは"); // Test speak
+                        bar.style.display = 'none';
+                    };
+                }
+            }
+
             updateInstructions();
             renderSelector();
             renderGrid(null); // Show all by default
@@ -532,10 +556,6 @@
                 resumeAudio();
                 setMode('final');
             });
-
-            // Resume audio context on first body click
-            document.body.addEventListener('touchstart', resumeAudio, { once: true });
-            document.body.addEventListener('click', resumeAudio, { once: true });
         }
 
         function resumeAudio() {
@@ -682,6 +702,9 @@
             if (currentMode === 'final') {
                 effectiveColumnIdx = null;
             }
+
+            // Resume audio just in case
+            resumeAudio();
 
             currentFilterIndex = columnIdx; // Update state
 
@@ -1023,8 +1046,7 @@
         function startChallenge() {
             setMode('challenge');
             isChallengeActive = true;
-            // Guide text
-            feedbackEl.textContent = "행(あ, か...)을 선택하면 문제가 시작됩니다!";
+            feedbackEl.innerHTML = "행(あ, か...)을 선택하면<br>문제가 시작됩니다!";
         }
 
         function nextChallenge() {
