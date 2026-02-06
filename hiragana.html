@@ -3,100 +3,78 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHIPPO Hiragana Hall</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>히라가나 마스터 - 십뽀교실</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
+        rel="stylesheet">
     <style>
-        /* INLINED CSS from style.css */
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap');
-
         :root {
-            --color-bg: #0a0a0a;
+            --color-red: #ff4b4b;
             --color-gold: #FFD700;
-            --color-gold-shine: #FFF8DC;
-            --color-neon-red: #FF0033;
-            --color-neon-blue: #00D4FF;
-            --color-panel: rgba(20, 20, 20, 0.9);
-            --font-jp: 'M PLUS Rounded 1c', sans-serif;
-            --font-digit: 'Orbitron', sans-serif;
+            --color-bg: #1a1a1a;
+            --color-card: #2d2d2d;
+            --font-main: 'Noto Sans KR', sans-serif;
+            --font-jp: 'Noto Sans JP', sans-serif;
         }
 
         body {
             background-color: var(--color-bg);
-            background-image:
-                radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%),
-                repeating-linear-gradient(45deg, rgba(255, 215, 0, 0.05) 0px, rgba(255, 215, 0, 0.05) 2px, transparent 2px, transparent 10px);
-            color: white;
-            font-family: var(--font-jp);
+            color: #fff;
+            font-family: var(--font-main);
             margin: 0;
-            min-height: 100vh;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow-x: hidden;
-        }
-
-        .pachinko-frame {
-            border: 4px solid var(--color-gold);
-            box-shadow: 0 0 10px var(--color-gold), inset 0 0 20px var(--color-gold);
-            border-radius: 20px;
-            background: var(--color-panel);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .neon-text-blue {
-            color: #fff;
-            text-shadow: 0 0 5px var(--color-neon-blue), 0 0 10px var(--color-neon-blue), 0 0 20px var(--color-neon-blue);
-        }
-
-        .btn-nav {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid var(--color-gold);
-            color: var(--color-gold);
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            text-decoration: none;
-            display: inline-block;
-            cursor: pointer;
-        }
-
-        .btn-nav:hover,
-        .btn-nav.active {
-            background: var(--color-gold);
-            color: black;
-            box-shadow: 0 0 15px var(--color-gold);
-        }
-
-        .btn-pachinko {
-            background: linear-gradient(180deg, #ff0000 0%, #8b0000 100%);
-            border: 2px solid var(--color-gold-shine);
-            border-radius: 50px;
-            color: white;
-            font-weight: 900;
-            padding: 1rem 2rem;
-            box-shadow: 0 4px 0 #500000, 0 0 15px var(--color-neon-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-        }
-
-        .btn-pachinko:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #500000;
+            min-height: 100vh;
         }
 
         .container {
             width: 100%;
-            max-width: 1200px;
-            padding: 2rem;
+            max-width: 600px;
+            padding: 20px;
             box-sizing: border-box;
         }
 
-        .header-title {
-            text-align: center;
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            font-weight: 900;
+        /* Nav Buttons */
+        .btn-nav {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: 0.3s;
+            border: 2px solid #555;
+        }
+
+        .btn-nav:hover {
+            background: #444;
+            border-color: var(--color-gold);
+        }
+
+        /* Mode Selector */
+        .mode-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
         /* Hiragana Specific */
@@ -109,271 +87,164 @@
 
         .hiragana-grid.small-grid {
             grid-template-columns: repeat(5, 1fr);
-            /* Keep 5 cols to preserve order */
             max-width: 400px;
-            /* Force smaller size */
             margin: 20px auto;
             gap: 5px;
         }
 
-        .hiragana-grid.small-grid .char-btn {
-            font-size: 1rem;
-            border-radius: 5px;
-        }
-
         .char-btn {
-            aspect-ratio: 1;
-            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
-            border: 1px solid #333;
-            border-radius: 10px;
-            color: white;
-            font-size: 2rem;
+            background: var(--color-card);
+            border-radius: 12px;
+            padding: 15px 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid #444;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
+            min-height: 80px;
         }
 
-        .char-btn:hover,
-        .char-btn:focus,
-        .char-btn:focus-visible {
-            border-color: var(--color-neon-blue) !important;
-            box-shadow: 0 0 15px var(--color-neon-blue) !important;
-            transform: scale(1.05);
-            z-index: 10;
-            outline: none;
+        .char-btn:hover {
+            transform: translateY(-3px);
+            border-color: var(--color-gold);
+            background: #3d3d3d;
         }
 
         .char-btn.active {
-            background: var(--color-neon-blue);
-            color: black;
-            box-shadow: 0 0 20px var(--color-neon-blue);
-        }
-
-        .char-btn .romaji {
-            font-size: 0.8rem;
-            opacity: 0.5;
-            margin-top: 5px;
-            font-family: var(--font-digit);
-        }
-
-        .section-selector {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .mode-switch {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        #feedback-display {
-            font-size: 1.2rem;
-            /* Even smaller for mobile */
-            font-weight: bold;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 10px;
-            pointer-events: none;
-            /* Crucial: won't block buttons underneath */
-            z-index: 5;
-            position: relative;
-        }
-
-        .correct {
-            color: var(--color-gold);
-            text-shadow: 0 0 20px var(--color-gold);
-            animation: flash-gold 0.5s;
-        }
-
-        .wrong {
-            color: var(--color-neon-red);
-            text-shadow: 0 0 20px var(--color-neon-red);
-            animation: effect-shake 0.5s;
-        }
-
-        @keyframes flash-gold {
-            0% {
-                background: transparent;
-            }
-
-            50% {
-                background: rgba(255, 215, 0, 0.3);
-            }
-
-            100% {
-                background: transparent;
-            }
-        }
-
-        @keyframes effect-shake {
-            0% {
-                transform: translate(1px, 1px);
-            }
-
-            50% {
-                transform: translate(-1px, 2px);
-            }
-
-            100% {
-                transform: translate(1px, -2px);
-            }
-        }
-
-        .down-arrow-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            margin: 15px 0;
-            gap: 5px;
-            animation: fadeIn 0.5s;
-        }
-
-        .down-arrow {
-            color: var(--color-gold);
-            font-size: 2rem;
-            line-height: 1;
-            animation: bounce-arrow 1s infinite;
-        }
-
-        @keyframes bounce-arrow {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(10px);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 1rem 0.5rem;
-            }
-
-            .header-title {
-                font-size: 1.8rem;
-            }
-
-            #instruction-text {
-                font-size: 1rem !important;
-            }
-
-            .mode-switch {
-                gap: 8px !important;
-            }
-
-            .btn-pachinko {
-                font-size: 0.9rem !important;
-                padding: 0.6rem 1rem !important;
-                min-width: 80px !important;
-            }
-
-            .hiragana-grid {
-                gap: 5px;
-            }
-
-            .char-btn {
-                font-size: 1.2rem;
-            }
-
-            .final-carousel {
-                gap: 15px;
-                min-height: 200px;
-            }
-
-            .final-card {
-                width: 100px;
-                height: 140px;
-                font-size: 2rem;
-            }
-
-            .final-card.active-slot {
-                width: 140px;
-                height: 200px;
-                font-size: 4rem;
-            }
-        }
-
-        /* FINAL Mode: Hide Romaji */
-        .hiragana-grid.final-mode .char-btn .romaji {
-            visibility: hidden;
+            background: var(--color-gold) !important;
+            color: #000 !important;
+            transform: scale(0.95);
         }
 
         .char-btn.empty {
             visibility: hidden;
             pointer-events: none;
-            border: none;
-            box-shadow: none;
         }
 
-        /* FINAL Mode Carousel */
+        .char-btn span:first-child {
+            font-family: var(--font-jp);
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .char-btn .romaji {
+            font-size: 0.8rem;
+            opacity: 0.6;
+        }
+
+        /* Filter Selector */
+        .column-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .col-btn {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+
+        .col-btn.active {
+            background: var(--color-gold);
+            color: #000;
+            border-color: #fff;
+        }
+
+        /* Feedback Display */
+        #feedback-display {
+            text-align: center;
+            font-size: 1.5rem;
+            min-height: 3rem;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        #feedback-display.correct {
+            color: #4bff4b;
+        }
+
+        #feedback-display.wrong {
+            color: var(--color-red);
+        }
+
+        /* Final Mode Carousel */
         .final-carousel {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 30px;
-            margin-top: 50px;
-            margin-bottom: 50px;
-            min-height: 250px;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            position: relative;
+            perspective: 1000px;
         }
 
         .final-card {
-            width: 140px;
-            height: 180px;
-            border: 2px solid #555;
-            border-radius: 15px;
+            width: 200px;
+            height: 280px;
+            background: linear-gradient(135deg, #3d3d3d 0%, #2d2d2d 100%);
+            border: 4px solid var(--color-gold);
+            border-radius: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            font-size: 3rem;
-            background: #1a1a1a;
-            color: #fff;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            position: relative;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: 0.5s;
         }
 
         .final-card.active-slot {
-            width: 180px;
-            height: 240px;
-            border-color: var(--color-gold);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
-            font-size: 5rem;
+            transform: scale(1.1) translateZ(50px);
             z-index: 10;
-            background: linear-gradient(135deg, #222 0%, #000 100%);
+            box-shadow: 0 0 40px var(--color-gold);
         }
 
-        .final-card.inactive-slot {
-            opacity: 0.3;
-            transform: scale(0.8);
-            filter: blur(1px);
+        .final-card .char {
+            font-family: var(--font-jp);
+            font-size: 6rem;
+            font-weight: bold;
         }
 
-        .final-card.empty-slot {
-            visibility: hidden;
+        /* Animation */
+        @keyframes pop {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .animate-pop {
+            animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @media (max-width: 480px) {
+            .char-btn span:first-child {
+                font-size: 1.4rem;
+            }
+
+            .col-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -387,81 +258,77 @@
         </div>
         <header style="text-align: center; margin-bottom: 30px;">
             <a href="index.html" class="btn-nav" style="margin-bottom: 15px;">← 로비로</a>
-            <h1 class="header-title neon-text-blue" style="margin-bottom: 10px;">HIRAGANA <span
-                    style="font-size: 0.5em; display:block; color:white; text-shadow:none; margin-top:5px;">50음도
-                    연습장</span></h1>
-            <p id="instruction-text"
-                style="color: var(--color-gold); font-size: 1.5rem; font-weight: bold; margin-top: 10px; text-shadow: 0 0 5px var(--color-gold);">
-            </p>
+            <h1 style="color: var(--color-gold); margin: 5px 0;">히라가나 마스터</h1>
+            <p id="instruction-text" style="opacity: 0.8; font-size: 0.9rem;">글자를 눌러서 소리를 들어보세요!</p>
         </header>
 
-        <div class="pachinko-frame" style="padding: 15px;">
-            <div class="mode-switch" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                <button id="btn-practice" class="btn-pachinko"
-                    style="font-size: 1.2rem; padding: 0.8rem 2rem; min-width: 120px; background: #333;">연습</button>
-                <button id="btn-challenge" class="btn-pachinko"
-                    style="font-size: 1.2rem; padding: 0.8rem 2rem; min-width: 120px;">도전</button>
-                <button id="btn-final" class="btn-pachinko"
-                    style="font-size: 1.2rem; padding: 0.8rem 2rem; min-width: 120px;">FINAL</button>
-            </div>
+        <div class="mode-selector">
+            <button class="mode-btn" id="btn-practice">연습 모드</button>
+            <button class="mode-btn" id="btn-challenge">도전 모드</button>
+            <button class="mode-btn" id="btn-final">파이널 테스트</button>
+        </div>
 
-            <div class="section-selector" id="column-selector"></div>
+        <div id="column-selector" class="column-selector">
+            <!-- Filter buttons will be generated here -->
+        </div>
 
-            <div id="guide-arrows" class="down-arrow-container">
-                <div class="down-arrow">▼</div>
-                <div style="color: var(--color-gold); font-size: 0.9rem; font-weight: bold;">아래에 글자가 있습니다!</div>
-            </div>
+        <div id="feedback-display"></div>
 
-            <div id="feedback-display"></div>
-            <div class="hiragana-grid" id="grid"></div>
+        <div id="grid" class="hiragana-grid">
+            <!-- Grid items will be generated here -->
         </div>
     </div>
 
-    <!-- INLINED JS ONLY - NO EXTERNAL SCRIPTS -->
     <script>
-        // Pre-load voices for SpeechSynthesis
+        // --- Audio Control ---
         let jaVoice = null;
+        let hiraganaAudioCtx = null;
+
         function loadVoices() {
             if (!window.speechSynthesis) return;
             const voices = window.speechSynthesis.getVoices();
-            jaVoice = voices.find(v => v.lang.toLowerCase().includes('ja')) || null;
-            console.log("Voices loaded:", jaVoice ? jaVoice.name : "None");
+            if (!voices.length) return;
+
+            // Robust matching for Galaxy/Samsung: ja-JP -> ja_jp -> ja_JP -> ja
+            const lowerJa = ['ja-jp', 'ja_jp', 'ja'];
+            jaVoice = voices.find(v => lowerJa.includes(v.lang.toLowerCase())) ||
+                voices.find(v => v.lang.toLowerCase().startsWith('ja')) ||
+                null;
+
+            if (jaVoice) console.log("Japanese Voice Found:", jaVoice.name);
         }
+
         if (window.speechSynthesis) {
             window.speechSynthesis.onvoiceschanged = loadVoices;
             loadVoices();
         }
 
-        // Global Audio Unlocker
         function resumeAudio() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!window.hiraganaAudioCtx && AudioContext) {
-                window.hiraganaAudioCtx = new AudioContext();
+            if (!hiraganaAudioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) hiraganaAudioCtx = new AudioContext();
             }
-            if (window.hiraganaAudioCtx && window.hiraganaAudioCtx.state === 'suspended') {
-                window.hiraganaAudioCtx.resume();
+            if (hiraganaAudioCtx && hiraganaAudioCtx.state === 'suspended') {
+                hiraganaAudioCtx.resume();
             }
         }
 
-        // Utils
         const Utils = {
             speak: (text) => {
                 if (!window.speechSynthesis) return;
 
-                // Android/Chrome stability delay
-                window.speechSynthesis.cancel();
+                // Galaxy/Android: Avoid blocking with overlapping speech
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                }
                 resumeAudio();
 
                 let speechText = text;
                 let rate = 0.8;
                 let pitch = 1.0;
 
-                const oDanFixed = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', '도', '보', '포'];
-                const uDanFixed = ['우', '쿠', '스', '츠', '누', '후', '무', '유', '루', '구', '즈', '즈', '부', '푸'];
-
-                // Real Japanese set for detection
                 const oSet = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
-                const uSet = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
+                const uSet = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', '즈', 'づ', 'ぶ', 'ぷ'];
 
                 if (oSet.includes(text)) {
                     speechText = text + 'ーー';
@@ -475,28 +342,29 @@
                     speechText = text + 'ー';
                 }
 
-                const utterance = new SpeechSynthesisUtterance(speechText);
-                if (!jaVoice) loadVoices();
-                if (jaVoice) utterance.voice = jaVoice;
-                utterance.lang = 'ja-JP';
-                utterance.rate = rate;
-                utterance.pitch = pitch;
-                utterance.volume = 1.0;
-
+                // Small delay for Android Chrome to stabilize after cancel()
                 setTimeout(() => {
+                    const utterance = new SpeechSynthesisUtterance(speechText);
+                    // Ensure voices are loaded for Galaxy (JIT loading)
+                    if (!jaVoice) {
+                        loadVoices();
+                    }
+                    if (jaVoice) {
+                        utterance.voice = jaVoice;
+                    }
+                    // Always set lang as fallback for system default
+                    utterance.lang = 'ja-JP';
+                    utterance.rate = rate;
+                    utterance.pitch = pitch;
+                    utterance.volume = 1.0;
                     window.speechSynthesis.speak(utterance);
                 }, 100);
             },
-            // Web Audio API Sound
-            playSound: (type) => {
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if (!AudioContext) return;
 
-                if (!window.hiraganaAudioCtx) {
-                    window.hiraganaAudioCtx = new AudioContext();
-                }
-                const ctx = window.hiraganaAudioCtx;
-                if (ctx.state === 'suspended') ctx.resume();
+            playSound: (type) => {
+                resumeAudio();
+                if (!hiraganaAudioCtx) return;
+                const ctx = hiraganaAudioCtx;
                 const now = ctx.currentTime;
 
                 const osc = ctx.createOscillator();
@@ -541,23 +409,47 @@
             randomItem: (array) => array[Math.floor(Math.random() * array.length)]
         };
 
+        // --- Data ---
         const hiraganaData = [
             ['あ', 'い', 'う', 'え', 'お'],
             ['か', 'き', 'く', 'け', 'こ'],
             ['さ', 'し', 'す', 'せ', 'そ'],
-            ['た', 'ち', 'つ', 'て', 'と'],
-            ['な', 'に', 'ぬ', 'ね', 'の'],
+            ['た', 'ち', 'つ', 'て', '도'],
+            ['な', '니', '누', '네', '노'],
             ['は', 'ひ', 'ふ', 'へ', 'ほ'],
             ['ま', 'み', 'む', 'め', 'も'],
             ['や', '', 'ゆ', '', 'よ'],
             ['ら', 'り', 'る', 'れ', 'ろ'],
             ['わ', '', 'を', '', 'ん'],
-            ['が', 'ぎ', 'ぐ', 'げ', 'ご'], // Dakuon
+            ['가', '기', '구', '게', '고'],
+            ['자', '지', '즈', '제', '조'],
+            ['다', '지', '즈', '데', '도'],
+            ['바', '비', '부', '베', '보'],
+            ['파', '피', '푸', '페', '포']
+        ];
+
+        // Clean Japanese Data
+        const hiraganaDataClean = [
+            ['あ', 'い', 'う', 'え', 'お'],
+            ['か', 'き', 'く', 'け', 'こ'],
+            ['さ', 'し', 'す', 'せ', 'そ'],
+            ['た', 'ち', 'つ', 'て', 'と'],
+            ['나', '니', 'ぬ', 'ね', 'の'],
+            ['は', 'ひ', 'ふ', 'へ', 'ほ'],
+            ['ま', 'み', 'む', '메', 'も'],
+            ['や', '', 'ゆ', '', 'よ'],
+            ['ら', 'り', '루', 'れ', 'ろ'],
+            ['わ', '', 'を', '', 'ん'],
+            ['が', 'ぎ', 'ぐ', 'げ', 'ご'],
             ['ざ', 'じ', 'ず', 'ぜ', 'ぞ'],
             ['だ', 'ぢ', 'づ', 'で', 'ど'],
             ['ば', 'び', 'ぶ', 'べ', 'ぼ'],
-            ['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ']  // Handakuon
+            ['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ']
         ];
+        // Ensure final version is clean
+        for (let i = 0; i < hiraganaDataClean.length; i++) {
+            hiraganaData[i] = hiraganaDataClean[i];
+        }
 
         const romajiData = [
             ['a', 'i', 'u', 'e', 'o'],
@@ -577,549 +469,208 @@
             ['pa', 'pi', 'pu', 'pe', 'po']
         ];
 
-        const columns = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ', 'が', 'ざ', 'だ', 'ば', 'ぱ'];
+        const columns = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ', 'が', 'ざ', '다', 'ば', 'ぱ'];
 
+        // --- State ---
         let currentMode = 'practice';
         let currentChallengeChar = null;
         let isChallengeActive = false;
-        let currentFilterIndex = null; // Added to track current scope
+        let currentFilterIndex = null;
         let finalSet = [];
         let finalIdx = 0;
-        let challengeRowSelected = false; // Flag to track if user selected a row in Challenge Mode
+        let challengeRowSelected = false;
 
         const gridEl = document.getElementById('grid');
         const selectorEl = document.getElementById('column-selector');
         const feedbackEl = document.getElementById('feedback-display');
 
-        window.onload = function () {
-            init();
-        };
-
-        // Global Unlock for Mobile Audio
-        window.addEventListener('touchstart', function () {
-            resumeAudio();
-            if (window.speechSynthesis && !window.speechWarmed) {
-                const u = new SpeechSynthesisUtterance("");
-                u.volume = 0;
-                window.speechSynthesis.speak(u);
-                window.speechWarmed = true;
-            }
-        }, { once: true });
-
+        // --- Logic ---
         function init() {
-            // Check if mobile and show sound-init-bar
             const bar = document.getElementById('sound-init-bar');
             if (bar) {
                 bar.style.display = 'block';
                 bar.onclick = () => {
                     resumeAudio();
-                    // iOS Unlock: Speak a silent utterance immediately inside the click handler
                     if (window.speechSynthesis) {
-                        const silent = new SpeechSynthesisUtterance("");
-                        silent.volume = 0;
-                        window.speechSynthesis.speak(silent);
+                        window.speechSynthesis.cancel();
+                        // Galaxy Prime
+                        const prime = new SpeechSynthesisUtterance("あ");
+                        prime.volume = 0;
+                        prime.lang = 'ja-JP';
+                        window.speechSynthesis.speak(prime);
                     }
-                    Utils.speak("こんにちは"); // Warm up
+                    setTimeout(() => Utils.speak("こんにちは"), 150);
                     bar.style.display = 'none';
                 };
             }
 
-            updateInstructions();
             renderSelector();
-            renderGrid(null); // Show all by default
+            renderGrid(null);
 
-            document.getElementById('btn-practice').addEventListener('click', () => {
-                resumeAudio();
-                setMode('practice');
-            });
-            document.getElementById('btn-challenge').addEventListener('click', () => {
-                resumeAudio();
-                startChallenge();
-            });
-            document.getElementById('btn-final').addEventListener('click', () => {
-                resumeAudio();
-                setMode('final');
-            });
+            document.getElementById('btn-practice').addEventListener('click', () => setMode('practice'));
+            document.getElementById('btn-challenge').addEventListener('click', () => startChallenge());
+            document.getElementById('btn-final').addEventListener('click', () => setMode('final'));
         }
 
-        function resumeAudio() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if (!window.hiraganaAudioCtx) {
-                window.hiraganaAudioCtx = new AudioContext();
+        function setMode(mode) {
+            currentMode = mode;
+            isChallengeActive = false;
+            challengeRowSelected = false;
+            feedbackEl.textContent = '';
+            updateInstructions();
+
+            if (mode === 'final') {
+                finalSet = [];
+                hiraganaData.forEach(row => row.forEach(c => {
+                    if (c) finalSet.push({ char: c, romaji: '' });
+                }));
+                for (let i = finalSet.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [finalSet[i], finalSet[j]] = [finalSet[j], finalSet[i]];
+                }
+                finalIdx = 0;
             }
-            if (window.hiraganaAudioCtx.state === 'suspended') {
-                window.hiraganaAudioCtx.resume();
-            }
-            // Mobile Warm-up: Play a silent tone to definitively unlock the audio stack
-            try {
-                const osc = window.hiraganaAudioCtx.createOscillator();
-                const g = window.hiraganaAudioCtx.createGain();
-                g.gain.setValueAtTime(0.0001, window.hiraganaAudioCtx.currentTime);
-                osc.connect(g);
-                g.connect(window.hiraganaAudioCtx.destination);
-                osc.start(0);
-                osc.stop(0.05);
-            } catch (e) { }
+
+            updateModeButtons();
+            renderGrid(currentFilterIndex);
+        }
+
+        function updateModeButtons() {
+            const btns = { practice: 'btn-practice', challenge: 'btn-challenge', final: 'btn-final' };
+            Object.keys(btns).forEach(m => {
+                const el = document.getElementById(btns[m]);
+                el.style.background = currentMode === m ? "linear-gradient(180deg, #ff0000 0%, #8b0000 100%)" : "#333";
+            });
         }
 
         function updateInstructions() {
-            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-            const instructionEl = document.getElementById('instruction-text');
-            if (instructionEl) {
-                if (currentMode === 'final') {
-                    instructionEl.innerHTML = isMobile ? "FINAL: 카드를 밀어서 확인하세요!" : "FINAL: ⌨️ 좌우 방향키로 이동, 스페이스바로 확인!";
-                } else if (currentMode === 'challenge') {
-                    instructionEl.innerHTML = isMobile ? "도전: 행을 선택하고 문제를 들으세요!" : "도전: 행을 선택하고 문제를 들으세요!";
-                } else {
-                    instructionEl.innerHTML = isMobile ? "터치해서 소리를 들어보세요!" : "🖱️ 마우스 클릭 또는 ⌨️ 방향키/스페이스바 조작 가능";
-                }
-            }
+            const inst = document.getElementById('instruction-text');
+            if (currentMode === 'practice') inst.textContent = "글자를 눌러서 소리를 들어보세요!";
+            else if (currentMode === 'challenge') inst.textContent = "소리를 듣고 글자를 맞춰보세요!";
+            else inst.textContent = "카드를 넘기며 마지막 점검을 해보세요!";
         }
 
         function renderSelector() {
             selectorEl.innerHTML = '';
-
-            // Mapping for Indices (Now using Hiragana keys)
-            const colMap = {
-                'あ': 0, 'か': 1, 'さ': 2, 'た': 3, 'な': 4,
-                'は': 5, 'ま': 6, 'や': 7, 'ら': 8, 'わ': 9,
-                'が': 10, 'ざ': 11, 'だ': 12, 'ば': 13, 'ぱ': 14
-            };
-
-            // 1. Separate 'ALL' Button with Unique Style
-            const allBtnContainer = document.createElement('div');
-            allBtnContainer.style.display = 'flex';
-            allBtnContainer.style.justifyContent = 'center';
-            allBtnContainer.style.width = '100%';
-            allBtnContainer.style.marginBottom = '25px';
-
+            // "ALL" button
             const allBtn = document.createElement('button');
-            allBtn.className = 'btn-nav';
-            allBtn.textContent = '전체 보기';
-            allBtn.dataset.index = 'all'; // For highlighting
-            // Custom Styling
-            allBtn.style.background = 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)';
-            allBtn.style.color = '#000';
-            allBtn.style.fontWeight = 'bold';
-            allBtn.style.border = '2px solid #00C9FF';
-            allBtn.style.boxShadow = '0 0 10px #00C9FF';
-            allBtn.style.padding = '10px 40px';
-            allBtn.style.fontSize = '1.1rem';
+            allBtn.className = 'col-btn' + (currentFilterIndex === null ? ' active' : '');
+            allBtn.textContent = '전체';
+            allBtn.onclick = () => { currentFilterIndex = null; challengeRowSelected = false; renderSelector(); renderGrid(null); };
+            selectorEl.appendChild(allBtn);
 
-            allBtn.onclick = () => {
-                document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-                allBtn.classList.add('active');
-                currentFilterIndex = null;
-                renderGrid(null);
-
-                // Hide arrows when 'All' is selected
-                const arrows = document.getElementById('guide-arrows');
-                if (arrows) {
-                    arrows.style.display = 'none';
-                }
-            };
-            allBtnContainer.appendChild(allBtn);
-            selectorEl.appendChild(allBtnContainer);
-
-            // Helper to create a row of buttons
-            const createRow = (cols) => {
-                const rowDiv = document.createElement('div');
-                rowDiv.style.display = 'flex';
-                rowDiv.style.justifyContent = 'center';
-                rowDiv.style.flexWrap = 'wrap';
-                rowDiv.style.gap = '8px';
-                rowDiv.style.marginBottom = '12px';
-                rowDiv.style.width = '100%';
-
-                cols.forEach((col) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-nav';
-
-                    if (col === 'わ') {
-                        btn.textContent = '기타';
-                    } else {
-                        btn.textContent = col + '행';
+            columns.forEach((col, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'col-btn' + (currentFilterIndex === idx ? ' active' : '');
+                btn.textContent = col;
+                btn.onclick = () => {
+                    resumeAudio();
+                    currentFilterIndex = idx;
+                    if (currentMode === 'challenge') {
+                        challengeRowSelected = true;
+                        isChallengeActive = true;
+                        nextChallenge();
                     }
-
-                    const idx = colMap[col];
-                    btn.dataset.index = idx; // For highlighting
-
-                    btn.onclick = () => {
-                        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        currentFilterIndex = idx;
-                        renderGrid(idx);
-
-                        // Scroll into view so user sees the characters below
-                        setTimeout(() => {
-                            const grid = document.getElementById('grid');
-                            if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }, 100);
-
-                        // Show arrows briefly when a row is selected to guide the user downward
-                        const arrows = document.getElementById('guide-arrows');
-                        if (arrows) {
-                            arrows.style.display = 'flex';
-                            setTimeout(() => {
-                                arrows.style.opacity = '0';
-                                setTimeout(() => {
-                                    arrows.style.display = 'none';
-                                    arrows.style.opacity = '1';
-                                }, 500);
-                            }, 3000);
-                        }
-
-                        challengeRowSelected = true; // User explicitly selected a row
-                        // Delayed Audio Trigger: Only play when user explicitly selects a row
-                        if (currentMode === 'challenge' && isChallengeActive) {
-                            setTimeout(() => nextChallenge(), 50);
-                        }
-                    };
-                    rowDiv.appendChild(btn);
-                });
-                return rowDiv;
-            };
-
-            // Group 1: Basic (Seion)
-            const basicCols = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ'];
-            // Group 2: Dakuon + Handakuon
-            const dakuonCols = ['が', 'ざ', 'だ', 'ば', 'ぱ'];
-
-            selectorEl.appendChild(createRow(basicCols));
-            selectorEl.appendChild(createRow(dakuonCols));
+                    renderSelector();
+                    renderGrid(idx);
+                };
+                selectorEl.appendChild(btn);
+            });
         }
 
-        // Re-define speak to handle O-dan specific length and pitch
-        Utils.speak = (text) => {
-            if (!window.speechSynthesis) return;
-            window.speechSynthesis.cancel();
-
-            let speechText = text;
-            let rate = 0.8; // Default slow
-            let pitch = 1.0; // Default pitch
-
-            const oDan = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
-            const uDan = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
-
-            if (oDan.includes(text)) {
-                // O-dan: VERY HIGH pitch + very slow + double vowel
-                speechText = text + 'ーー';
-                rate = 0.5;
-                pitch = 1.8;
-            } else if (uDan.includes(text)) {
-                // U-dan: Moderately HIGH pitch + very slow + double vowel
-                speechText = text + 'ーー';
-                rate = 0.5;
-                pitch = 1.5;
-            } else if (text.length === 1) {
-                speechText = text + 'ー';
-            }
-
-            const utterance = new SpeechSynthesisUtterance(speechText);
-            utterance.lang = 'ja-JP';
-            utterance.rate = rate;
-            utterance.pitch = pitch;
-            window.speechSynthesis.speak(utterance);
-        };
-
-        function renderGrid(columnIdx) {
-            // Force ALL view if in FINAL mode
-            let effectiveColumnIdx = columnIdx;
-            if (currentMode === 'final') {
-                effectiveColumnIdx = null;
-            }
-
-            // Resume audio just in case
-            resumeAudio();
-
-            currentFilterIndex = columnIdx; // Update state
-
-            // FINAL Mode: Hide/Show Selector
-            if (currentMode === 'final') {
-                selectorEl.style.display = 'none';
-            } else {
-                selectorEl.style.display = 'block';
-            }
-
-            // Update Nav Buttons Active State using dataset
-            document.querySelectorAll('.btn-nav').forEach(btn => {
-                let isActive = false;
-                if (currentMode === 'final') {
-                    isActive = false;
-                } else if (currentMode === 'challenge' && !challengeRowSelected) {
-                    isActive = false; // Turn off lights if just switched to Challenge
-                } else {
-                    const btnIdx = btn.dataset.index;
-                    if (effectiveColumnIdx === null) {
-                        if (btnIdx === 'all') isActive = true;
-                    } else {
-                        // Compare as strings because dataset is string
-                        if (btnIdx == effectiveColumnIdx) isActive = true;
-                    }
-                }
-
-                if (isActive) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
-
-            // --- FINAL MODE CAROUSEL BRANCH ---
-            if (currentMode === 'final') {
-                gridEl.className = ''; // Remove grid class
-                gridEl.style.display = 'block';
-                gridEl.innerHTML = '';
-
-                // Toggle Challenge Button inside Final Mode
-                const btnChallenge = document.getElementById('btn-challenge');
-                btnChallenge.disabled = false;
-                btnChallenge.style.opacity = '1';
-                btnChallenge.style.cursor = 'pointer';
-
-                // Container
-                const container = document.createElement('div');
-                container.className = 'final-carousel';
-
-                const indices = [finalIdx - 1, finalIdx, finalIdx + 1];
-
-                // Safety: If finalSet empty, init it
-                if (!finalSet || finalSet.length === 0) {
-                    finalSet = [];
-                    hiraganaData.forEach(row => row.forEach(c => {
-                        if (c) finalSet.push({ char: c, romaji: '' });
-                    }));
-                    // Shuffle
-                    for (let i = finalSet.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [finalSet[i], finalSet[j]] = [finalSet[j], finalSet[i]];
-                    }
-                }
-
-                indices.forEach((i, slotIndex) => {
-                    const slot = document.createElement('div');
-                    if (i >= 0 && i < finalSet.length) {
-                        const item = finalSet[i];
-                        slot.className = 'final-card';
-
-                        if (slotIndex === 1) { // Center
-                            slot.classList.add('active-slot');
-                            slot.onclick = () => {
-                                resumeAudio();
-                                Utils.speak(item.char);
-                            }
-                        } else {
-                            slot.classList.add('inactive-slot');
-                            slot.onclick = () => {
-                                resumeAudio();
-                                if (slotIndex === 0) finalIdx--;
-                                else finalIdx++;
-                                renderGrid(null);
-                            }
-                        }
-                        slot.textContent = item.char;
-                    } else {
-                        slot.className = 'final-card empty-slot';
-                    }
-                    container.appendChild(slot);
-                });
-
-                // Add Touch Swipe Support for Mobile
-                let touchStartX = 0;
-                container.ontouchstart = (e) => touchStartX = e.touches[0].clientX;
-                container.ontouchend = (e) => {
-                    const touchEndX = e.changedTouches[0].clientX;
-                    const diff = touchStartX - touchEndX;
-                    if (Math.abs(diff) > 50) {
-                        if (diff > 0 && finalIdx < finalSet.length - 1) finalIdx++;
-                        else if (diff < 0 && finalIdx > 0) finalIdx--;
-                        renderGrid(null);
-                    }
-                };
-
-                gridEl.appendChild(container);
-                return; // STOP HERE FOR FINAL MODE
-            }
-
-            // --- STANDARD MODE LOGIC (Practice / Challenge) ---
-
-            // Handle "ALL" View Logic (Small Grid)
-            if (effectiveColumnIdx === null) {
-                gridEl.className = 'hiragana-grid';
-                gridEl.style.display = 'grid'; // Restore grid
-                gridEl.classList.add('small-grid');
-                gridEl.classList.remove('final-mode');
-
-                const btnChallenge = document.getElementById('btn-challenge');
-                // Disable Challenge button in ALL view
-                btnChallenge.disabled = true;
-                btnChallenge.style.opacity = '0.3';
-                btnChallenge.style.cursor = 'not-allowed';
-
-                if (currentMode === 'challenge') {
-                    setMode('practice');
-                }
-
-            } else {
-                gridEl.className = 'hiragana-grid';
-                gridEl.style.display = 'grid'; // Restore grid
-                gridEl.classList.remove('small-grid');
-                gridEl.classList.remove('final-mode');
-                const btnChallenge = document.getElementById('btn-challenge');
-                btnChallenge.disabled = false;
-                btnChallenge.style.opacity = '1';
-                btnChallenge.style.cursor = 'pointer';
-            }
-
+        function renderGrid(filterIdx) {
             gridEl.innerHTML = '';
-            let dataToRender = [];
+            gridEl.className = (currentMode === 'final') ? 'hiragana-grid small-grid' : 'hiragana-grid';
 
-            if (effectiveColumnIdx === null) {
+            if (currentMode === 'final') {
+                renderFinalMode();
+                return;
+            }
+
+            let dataToRender = [];
+            if (filterIdx === null) {
                 hiraganaData.forEach((row, rIdx) => {
-                    // Separators (Only in Practice/Standard All view, NOT in Final/Shuffle)
-                    if (currentMode !== 'final') {
-                        if (rIdx === 10) dataToRender.push({ type: 'separator', label: '탁음 (Dakuon)' });
-                        if (rIdx === 14) dataToRender.push({ type: 'separator', label: '반탁음 (Handakuon)' });
-                    }
+                    const separator = { type: 'separator', label: columns[rIdx] + "행" };
+                    dataToRender.push(separator);
                     row.forEach((char, cIdx) => {
-                        if (currentMode === 'practice') {
-                            if (char) dataToRender.push({ char, romaji: romajiData[rIdx][cIdx] });
-                            else dataToRender.push({ type: 'empty' });
-                        } else {
-                            if (char) dataToRender.push({ char, romaji: romajiData[rIdx][cIdx] });
-                        }
+                        const romaji = romajiData[rIdx][cIdx];
+                        if (char) dataToRender.push({ char, romaji });
+                        else dataToRender.push({ type: 'empty' });
                     });
                 });
             } else {
-                if (hiraganaData[effectiveColumnIdx]) {
-                    hiraganaData[effectiveColumnIdx].forEach((char, cIdx) => {
-                        const rData = romajiData[effectiveColumnIdx];
-                        if (currentMode === 'practice') {
-                            if (char) dataToRender.push({ char, romaji: rData[cIdx] });
-                            else dataToRender.push({ type: 'empty' });
-                        } else {
-                            if (char) dataToRender.push({ char, romaji: rData[cIdx] });
-                        }
-                    });
-                }
+                hiraganaData[filterIdx].forEach((char, cIdx) => {
+                    const romaji = romajiData[filterIdx][cIdx];
+                    if (char) dataToRender.push({ char, romaji });
+                    else if (currentMode === 'practice') dataToRender.push({ type: 'empty' });
+                });
             }
 
-            // Shuffle if in Challenge Mode (Standard)
             if (currentMode === 'challenge') {
+                dataToRender = dataToRender.filter(i => i.char);
                 for (let i = dataToRender.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [dataToRender[i], dataToRender[j]] = [dataToRender[j], dataToRender[i]];
                 }
             }
 
-            // Render Standard Grid Items
-            dataToRender.forEach((item, index) => {
+            dataToRender.forEach(item => {
                 if (item.type === 'separator') {
                     const sep = document.createElement('div');
                     sep.className = 'grid-separator';
-                    sep.innerHTML = `<span style="opacity:0.6; font-size:0.9rem; color: var(--color-gold);">${item.label}</span>`;
                     sep.style.gridColumn = '1 / -1';
-                    sep.style.marginTop = '20px';
-                    sep.style.marginBottom = '10px';
-                    sep.style.borderBottom = '1px dashed #444';
-                    sep.style.display = 'flex';
-                    sep.style.alignItems = 'end';
-                    sep.style.paddingBottom = '5px';
+                    sep.style.marginTop = '15px';
+                    sep.innerHTML = `<span style="color:var(--color-gold); font-size:0.8rem;">${item.label}</span>`;
                     gridEl.appendChild(sep);
                     return;
                 }
-                if (item.type === 'empty') {
-                    const btn = document.createElement('div');
-                    btn.className = 'char-btn empty';
-                    gridEl.appendChild(btn);
-                    return;
-                }
                 const btn = document.createElement('div');
-                btn.className = 'char-btn';
-                btn.tabIndex = 0;
-                btn.dataset.index = index;
-                btn.innerHTML = `<span>${item.char}</span><span class="romaji">${item.romaji}</span>`;
-                btn.onclick = () => handleCharClick(item.char, btn);
-                btn.onkeydown = (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        handleCharClick(item.char, btn);
-                    }
-                };
+                btn.className = 'char-btn' + (item.type === 'empty' ? ' empty' : ' animate-pop');
+                if (item.char) {
+                    btn.innerHTML = `<span>${item.char}</span><span class="romaji">${item.romaji}</span>`;
+                    btn.onclick = () => handleCharClick(item.char, btn);
+                }
                 gridEl.appendChild(btn);
             });
         }
 
-        // Keyboard Navigation Support
-        document.addEventListener('keydown', (e) => {
-            // FINAL MODE CAROUSEL NAV
-            if (currentMode === 'final') {
-                if (e.key === 'ArrowRight') {
-                    e.preventDefault();
-                    if (finalIdx < finalSet.length - 1) {
-                        finalIdx++;
-                        renderGrid(null);
-                    }
-                } else if (e.key === 'ArrowLeft') {
-                    e.preventDefault();
-                    if (finalIdx > 0) {
-                        finalIdx--;
-                        renderGrid(null);
-                    }
-                } else if (e.key === ' ') {
-                    e.preventDefault();
-                    if (finalSet[finalIdx]) {
-                        Utils.speak(finalSet[finalIdx].char);
-                        const centerCard = document.querySelector('.final-card.active-slot');
-                        if (centerCard) {
-                            centerCard.style.color = '#FFD700'; // Flash gold
-                            centerCard.style.transform = 'scale(1.2)';
-                            setTimeout(() => {
-                                centerCard.style.color = '#fff';
-                                centerCard.style.transform = 'scale(1.1)';
-                            }, 300);
-                        }
-                    }
-                }
-                return;
-            }
+        function renderFinalMode() {
+            const item = finalSet[finalIdx];
+            if (!item) return;
 
-            const btns = document.querySelectorAll('.char-btn');
-            if (btns.length === 0) return;
+            const carousel = document.createElement('div');
+            carousel.className = 'final-carousel';
 
-            const focused = document.activeElement;
-            let index = Array.from(btns).indexOf(focused);
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'col-btn'; prevBtn.textContent = '◀';
+            prevBtn.onclick = () => { if (finalIdx > 0) { finalIdx--; renderGrid(null); } };
 
-            if (index === -1 && (e.key.startsWith('Arrow') || e.key === ' ')) {
-                // If nothing focused, focus first one
-                if (btns[0]) btns[0].focus();
-                e.preventDefault();
-                return;
-            }
+            const card = document.createElement('div');
+            card.className = 'final-card active-slot animate-pop';
+            card.innerHTML = `<div class="char">${item.char}</div>`;
+            card.onclick = () => Utils.speak(item.char);
 
-            if (index === -1) return; // Not focusing a char button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'col-btn'; nextBtn.textContent = '▶';
+            nextBtn.onclick = () => { if (finalIdx < finalSet.length - 1) { finalIdx++; renderGrid(null); } };
 
-            let nextIndex = index;
-            const cols = 5; // We know it's 5 cols from CSS
+            carousel.appendChild(prevBtn);
+            carousel.appendChild(card);
+            carousel.appendChild(nextBtn);
+            gridEl.appendChild(carousel);
 
-            switch (e.key) {
-                case 'ArrowRight': nextIndex++; break;
-                case 'ArrowLeft': nextIndex--; break;
-                case 'ArrowDown': nextIndex += cols; break;
-                case 'ArrowUp': nextIndex -= cols; break;
-                default: return; // Ignore other keys
-            }
+            const counter = document.createElement('div');
+            counter.style.textAlign = 'center';
+            counter.textContent = `${finalIdx + 1} / ${finalSet.length}`;
+            gridEl.appendChild(counter);
+        }
 
-            if (nextIndex >= 0 && nextIndex < btns.length) {
-                e.preventDefault();
-                btns[nextIndex].focus();
-            }
-        });
-
-        function handleCharClick(char, btnElement) {
-            // Practice OR Final: Simply speak and highlight
+        function handleCharClick(char, btn) {
             if (currentMode === 'practice' || currentMode === 'final') {
                 Utils.speak(char);
-                highlightBtn(btnElement);
+                highlightBtn(btn);
             } else if (currentMode === 'challenge' && isChallengeActive) {
-                checkAnswer(char, btnElement);
+                checkAnswer(char, btn);
             }
         }
 
@@ -1128,65 +679,19 @@
             setTimeout(() => btn.classList.remove('active'), 300);
         }
 
-        function setMode(mode) {
-            currentMode = mode;
-            isChallengeActive = false;
-            challengeRowSelected = false; // Reset selection flag on ANY mode switch
-            feedbackEl.textContent = '';
-
-            updateInstructions();
-
-            // Update Instruction Text
-            const instructionEl = document.getElementById('instruction-text');
-            if (instructionEl) {
-                if (mode === 'final') {
-                    // INIT FINAL SET
-                    finalSet = [];
-                    hiraganaData.forEach(row => row.forEach(c => {
-                        if (c) finalSet.push({ char: c, romaji: '' });
-                    }));
-                    // Shuffle
-                    for (let i = finalSet.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [finalSet[i], finalSet[j]] = [finalSet[j], finalSet[i]];
-                    }
-                    finalIdx = 0; // Reset Index
-
-                }
-            }
-
-            const btnPractice = document.getElementById('btn-practice');
-            const btnChallenge = document.getElementById('btn-challenge');
-            const btnFinal = document.getElementById('btn-final');
-
-            const activeStyle = "linear-gradient(180deg, #ff0000 0%, #8b0000 100%)";
-            const inactiveStyle = "#333";
-
-            btnPractice.style.background = mode === 'practice' ? activeStyle : inactiveStyle;
-            btnChallenge.style.background = mode === 'challenge' ? activeStyle : inactiveStyle;
-            btnFinal.style.background = mode === 'final' ? activeStyle : inactiveStyle;
-
-            renderGrid(currentFilterIndex);
-        }
-
         function startChallenge() {
             setMode('challenge');
             isChallengeActive = true;
-            feedbackEl.innerHTML = "행(あ, か...)을 선택하면<br>문제가 시작됩니다!";
+            feedbackEl.innerHTML = "행을 선택하면 문제가 시작됩니다!";
         }
 
         function nextChallenge() {
             feedbackEl.textContent = "🔊 잘 듣고 맞춰보세요!";
             feedbackEl.className = '';
 
-            // Filter pool based on current selection
             let pool = [];
-            if (currentFilterIndex === null) {
-                pool = hiraganaData.flat().filter(c => c !== '');
-            } else {
-                // Should only be one row if an index is selected
-                pool = hiraganaData[currentFilterIndex].filter(c => c !== '');
-            }
+            if (currentFilterIndex === null) pool = hiraganaData.flat().filter(c => c !== '');
+            else pool = hiraganaData[currentFilterIndex].filter(c => c !== '');
 
             currentChallengeChar = Utils.randomItem(pool);
             setTimeout(() => Utils.speak(currentChallengeChar), 500);
@@ -1194,31 +699,29 @@
 
         function checkAnswer(char, btn) {
             if (char === currentChallengeChar) {
-                feedbackEl.textContent = ""; // User requested no text
+                feedbackEl.textContent = "정답! ✨";
                 feedbackEl.className = "correct";
                 Utils.playSound('win');
-                // Voice removed as per request, just sound effect
                 isChallengeActive = false;
-                btn.style.background = "gold";
-                btn.style.color = "black";
+                btn.classList.add('active');
                 setTimeout(() => {
-                    btn.style.background = "";
-                    btn.style.color = "";
+                    btn.classList.remove('active');
                     if (challengeRowSelected) {
                         isChallengeActive = true;
-                        renderGrid(currentFilterIndex); // Shuffle grid for next question
                         nextChallenge();
                     } else {
                         startChallenge();
                     }
                 }, 1500);
             } else {
-                feedbackEl.textContent = ""; // User requested no text
+                feedbackEl.textContent = "땡! 다시 들어보세요";
                 feedbackEl.className = "wrong";
-                Utils.playSound('error'); // Added error sound
+                Utils.playSound('error');
                 Utils.speak(currentChallengeChar);
             }
         }
+
+        window.onload = init;
     </script>
 </body>
 
