@@ -375,12 +375,25 @@
 
     <!-- INLINED JS ONLY - NO EXTERNAL SCRIPTS -->
     <script>
+        // Wake up speech engine for Mobile
+        if (window.speechSynthesis) {
+            window.speechSynthesis.getVoices();
+            if (window.speechSynthesis.onvoiceschanged !== undefined) {
+                window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+            }
+        }
+
         // Utils
         const Utils = {
             speak: (text) => {
                 if (!window.speechSynthesis) return;
+
+                // Clear any pending speech
                 window.speechSynthesis.cancel();
-                // O-dan & U-dan fix logic (redundant here if overridden later, but good for safety)
+
+                // Robust initialization trigger
+                resumeAudio();
+
                 let speechText = text;
                 let rate = 0.8;
                 let pitch = 1.0;
@@ -388,14 +401,15 @@
                 const oDan = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
                 const uDan = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
 
+                // Custom phonetic tuning for better clarity on mobile
                 if (oDan.includes(text)) {
                     speechText = text + 'ーー';
                     rate = 0.5;
-                    pitch = 1.8;
+                    pitch = 1.3; // Less extreme than before
                 } else if (uDan.includes(text)) {
                     speechText = text + 'ーー';
                     rate = 0.5;
-                    pitch = 1.5;
+                    pitch = 1.2;
                 } else if (text.length === 1) {
                     speechText = text + 'ー';
                 }
@@ -404,7 +418,12 @@
                 utterance.lang = 'ja-JP';
                 utterance.rate = rate;
                 utterance.pitch = pitch;
-                window.speechSynthesis.speak(utterance);
+                utterance.volume = 1.0;
+
+                // Important: small delay after cancel helps iOS stability
+                setTimeout(() => {
+                    window.speechSynthesis.speak(utterance);
+                }, 50);
             },
             // Web Audio API Sound
             playSound: (type) => {
@@ -418,55 +437,44 @@
                 if (ctx.state === 'suspended') ctx.resume();
                 const now = ctx.currentTime;
 
-                if (type === 'win') {
-                    // Ding-Dong! (Two-tone chime)
-                    // Tone 1: E5 (659.25Hz)
-                    const osc1 = ctx.createOscillator();
-                    const gain1 = ctx.createGain();
-                    osc1.connect(gain1);
-                    gain1.connect(ctx.destination);
-                    osc1.type = 'sine';
-                    osc1.frequency.setValueAtTime(659.25, now);
-                    gain1.gain.setValueAtTime(0, now);
-                    gain1.gain.linearRampToValueAtTime(0.3, now + 0.01);
-                    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-                    osc1.start(now);
-                    osc1.stop(now + 0.6);
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
 
-                    // Tone 2: C5 (523.25Hz) - starts after 0.4s
+                if (type === 'win') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(659.25, now);
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.3, now + 0.01);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                    osc.start(now);
+                    osc.stop(now + 0.6);
+
                     const osc2 = ctx.createOscillator();
                     const gain2 = ctx.createGain();
-                    osc2.connect(gain2);
-                    gain2.connect(ctx.destination);
-                    osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(523.25, now + 0.4);
-                    gain2.gain.setValueAtTime(0, now + 0.4);
-                    gain2.gain.linearRampToValueAtTime(0.3, now + 0.41);
-                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
-                    osc2.start(now + 0.4);
-                    osc2.stop(now + 1.2);
+                    osc2.connect(gain2); gain2.connect(ctx.destination);
+                    osc2.type = 'sine'; osc2.frequency.setValueAtTime(523.25, now + 0.3);
+                    gain2.gain.setValueAtTime(0, now + 0.3);
+                    gain2.gain.linearRampToValueAtTime(0.3, now + 0.31);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                    osc2.start(now + 0.3); osc2.stop(now + 0.8);
+                } else if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
                 } else {
-                    // Ddeng! (Clean metallic hit - Wrong answer)
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
-
-                    osc.type = 'sine'; // Clean sound
-                    osc.frequency.setValueAtTime(330, now); // E4
-
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(330, now);
                     gain.gain.setValueAtTime(0, now);
                     gain.gain.linearRampToValueAtTime(0.5, now + 0.02);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-
                     osc.start(now);
                     osc.stop(now + 0.4);
                 }
-
-                // Cleanup
-                setTimeout(() => {
-                    if (ctx.state !== 'closed') ctx.close();
-                }, 1500);
             },
             randomItem: (array) => array[Math.floor(Math.random() * array.length)]
         };
@@ -525,6 +533,17 @@
             init();
         };
 
+        // Global Unlock for Mobile Audio
+        window.addEventListener('touchstart', function () {
+            resumeAudio();
+            if (window.speechSynthesis && !window.speechWarmed) {
+                const u = new SpeechSynthesisUtterance("");
+                u.volume = 0;
+                window.speechSynthesis.speak(u);
+                window.speechWarmed = true;
+            }
+        }, { once: true });
+
         function init() {
             // Check if mobile and show sound-init-bar
             const bar = document.getElementById('sound-init-bar');
@@ -532,14 +551,7 @@
                 bar.style.display = 'block';
                 bar.onclick = () => {
                     resumeAudio();
-                    // Robust warm up for SpeechSynthesis on Mobile
-                    if (window.speechSynthesis) {
-                        const welcome = new SpeechSynthesisUtterance("こんにちは");
-                        welcome.lang = 'ja-JP';
-                        welcome.volume = 0; // Silent but valid utterance
-                        window.speechSynthesis.speak(welcome);
-                    }
-                    Utils.speak("こんにちは"); // Audible test
+                    Utils.speak("こんにちは"); // Warm up
                     bar.style.display = 'none';
                 };
             }
@@ -570,6 +582,16 @@
             if (window.hiraganaAudioCtx.state === 'suspended') {
                 window.hiraganaAudioCtx.resume();
             }
+            // Mobile Warm-up: Play a silent tone to definitively unlock the audio stack
+            try {
+                const osc = window.hiraganaAudioCtx.createOscillator();
+                const g = window.hiraganaAudioCtx.createGain();
+                g.gain.setValueAtTime(0.0001, window.hiraganaAudioCtx.currentTime);
+                osc.connect(g);
+                g.connect(window.hiraganaAudioCtx.destination);
+                osc.start(0);
+                osc.stop(0.05);
+            } catch (e) { }
         }
 
         function updateInstructions() {

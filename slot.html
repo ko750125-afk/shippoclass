@@ -655,15 +655,15 @@
                 const uDan = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
 
                 if (oDan.includes(text)) {
-                    // O-dan: VERY HIGH pitch
+                    // O-dan: Tuning
                     speechText = text + 'ーー';
                     rate = 0.5;
-                    pitch = 1.8;
+                    pitch = 1.3;
                 } else if (uDan.includes(text)) {
-                    // U-dan: Moderately HIGH pitch
+                    // U-dan: Tuning
                     speechText = text + 'ーー';
                     rate = 0.5;
-                    pitch = 1.5;
+                    pitch = 1.2;
                 } else if (text.length === 1) {
                     speechText = text + 'ー';
                 }
