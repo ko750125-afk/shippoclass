@@ -230,6 +230,44 @@
             }
         }
 
+        .down-arrow-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin: 15px 0;
+            gap: 5px;
+            animation: fadeIn 0.5s;
+        }
+
+        .down-arrow {
+            color: var(--color-gold);
+            font-size: 2rem;
+            line-height: 1;
+            animation: bounce-arrow 1s infinite;
+        }
+
+        @keyframes bounce-arrow {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(10px);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 1rem 0.5rem;
@@ -368,6 +406,12 @@
             </div>
 
             <div class="section-selector" id="column-selector"></div>
+
+            <div id="guide-arrows" class="down-arrow-container">
+                <div class="down-arrow">▼</div>
+                <div style="color: var(--color-gold); font-size: 0.9rem; font-weight: bold;">아래에 글자가 있습니다!</div>
+            </div>
+
             <div id="feedback-display"></div>
             <div class="hiragana-grid" id="grid"></div>
         </div>
@@ -387,12 +431,11 @@
         const Utils = {
             speak: (text) => {
                 if (!window.speechSynthesis) return;
-
-                // Clear any pending speech
                 window.speechSynthesis.cancel();
-
-                // Robust initialization trigger
                 resumeAudio();
+
+                const voices = window.speechSynthesis.getVoices();
+                const jaVoice = voices.find(v => v.lang.includes('ja')) || null;
 
                 let speechText = text;
                 let rate = 0.8;
@@ -401,11 +444,10 @@
                 const oDan = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
                 const uDan = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
 
-                // Custom phonetic tuning for better clarity on mobile
                 if (oDan.includes(text)) {
                     speechText = text + 'ーー';
                     rate = 0.5;
-                    pitch = 1.3; // Less extreme than before
+                    pitch = 1.3;
                 } else if (uDan.includes(text)) {
                     speechText = text + 'ーー';
                     rate = 0.5;
@@ -415,15 +457,15 @@
                 }
 
                 const utterance = new SpeechSynthesisUtterance(speechText);
-                utterance.lang = 'ja-JP';
+                utterance.lang = jaVoice ? jaVoice.lang : 'ja-JP';
+                if (jaVoice) utterance.voice = jaVoice;
                 utterance.rate = rate;
                 utterance.pitch = pitch;
                 utterance.volume = 1.0;
 
-                // Important: small delay after cancel helps iOS stability
                 setTimeout(() => {
                     window.speechSynthesis.speak(utterance);
-                }, 50);
+                }, 100);
             },
             // Web Audio API Sound
             playSound: (type) => {
@@ -639,7 +681,16 @@
             allBtn.style.fontSize = '1.1rem';
 
             allBtn.onclick = () => {
+                document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+                allBtn.classList.add('active');
+                currentFilterIndex = null;
                 renderGrid(null);
+
+                // Hide arrows when 'All' is selected
+                const arrows = document.getElementById('guide-arrows');
+                if (arrows) {
+                    arrows.style.display = 'none';
+                }
             };
             allBtnContainer.appendChild(allBtn);
             selectorEl.appendChild(allBtnContainer);
@@ -668,8 +719,31 @@
                     btn.dataset.index = idx; // For highlighting
 
                     btn.onclick = () => {
-                        challengeRowSelected = true; // User explicitly selected a row
+                        document.querySelectorAll('.btn-nav').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        currentFilterIndex = idx;
                         renderGrid(idx);
+
+                        // Scroll into view so user sees the characters below
+                        setTimeout(() => {
+                            const grid = document.getElementById('grid');
+                            if (grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }, 100);
+
+                        // Show arrows briefly when a row is selected to guide the user downward
+                        const arrows = document.getElementById('guide-arrows');
+                        if (arrows) {
+                            arrows.style.display = 'flex';
+                            setTimeout(() => {
+                                arrows.style.opacity = '0';
+                                setTimeout(() => {
+                                    arrows.style.display = 'none';
+                                    arrows.style.opacity = '1';
+                                }, 500);
+                            }, 3000);
+                        }
+
+                        challengeRowSelected = true; // User explicitly selected a row
                         // Delayed Audio Trigger: Only play when user explicitly selects a row
                         if (currentMode === 'challenge' && isChallengeActive) {
                             setTimeout(() => nextChallenge(), 50);
