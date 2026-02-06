@@ -225,12 +225,51 @@
         }
 
         @media (max-width: 600px) {
+            .container {
+                padding: 1rem 0.5rem;
+            }
+
+            .header-title {
+                font-size: 1.8rem;
+            }
+
+            #instruction-text {
+                font-size: 1rem !important;
+            }
+
+            .mode-switch {
+                gap: 8px !important;
+            }
+
+            .btn-pachinko {
+                font-size: 0.9rem !important;
+                padding: 0.6rem 1rem !important;
+                min-width: 80px !important;
+            }
+
             .hiragana-grid {
                 gap: 5px;
             }
 
             .char-btn {
-                font-size: 1.5rem;
+                font-size: 1.2rem;
+            }
+
+            .final-carousel {
+                gap: 15px;
+                min-height: 200px;
+            }
+
+            .final-card {
+                width: 100px;
+                height: 140px;
+                font-size: 2rem;
+            }
+
+            .final-card.active-slot {
+                width: 140px;
+                height: 200px;
+                font-size: 4rem;
             }
         }
 
@@ -299,18 +338,17 @@
 
     <div class="container">
         <header style="text-align: center; margin-bottom: 30px;">
-            <a href="index.html" class="btn-nav">← 로비로</a>
-            <h1 class="header-title neon-text-blue">HIRAGANA <span
-                    style="font-size: 0.5em; display:block; color:white; text-shadow:none; margin-top:10px;">50음도
+            <a href="index.html" class="btn-nav" style="margin-bottom: 15px;">← 로비로</a>
+            <h1 class="header-title neon-text-blue" style="margin-bottom: 10px;">HIRAGANA <span
+                    style="font-size: 0.5em; display:block; color:white; text-shadow:none; margin-top:5px;">50음도
                     연습장</span></h1>
             <p id="instruction-text"
-                style="color: var(--color-gold); font-size: 1.5rem; font-weight: bold; margin-top: 15px; text-shadow: 0 0 5px var(--color-gold);">
-                🖱️ 마우스 클릭 또는 ⌨️ 방향키와 스페이스바로 조작 가능
+                style="color: var(--color-gold); font-size: 1.5rem; font-weight: bold; margin-top: 10px; text-shadow: 0 0 5px var(--color-gold);">
             </p>
         </header>
 
-        <div class="pachinko-frame" style="padding: 20px;">
-            <div class="mode-switch" style="display: flex; justify-content: center; gap: 15px;">
+        <div class="pachinko-frame" style="padding: 15px;">
+            <div class="mode-switch" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
                 <button id="btn-practice" class="btn-pachinko"
                     style="font-size: 1.2rem; padding: 0.8rem 2rem; min-width: 120px; background: #333;">연습</button>
                 <button id="btn-challenge" class="btn-pachinko"
@@ -362,7 +400,12 @@
             playSound: (type) => {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContext) return;
-                const ctx = new AudioContext();
+
+                if (!window.hiraganaAudioCtx) {
+                    window.hiraganaAudioCtx = new AudioContext();
+                }
+                const ctx = window.hiraganaAudioCtx;
+                if (ctx.state === 'suspended') ctx.resume();
                 const now = ctx.currentTime;
 
                 if (type === 'win') {
@@ -473,12 +516,50 @@
         };
 
         function init() {
+            updateInstructions();
             renderSelector();
             renderGrid(null); // Show all by default
 
-            document.getElementById('btn-practice').addEventListener('click', () => setMode('practice'));
-            document.getElementById('btn-challenge').addEventListener('click', () => startChallenge());
-            document.getElementById('btn-final').addEventListener('click', () => setMode('final'));
+            document.getElementById('btn-practice').addEventListener('click', () => {
+                resumeAudio();
+                setMode('practice');
+            });
+            document.getElementById('btn-challenge').addEventListener('click', () => {
+                resumeAudio();
+                startChallenge();
+            });
+            document.getElementById('btn-final').addEventListener('click', () => {
+                resumeAudio();
+                setMode('final');
+            });
+
+            // Resume audio context on first body click
+            document.body.addEventListener('touchstart', resumeAudio, { once: true });
+            document.body.addEventListener('click', resumeAudio, { once: true });
+        }
+
+        function resumeAudio() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!window.hiraganaAudioCtx) {
+                window.hiraganaAudioCtx = new AudioContext();
+            }
+            if (window.hiraganaAudioCtx.state === 'suspended') {
+                window.hiraganaAudioCtx.resume();
+            }
+        }
+
+        function updateInstructions() {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const instructionEl = document.getElementById('instruction-text');
+            if (instructionEl) {
+                if (currentMode === 'final') {
+                    instructionEl.innerHTML = isMobile ? "FINAL: 카드를 밀어서 확인하세요!" : "FINAL: ⌨️ 좌우 방향키로 이동, 스페이스바로 확인!";
+                } else if (currentMode === 'challenge') {
+                    instructionEl.innerHTML = isMobile ? "도전: 행을 선택하고 문제를 들으세요!" : "도전: 행을 선택하고 문제를 들으세요!";
+                } else {
+                    instructionEl.innerHTML = isMobile ? "터치해서 소리를 들어보세요!" : "🖱️ 마우스 클릭 또는 ⌨️ 방향키/스페이스바 조작 가능";
+                }
+            }
         }
 
         function renderSelector() {
@@ -671,9 +752,18 @@
 
                         if (slotIndex === 1) { // Center
                             slot.classList.add('active-slot');
-                            slot.onclick = () => Utils.speak(item.char); // Tap to speak center
+                            slot.onclick = () => {
+                                resumeAudio();
+                                Utils.speak(item.char);
+                            }
                         } else {
                             slot.classList.add('inactive-slot');
+                            slot.onclick = () => {
+                                resumeAudio();
+                                if (slotIndex === 0) finalIdx--;
+                                else finalIdx++;
+                                renderGrid(null);
+                            }
                         }
                         slot.textContent = item.char;
                     } else {
@@ -681,6 +771,19 @@
                     }
                     container.appendChild(slot);
                 });
+
+                // Add Touch Swipe Support for Mobile
+                let touchStartX = 0;
+                container.ontouchstart = (e) => touchStartX = e.touches[0].clientX;
+                container.ontouchend = (e) => {
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const diff = touchStartX - touchEndX;
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0 && finalIdx < finalSet.length - 1) finalIdx++;
+                        else if (diff < 0 && finalIdx > 0) finalIdx--;
+                        renderGrid(null);
+                    }
+                };
 
                 gridEl.appendChild(container);
                 return; // STOP HERE FOR FINAL MODE
@@ -882,12 +985,12 @@
             challengeRowSelected = false; // Reset selection flag on ANY mode switch
             feedbackEl.textContent = '';
 
+            updateInstructions();
+
             // Update Instruction Text
             const instructionEl = document.getElementById('instruction-text');
             if (instructionEl) {
                 if (mode === 'final') {
-                    instructionEl.innerHTML = "FINAL 챌린지: ⌨️ 좌우 방향키로 이동, 스페이스바로 확인하세요!";
-
                     // INIT FINAL SET
                     finalSet = [];
                     hiraganaData.forEach(row => row.forEach(c => {
@@ -900,8 +1003,6 @@
                     }
                     finalIdx = 0; // Reset Index
 
-                } else {
-                    instructionEl.innerHTML = "🖱️ 마우스 클릭 또는 ⌨️ 방향키와 스페이스바로 조작 가능";
                 }
             }
 
@@ -922,7 +1023,8 @@
         function startChallenge() {
             setMode('challenge');
             isChallengeActive = true;
-            // No auto-trigger. User selects row manually.
+            // Guide text
+            feedbackEl.textContent = "행(あ, か...)을 선택하면 문제가 시작됩니다!";
         }
 
         function nextChallenge() {

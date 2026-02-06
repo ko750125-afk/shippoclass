@@ -225,8 +225,7 @@
             max-width: 1200px;
             padding: 2rem;
             box-sizing: border-box;
-            margin-top: 80px;
-            /* Lower the UI for better balance */
+            margin-top: 20px;
         }
 
         .header-title {
@@ -302,6 +301,8 @@
         .reel-item .meaning {
             font-size: 0.9rem;
             color: #666;
+            display: none;
+            /* Hide meaning in reels for cleaner look */
         }
 
         .controls-area {
@@ -512,7 +513,7 @@
         @media (max-width: 600px) {
             .container {
                 padding: 1rem 0.5rem;
-                margin-top: 60px;
+                margin-top: 10px;
             }
 
             .slot-machine {
@@ -568,10 +569,10 @@
             }
 
             .coin-wallet {
-                top: 10px;
-                right: 10px;
-                font-size: 0.9rem;
-                padding: 5px 10px;
+                top: 5px;
+                right: 5px;
+                font-size: 0.8rem;
+                padding: 4px 8px;
             }
 
             #start-lever {
@@ -603,15 +604,17 @@
 </head>
 
 <body>
-    <div class="container" style="padding: 0;">
-        <!-- Header removed for space optimization - Floating Lobby Button made more prominent -->
-        <a href="index.html" class="btn-nav neon-text-gold"
-            style="position: absolute; left: 15px; top: 15px; font-size: 1rem; padding: 6px 15px; z-index: 100; border-width: 2px;">←
-            LOBBY</a>
-
-        <div class="coin-wallet" id="coin-wallet">
-            <span class="coin-icon">💰</span>
-            <span id="coin-count">0</span>
+    <div class="container" style="padding: 0; width: 100%;">
+        <!-- Dedicated Header for Buttons to avoid overlap -->
+        <div
+            style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; width: 100%; box-sizing: border-box;">
+            <a href="index.html" class="btn-nav neon-text-gold"
+                style="font-size: 0.9rem; padding: 5px 12px; border-width: 2px;">← LOBBY</a>
+            <div class="coin-wallet-mobile" id="coin-wallet"
+                style="background: rgba(0, 0, 0, 0.8); border: 2px solid var(--color-gold); padding: 5px 12px; border-radius: 20px; color: var(--color-gold); font-family: var(--font-digit); display: flex; align-items: center; gap: 5px;">
+                <span style="font-size: 1rem;">💰</span>
+                <span id="coin-count" style="font-size: 1rem;">0</span>
+            </div>
         </div>
 
         <div class="slot-machine" id="machine-frame">
@@ -642,26 +645,24 @@
                 </div>
             </div>
 
-            <a href="index.html" class="btn-nav neon-text-gold"
-                style="position: absolute; left: 25px; top: -55px; font-size: 1rem; padding: 6px 15px; z-index: 100; border-width: 2px;">←
-                LOBBY</a>
+        </div>
 
-            <div class="controls-area">
-                <div class="stop-buttons">
-                    <button class="btn-stop" id="stop-1" disabled>STOP 1</button>
-                    <button class="btn-stop" id="stop-2" disabled>STOP 2</button>
-                    <button class="btn-stop" id="stop-3" disabled>STOP 3</button>
-                </div>
-                <button id="start-lever">START</button>
+        <div class="controls-area">
+            <div class="stop-buttons">
+                <button class="btn-stop" id="stop-1" disabled>STOP 1</button>
+                <button class="btn-stop" id="stop-2" disabled>STOP 2</button>
+                <button class="btn-stop" id="stop-3" disabled>STOP 3</button>
             </div>
+            <button id="start-lever">START</button>
+        </div>
 
-            <div style="text-align:center; margin-top:20px;">
-                <p id="result-meaning" style="color: #aaa; font-size: 1.2rem; min-height: 1.5rem;"></p>
-                <div id="feedback-area" class="feedback-area">
-                    <div id="feedback-content"></div>
-                </div>
+        <div style="text-align:center; margin-top:20px;">
+            <p id="result-meaning" style="color: #aaa; font-size: 1.2rem; min-height: 1.5rem;"></p>
+            <div id="feedback-area" class="feedback-area">
+                <div id="feedback-content"></div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- INLINED JS LOGIC ONLY - NO EXTERNAL SCRIPTS -->
@@ -893,8 +894,8 @@
         */
 
         // --- Game Logic ---
-        const REEL_HEIGHT = 200;
-        const SPIN_SPEED = 15; // Lowered from 40 for skill-based stopping
+        let REEL_HEIGHT = 200; // Will be updated dynamically on load
+        const SPIN_SPEED = 15;
 
         let reels = [[], [], []];
         let reelElements = [null, null, null];
@@ -915,10 +916,13 @@
             machineFrame = document.getElementById('machine-frame');
             resultMeaning = document.getElementById('result-meaning');
             charFace = document.getElementById('char-face');
+            coinCountDisplay = document.getElementById('coin-count');
             resultItem = document.getElementById('result-item');
             feedbackArea = document.getElementById('feedback-area');
             feedbackContent = document.getElementById('feedback-content');
-            coinCountDisplay = document.getElementById('coin-count');
+
+            // Initial height check
+            REEL_HEIGHT = (window.innerWidth <= 600) ? 120 : 200;
 
             // Load Coins from LocalStorage
             const savedCoins = localStorage.getItem('shippo_coins');
@@ -1009,6 +1013,14 @@
             reels[2] = [...vrb, ...vrb, ...vrb];
 
             reelElements.forEach((el, i) => renderReel(el, reels[i]));
+
+            // Double check height after rendering content
+            setTimeout(() => {
+                const sample = document.querySelector('.reel-item');
+                if (sample && sample.offsetHeight > 0) {
+                    REEL_HEIGHT = sample.offsetHeight;
+                }
+            }, 100);
 
             document.getElementById('start-lever').addEventListener('click', () => {
                 Utils.playSound('click');
