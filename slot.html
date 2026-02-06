@@ -220,62 +220,29 @@
             <button id="start-lever">START</button>
         </div>
         <p id="result-meaning" style="text-align:center; color: #aaa; font-size: 1.2rem; margin-top:20px;"></p>
-
-        <!-- Debug Console -->
-        <div id="debug-console">
-            <div
-                style="position:sticky; top:0; background:#000; color:#fff; font-weight:bold; border-bottom:1px solid #555;">
-                DEBUG LOG (Double Click to Clear)
-            </div>
-            <div id="debug-content"></div>
-        </div>
     </div>
-
     <script>
         // --- Debug Manager ---
-        const DebugManager = {
-            el: null, content: null,
-            init: function () {
-                this.el = document.getElementById('debug-console');
-                this.content = document.getElementById('debug-content');
-                if (this.el) this.el.style.display = 'block';
-                if (this.el) this.el.ondblclick = () => { this.content.innerHTML = ''; };
-                this.log("Slot Debug Initialized");
-            },
-            log: function (msg, type = 'info') {
-                if (!this.content) return;
-                const div = document.createElement('div');
-                div.className = 'debug-line ' + (type === 'error' ? 'debug-error' : type === 'success' ? 'debug-success' : '');
-                div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
-                this.content.prepend(div);
-                console.log(`[SlotDebug] ${msg}`);
-            }
-        };
-
+        // --- Audio Control ---
         let jaVoice = null;
         let slotAudioCtx = null;
 
         // Polyfill
         if (!window.speechSynthesis && window.webkitSpeechSynthesis) {
             window.speechSynthesis = window.webkitSpeechSynthesis;
-            DebugManager.log("Used webkitSpeechSynthesis polyfill");
         }
 
         // GLOBAL VARIABLE TO PREVENT GC
         window.ttsUtterance = null;
 
         function loadVoices() {
-            if (!window.speechSynthesis) { DebugManager.log("오류: TTS 미지원 (크롬/삼성인터넷 권장)", 'error'); return; }
+            if (!window.speechSynthesis) return;
             const voices = window.speechSynthesis.getVoices();
-            DebugManager.log(`Voices loaded: ${voices.length}`);
             if (!voices.length) return;
 
             const lowerJa = ['ja-jp', 'ja_jp', 'ja'];
             jaVoice = voices.find(v => lowerJa.includes(v.lang.toLowerCase())) ||
                 voices.find(v => v.lang.toLowerCase().startsWith('ja')) || null;
-
-            if (jaVoice) DebugManager.log(`Voice: ${jaVoice.name}`, 'success');
-            else DebugManager.log("No JA Voice found, using default.", 'error');
         }
         if (window.speechSynthesis) {
             window.speechSynthesis.onvoiceschanged = loadVoices;
@@ -342,7 +309,7 @@
         let stopCount = 0;
 
         async function init() {
-            // Remove Sound Bar
+            // Remove Sound Bar if present
             const bar = document.getElementById('sound-init-bar');
             if (bar) bar.remove();
 
