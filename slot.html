@@ -287,11 +287,17 @@
         let jaVoice = null;
         let slotAudioCtx = null;
 
+        // Polyfill
+        if (!window.speechSynthesis && window.webkitSpeechSynthesis) {
+            window.speechSynthesis = window.webkitSpeechSynthesis;
+            DebugManager.log("Used webkitSpeechSynthesis polyfill");
+        }
+
         // GLOBAL VARIABLE TO PREVENT GC
         window.ttsUtterance = null;
 
         function loadVoices() {
-            if (!window.speechSynthesis) { DebugManager.log("No Speech API", 'error'); return; }
+            if (!window.speechSynthesis) { DebugManager.log("오류: TTS 미지원 (크롬/삼성인터넷 권장)", 'error'); return; }
             const voices = window.speechSynthesis.getVoices();
             DebugManager.log(`Voices loaded: ${voices.length}`);
             if (!voices.length) return;
