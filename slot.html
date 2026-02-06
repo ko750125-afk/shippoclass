@@ -178,38 +178,6 @@
                 display: none;
             }
         }
-
-        /* Debug Console */
-        #debug-console {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 120px;
-            background: rgba(0, 0, 0, 0.85);
-            color: #0f0;
-            font-family: monospace;
-            font-size: 0.8rem;
-            overflow-y: scroll;
-            padding: 10px;
-            box-sizing: border-box;
-            z-index: 9999;
-            border-top: 2px solid #0f0;
-            display: none;
-        }
-
-        .debug-line {
-            margin: 2px 0;
-            border-bottom: 1px solid #333;
-        }
-
-        .debug-error {
-            color: #ff4b4b;
-        }
-
-        .debug-success {
-            color: #4bff4b;
-        }
     </style>
 </head>
 
@@ -324,9 +292,8 @@
 
         const Utils = {
             speak: (text) => {
-                if (!window.speechSynthesis) { DebugManager.log("No TTS Engine", 'error'); return; }
+                if (!window.speechSynthesis) return;
 
-                DebugManager.log(`Speak: ${text}`);
                 window.speechSynthesis.cancel();
                 resumeAudio();
 
@@ -339,10 +306,7 @@
 
                     if (jaVoice) u.voice = jaVoice;
                     u.lang = 'ja-JP';
-                    u.rate = 0.8;
-
-                    u.onstart = () => DebugManager.log("TTS Start", 'success');
-                    u.onerror = (e) => DebugManager.log(`TTS Error: ${e.error}`, 'error');
+                    u.rate = 1.0;
 
                     window.speechSynthesis.speak(window.ttsUtterance);
                 }, 100);
@@ -378,7 +342,10 @@
         let stopCount = 0;
 
         async function init() {
-            DebugManager.init();
+            // Remove Sound Bar
+            const bar = document.getElementById('sound-init-bar');
+            if (bar) bar.remove();
+
             const resp = await fetch('data/slots.json');
             slotData = await resp.json();
 
@@ -395,24 +362,6 @@
 
             document.getElementById('start-lever').onclick = startSpin;
             [0, 1, 2].forEach(i => document.getElementById(`stop-${i + 1}`).onclick = () => stopReel(i));
-
-            const bar = document.getElementById('sound-init-bar');
-            bar.style.display = 'block';
-            bar.onclick = () => {
-                DebugManager.log("Unlock Clicked");
-                resumeAudio();
-                if (window.speechSynthesis) {
-                    window.speechSynthesis.cancel();
-                    const p = new SpeechSynthesisUtterance("あ");
-                    p.volume = 0.1;
-                    p.lang = "ja-JP";
-                    window.ttsUtterance = p;
-                    window.speechSynthesis.speak(p);
-                }
-                bar.style.background = '#4bff4b';
-                bar.textContent = "OK! (Check Debug Log)";
-                setTimeout(() => { bar.style.display = 'none'; }, 1000);
-            };
         }
 
 
@@ -458,9 +407,33 @@
             });
             const sentence = results.map(r => r.kanji).join(' ');
             const meaning = results.map(r => r.meaning).join(' ');
-            resultMeaning.textContent = meaning;
+
+            // Check Win Logic
+            // Reel 2 (Object) dictates allowed verbs in Reel 3
+            // results[1].text is the key for objects e.g. "ラーメンを"
+            // results[2].kanji is the verb kanji e.g. "食べました"
+            const objKey = results[1].text;
+            const verbKanji = results[2].kanji;
+            const validVerbs = slotData.objects[objKey] ? slotData.objects[objKey].verbs : [];
+
+            const isWin = validVerbs.includes(verbKanji);
+
+            resultMeaning.textContent = meaning + (isWin ? " (Great!)" : " (?)");
+
+            // Speak regardless, but maybe tone differs? For now just speak.
             Utils.speak(sentence);
-            Utils.playSound('win');
+
+            if (isWin) {
+                userCoins += 50;
+                coinCountDisplay.textContent = userCoins;
+                localStorage.setItem('shippo_coins', userCoins);
+                Utils.playSound('win');
+                statusText.textContent = "WIN! +50";
+                statusText.style.color = "#4bff4b";
+            } else {
+                statusText.textContent = "TRY AGAIN";
+                statusText.style.color = "#ff4b4b";
+            }
         }
 
         init();
