@@ -333,8 +333,20 @@
         let jaVoice = null;
         let hiraganaAudioCtx = null;
 
+        // 1. Browser Compatibility Check (Polyfill)
+        if (!window.speechSynthesis && window.webkitSpeechSynthesis) {
+            window.speechSynthesis = window.webkitSpeechSynthesis;
+            DebugManager.log("Used webkitSpeechSynthesis polyfill");
+        }
+
+        // GLOBAL VARIABLE TO PREVENT GC ON ANDROID
+        window.ttsUtterance = null;
+
         function loadVoices() {
-            if (!window.speechSynthesis) return;
+            if (!window.speechSynthesis) {
+                DebugManager.log("오류: 이 브라우저는 음성 기능을 지원하지 않습니다. (크롬 권장)", 'error');
+                return;
+            }
             const voices = window.speechSynthesis.getVoices();
             if (!voices.length) return;
             const lowerJa = ['ja-jp', 'ja_jp', 'ja'];
@@ -358,8 +370,18 @@
         const Utils = {
             speak: (text) => {
                 if (!window.speechSynthesis) {
-                    DebugManager.log("Values to speak but NO Engine support", 'error');
+                    DebugManager.log("오류: TTS 엔진 없음. 카카오톡/인스타라면 '다른 브라우저로 열기'를 해주세요.", 'error');
                     return;
+                }
+
+                if (jaVoice) {
+                    DebugManager.log(`Selected Voice: ${jaVoice.name} (${jaVoice.lang})`, 'success');
+                } else {
+                    DebugManager.log("No specific JA voice found. Fallback.", 'error');
+                    // Log detected languages to debug
+                    const voices = window.speechSynthesis.getVoices();
+                    const allLangs = voices.map(v => v.lang).join(', ');
+                    DebugManager.log(`Available Langs: ${allLangs}`);
                 }
 
                 DebugManager.log(`Request Speak: "${text}"`);
