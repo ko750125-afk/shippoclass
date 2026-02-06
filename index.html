@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIPPO WORLD - Pachinko Style Learning</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .lobby-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            align-items: center;
+            margin-top: 40px;
+        }
+
+        .menu-item {
+            width: 100%;
+            max-width: 500px;
+            height: 120px;
+            position: relative;
+            background: black;
+            border: 2px solid #333;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-sizing: border-box;
+            text-decoration: none;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-item:hover {
+            border-color: var(--color-gold);
+            box-shadow: 0 0 30px var(--color-gold);
+            transform: scale(1.05);
+        }
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: skewX(-20deg);
+            transition: left 0.5s;
+        }
+
+        .menu-item:hover::before {
+            left: 150%;
+        }
+
+        .menu-label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .menu-sub {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .menu-icon {
+            font-size: 3rem;
+        }
+
+        .neon-sign {
+            border: 4px solid #fff;
+            padding: 20px 40px;
+            border-radius: 20px;
+            box-shadow:
+                0 0 10px #fff,
+                inset 0 0 10px #fff,
+                0 0 20px var(--color-neon-blue),
+                inset 0 0 20px var(--color-neon-blue);
+            animation: flicker 3s infinite;
+        }
+
+        @keyframes flicker {
+
+            0%,
+            19%,
+            21%,
+            23%,
+            25%,
+            54%,
+            56%,
+            100% {
+                opacity: 1;
+                text-shadow:
+                    0 0 5px #fff,
+                    0 0 10px #fff,
+                    0 0 20px var(--color-neon-blue),
+                    0 0 40px var(--color-neon-blue);
+            }
+
+            20%,
+            24%,
+            55% {
+                opacity: 0.8;
+                text-shadow: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div style="text-align: center; margin-top: 40px; margin-bottom: 60px;">
+            <div class="neon-sign" style="display: inline-block;">
+                <h1 style="margin:0; font-size: 3.5rem;">SHIPPO</h1>
+                <p style="margin:0; letter-spacing: 5px;">WORLD</p>
+            </div>
+        </div>
+
+        <nav class="lobby-menu">
+            <a href="hiragana.html" class="menu-item">
+                <div class="menu-label">
+                    <span class="menu-title" style="color: var(--color-neon-blue);">ひらがな (히라가나)</span>
+                    <span class="menu-sub">50음도 트레이닝</span>
+                </div>
+                <div class="menu-icon">あ</div>
+            </a>
+
+            <a href="slot.html" class="menu-item">
+                <div class="menu-label">
+                    <span class="menu-title" style="color: var(--color-gold);">JP Slots (작문)</span>
+                    <span class="menu-sub">일본어 문장 만들기 게임</span>
+                </div>
+                <div class="menu-icon">🎰</div>
+            </a>
+
+            <a href="grammar.html" class="menu-item">
+                <div class="menu-label">
+                    <span class="menu-title" style="color: var(--color-neon-red);">비급 노트 (문법)</span>
+                    <span class="menu-sub">쉽게 배우는 문법 & 팁</span>
+                </div>
+                <div class="menu-icon">📖</div>
+            </a>
+        </nav>
+
+        <footer style="text-align: center; margin-top: 50px; color: #444; font-size: 0.8rem;">
+            © 2026 SHIPPO PROJECT. ALL RIGHTS RESERVED. (십뽀 프로젝트)
+        </footer>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIPPO SLOTS - Japanese Sentence Maker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap');
+
+        :root {
+            --color-bg: #0a0a0a;
+            --color-gold: #FFD700;
+            --color-gold-shine: #FFF8DC;
+            --color-neon-red: #FF0033;
+            --color-neon-blue: #00D4FF;
+            --color-panel: rgba(20, 20, 20, 0.9);
+            --font-jp: 'M PLUS Rounded 1c', sans-serif;
+            --font-digit: 'Orbitron', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            background-image:
+                radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%),
+                repeating-linear-gradient(45deg, rgba(255, 215, 0, 0.05) 0px, rgba(255, 215, 0, 0.05) 2px, transparent 2px, transparent 10px);
+            color: white;
+            font-family: var(--font-jp);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .pachinko-frame {
+            border: 4px solid var(--color-gold);
+            box-shadow: 0 0 10px var(--color-gold), inset 0 0 20px var(--color-gold);
+            border-radius: 20px;
+            background: var(--color-panel);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* REACH (RICH) State */
+        .reach-active {
+            animation: reach-flash 0.5s infinite alternate !important;
+            border-color: var(--color-neon-red) !important;
+            box-shadow: 0 0 30px var(--color-neon-red), inset 0 0 50px var(--color-neon-red) !important;
+        }
+
+        @keyframes reach-flash {
+            from {
+                background: var(--color-panel);
+            }
+
+            to {
+                background: rgba(150, 0, 0, 0.4);
+            }
+        }
+
+        /* CELEBRATION State */
+        .celebration-active {
+            animation: celebration-strobe 0.1s infinite !important;
+        }
+
+        @keyframes celebration-strobe {
+            0% {
+                background: #fff;
+                box-shadow: 0 0 100px #fff;
+            }
+
+            50% {
+                background: var(--color-bg);
+            }
+
+            100% {
+                background: #FFD700;
+                box-shadow: 0 0 100px #FFD700;
+            }
+        }
+
+        .celebration-shake {
+            animation: shake 0.2s infinite;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0deg);
+            }
+
+            10% {
+                transform: translate(-1px, -2px) rotate(-1deg);
+            }
+
+            20% {
+                transform: translate(-3px, 0px) rotate(1deg);
+            }
+
+            30% {
+                transform: translate(3px, 2px) rotate(0deg);
+            }
+
+            40% {
+                transform: translate(1px, -1px) rotate(1deg);
+            }
+
+            50% {
+                transform: translate(-1px, 2px) rotate(-1deg);
+            }
+
+            60% {
+                transform: translate(-3px, 1px) rotate(0deg);
+            }
+
+            70% {
+                transform: translate(3px, 1px) rotate(-1deg);
+            }
+
+            80% {
+                transform: translate(-1px, -1px) rotate(1deg);
+            }
+
+            90% {
+                transform: translate(1px, 2px) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(1px, -2px) rotate(-1deg);
+            }
+        }
+
+        .neon-text-red {
+            color: #fff;
+            text-shadow: 0 0 5px var(--color-neon-red), 0 0 10px var(--color-neon-red), 0 0 20px var(--color-neon-red);
+        }
+
+        .neon-text-gold {
+            color: var(--color-gold);
+            text-shadow: 0 0 5px var(--color-gold), 0 0 10px var(--color-gold);
+        }
+
+        button {
+            cursor: pointer;
+            font-family: var(--font-jp);
+            transition: all 0.2s ease;
+        }
+
+        /* Coin Wallet UI */
+        .coin-wallet {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid var(--color-gold);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: var(--color-gold);
+            font-family: var(--font-digit);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            text-shadow: 0 0 5px var(--color-gold);
+        }
+
+        .coin-icon {
+            font-size: 1.3rem;
+            animation: coin-bounce 2s infinite ease-in-out;
+        }
+
+        @keyframes coin-bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        .coin-animation {
+            animation: coin-plus 0.5s ease-out;
+        }
+
+        @keyframes coin-plus {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.3);
+                color: white;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .btn-nav {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--color-gold);
+            color: var(--color-gold);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-nav:hover {
+            background: var(--color-gold);
+            color: black;
+            box-shadow: 0 0 15px var(--color-gold);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem;
+            box-sizing: border-box;
+            margin-top: 80px;
+            /* Lower the UI for better balance */
+        }
+
+        .header-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 900;
+        }
+
+        .slot-machine {
+            background: linear-gradient(180deg, #2a2a2a 0%, #000 100%);
+            border: 8px solid var(--color-gold);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.2);
+            position: relative;
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .reels-container {
+            display: flex;
+            gap: 15px;
+            background: #000;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid #555;
+            box-shadow: inset 0 0 20px #000;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reel-window {
+            flex: 1;
+            height: 200px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .reel-tape {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .reel-item {
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: black;
+            border-bottom: 1px solid #eee;
+            box-sizing: border-box;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .reel-item .kanji {
+            font-size: 2.5rem;
+            color: #d00;
+            margin-bottom: 5px;
+        }
+
+        .reel-item .meaning {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .controls-area {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: flex-end;
+            margin-top: 20px;
+        }
+
+        #start-lever {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ff4444, #990000);
+            border: 4px solid var(--color-gold-shine);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            font-size: 1rem;
+            color: white;
+            font-weight: 900;
+        }
+
+        #start-lever:active {
+            transform: scale(0.95);
+        }
+
+        #start-lever:disabled {
+            filter: grayscale(1);
+            cursor: not-allowed;
+        }
+
+        .stop-buttons {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+            justify-content: space-around;
+        }
+
+        .btn-stop {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #4444ff, #000099);
+            border: 3px solid #aaf;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 0 10px rgba(0, 0, 255, 0.5);
+        }
+
+        .btn-stop:disabled {
+            background: #333;
+            border-color: #555;
+            box-shadow: none;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .status-display {
+            background: black;
+            border: 2px solid var(--color-neon-red);
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-text {
+            font-family: var(--font-digit);
+            font-size: 1.5rem;
+            color: var(--color-neon-red);
+            text-shadow: 0 0 10px var(--color-neon-red);
+        }
+
+        .character-area {
+            position: absolute;
+            top: -120px;
+            right: -10px;
+            width: 180px;
+            height: 180px;
+            background:
+                radial-gradient(circle at 50% 100%, rgba(0, 212, 255, 0.3), transparent 70%),
+                radial-gradient(circle, #111, #000);
+            border-radius: 50%;
+            border: 4px solid var(--color-neon-blue);
+            box-shadow:
+                0 0 40px rgba(0, 212, 255, 0.4),
+                inset 0 0 30px rgba(0, 212, 255, 0.2);
+            overflow: hidden;
+            /* Ensure image stays inside the circle */
+            z-index: 10;
+            animation: float 4s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1) rotate(3deg);
+            }
+
+            50% {
+                transform: translateY(-20px) scale(1.05) rotate(-3deg);
+            }
+        }
+
+        .character-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.5));
+            z-index: 11;
+        }
+
+        .shippo-label {
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #00d4ff, #0088ff);
+            color: black;
+            padding: 5px 18px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 900;
+            box-shadow: 0 0 15px var(--color-neon-blue);
+            white-space: nowrap;
+            letter-spacing: 1px;
+            border: 2px solid white;
+        }
+
+        .character-area::after {
+            content: '😸';
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0;
+            z-index: -1;
+        }
+
+        #shippo-rope-container {
+            display: none;
+        }
+
+        .failed-sentence {
+            text-decoration: line-through var(--color-neon-red) 4px !important;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+
+
+        /* Result Items */
+        .result-item {
+            position: absolute;
+            bottom: 0px;
+            right: 120px;
+            font-size: 5rem;
+            z-index: 21;
+            display: none;
+            animation: item-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes item-bounce {
+            0% {
+                transform: scale(0) rotate(-45deg);
+                opacity: 0;
+            }
+
+            70% {
+                transform: scale(1.2) rotate(10deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        .feedback-area {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .correct-sentence {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .wrong-sentence {
+            color: #ff4444;
+            text-decoration: line-through;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" style="padding: 0;">
+        <!-- Header removed for space optimization - Floating Lobby Button made more prominent -->
+        <a href="index.html" class="btn-nav neon-text-gold"
+            style="position: absolute; left: 15px; top: 15px; font-size: 1rem; padding: 6px 15px; z-index: 100; border-width: 2px;">←
+            LOBBY</a>
+
+        <div class="coin-wallet" id="coin-wallet">
+            <span class="coin-icon">💰</span>
+            <span id="coin-count">0</span>
+        </div>
+
+        <div class="slot-machine" id="machine-frame">
+
+
+            <div class="character-area">
+                <img id="char-face" src="assets/shippo_v5.png" class="character-img" alt="Shippo">
+                <div class="shippo-label">SHIPPO</div>
+            </div>
+
+
+
+            <div id="result-item" class="result-item"></div>
+
+            <div class="status-display">
+                <span id="status-text" class="status-text">INSERT COINS (Click Start)</span>
+            </div>
+
+            <div class="reels-container">
+                <div class="reel-window">
+                    <div class="reel-tape" id="reel-1"></div>
+                </div>
+                <div class="reel-window">
+                    <div class="reel-tape" id="reel-2"></div>
+                </div>
+                <div class="reel-window">
+                    <div class="reel-tape" id="reel-3"></div>
+                </div>
+            </div>
+
+            <a href="index.html" class="btn-nav neon-text-gold"
+                style="position: absolute; left: 25px; top: -55px; font-size: 1rem; padding: 6px 15px; z-index: 100; border-width: 2px;">←
+                LOBBY</a>
+
+            <div class="controls-area">
+                <div class="stop-buttons">
+                    <button class="btn-stop" id="stop-1" disabled>STOP 1</button>
+                    <button class="btn-stop" id="stop-2" disabled>STOP 2</button>
+                    <button class="btn-stop" id="stop-3" disabled>STOP 3</button>
+                </div>
+                <button id="start-lever">START</button>
+            </div>
+
+            <div style="text-align:center; margin-top:20px;">
+                <p id="result-meaning" style="color: #aaa; font-size: 1.2rem; min-height: 1.5rem;"></p>
+                <div id="feedback-area" class="feedback-area">
+                    <div id="feedback-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INLINED JS LOGIC ONLY - NO EXTERNAL SCRIPTS -->
+    <script>
+        // --- Utils ---
+        const Utils = {
+            speak: (text) => {
+                if (!window.speechSynthesis) return;
+                window.speechSynthesis.cancel();
+
+                let speechText = text;
+                let rate = 0.8;
+                let pitch = 1.0;
+
+                const oDan = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
+                const uDan = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
+
+                if (oDan.includes(text)) {
+                    // O-dan: VERY HIGH pitch
+                    speechText = text + 'ーー';
+                    rate = 0.5;
+                    pitch = 1.8;
+                } else if (uDan.includes(text)) {
+                    // U-dan: Moderately HIGH pitch
+                    speechText = text + 'ーー';
+                    rate = 0.5;
+                    pitch = 1.5;
+                } else if (text.length === 1) {
+                    speechText = text + 'ー';
+                }
+
+                const utterance = new SpeechSynthesisUtterance(speechText);
+                utterance.lang = 'ja-JP';
+                utterance.rate = rate;
+                utterance.pitch = pitch;
+                window.speechSynthesis.speak(utterance);
+            },
+            // Web Audio API Sound
+            playSound: (type) => {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+
+                if (!window.slotAudioCtx) {
+                    window.slotAudioCtx = new AudioContext();
+                }
+                const ctx = window.slotAudioCtx;
+                if (ctx.state === 'suspended') ctx.resume();
+                const now = ctx.currentTime;
+
+                if (type === 'spin_loop') {
+                    if (window.currentSpinOsc) {
+                        try { window.currentSpinOsc.osc.stop(); window.currentSpinOsc.lfo.stop(); } catch (e) { }
+                    }
+
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    const lfo = ctx.createOscillator();
+                    const lfoGain = ctx.createGain();
+
+                    // Strong but clear mechanical sound
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(110, now);
+
+                    lfo.type = 'sine';
+                    lfo.frequency.value = 12;
+                    lfoGain.gain.value = 40;
+
+                    lfo.connect(lfoGain);
+                    lfoGain.connect(osc.frequency);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.6, now + 0.1); // High Volume
+
+                    osc.start(now);
+                    lfo.start(now);
+                    window.currentSpinOsc = { osc, gain, lfo };
+                    return;
+                }
+
+                if (type === 'spin_stop') {
+                    if (window.currentSpinOsc) {
+                        const { osc, gain, lfo } = window.currentSpinOsc;
+                        gain.gain.setValueAtTime(gain.gain.value, now);
+                        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+                        osc.stop(now + 0.3);
+                        lfo.stop(now + 0.3);
+                        window.currentSpinOsc = null;
+                    }
+                    return;
+                }
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'win') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, now);
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.8, now + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+                    osc.start(now);
+                    osc.stop(now + 0.8);
+
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.connect(gain2); gain2.connect(ctx.destination);
+                    osc2.type = 'sine'; osc2.frequency.setValueAtTime(1175, now + 0.15);
+                    gain2.gain.setValueAtTime(0, now + 0.15);
+                    gain2.gain.linearRampToValueAtTime(0.8, now + 0.16);
+                    gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                    osc2.start(now + 0.15); osc2.stop(now + 1.2);
+                } else if (type === 'stop') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(180, now);
+                    gain.gain.setValueAtTime(0.6, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'click' || type === 'spin') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200, now);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.05);
+                    gain.gain.setValueAtTime(0.6, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'error') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(330, now);
+                    gain.gain.setValueAtTime(0.6, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                } else if (type === 'siren') {
+                    // Pulsing Siren for Reach tension
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.exponentialRampToValueAtTime(880, now + 0.5);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.3, now + 0.25);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                }
+            },
+
+            randomInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
+        };
+
+        // --- Slot Data ---
+        let slotData = null;
+        /*
+        const slotData = {
+            "subjects": [
+                { "text": "わたしは", "kanji": "私は", "meaning": "나는" },
+                { "text": "ちちは", "kanji": "父は", "meaning": "아빠는" },
+                { "text": "ははは", "kanji": "母は", "meaning": "엄마는" },
+                { "text": "ともだちは", "kanji": "友だちは", "meaning": "친구는" },
+                { "text": "がくせいは", "kanji": "学生は", "meaning": "학생은" },
+                { "text": "せんせいは", "kanji": "先生は", "meaning": "선생님은" },
+                { "text": "こどもは", "kanji": "子どもは", "meaning": "아이는" },
+                { "text": "かいしゃいんは", "kanji": "会社員は", "meaning": "회사원은" },
+                { "text": "てんいんは", "kanji": "店員は", "meaning": "점원은" },
+                { "text": "おきゃくさんは", "kanji": "お客さんは", "meaning": "손님은" },
+                { "text": "かれは", "kanji": "彼は", "meaning": "그는" },
+                { "text": "かのじょは", "kanji": "彼女は", "meaning": "그녀는" },
+                { "text": "にほんじんは", "kanji": "日本人は", "meaning": "일본인은" },
+                { "text": "かんこくじんは", "kanji": "韓国人は", "meaning": "한국인은" },
+                { "text": "せんぱいは", "kanji": "先輩は", "meaning": "선배는" },
+                { "text": "こうはいは", "kanji": "後輩は", "meaning": "후배는" },
+                { "text": "どうりょうは", "kanji": "同僚は", "meaning": "동료는" },
+                { "text": "あには", "kanji": "兄は", "meaning": "형/오빠는" },
+                { "text": "あねは", "kanji": "姉は", "meaning": "누나/언니는" },
+                { "text": "となり の ひと は", "kanji": "隣の人は", "meaning": "옆집 사람은" }
+            ],
+            "objects": {
+                "ラーメンを": { "meaning": "라면을", "verbs": ["食べました", "作りました", "買いました", "選びました", "送りました", "見ました"] },
+                "寿司を": { "meaning": "초밥을", "verbs": ["食べました", "買いました", "選びました", "送りました", "見ました", "作りました"] },
+                "ご飯を": { "meaning": "밥을", "verbs": ["食べました", "作りました", "選びました", "送りました", "見ました"] },
+                "パンを": { "meaning": "빵을", "verbs": ["食べました", "買いました", "選びました", "送りました", "作りました", "見ました"] },
+                "コーヒーを": { "meaning": "커피를", "verbs": ["飲みました", "買いました", "送りました", "選びました", "見ました"] },
+                "お茶を": { "meaning": "차를", "verbs": ["飲みました", "買いました", "送りました", "選びました", "見ました"] },
+                "水を": { "meaning": "물을", "verbs": ["飲みました", "買いました", "送りました", "選びました", "見ました"] },
+                "日本語を": { "meaning": "일본어를", "verbs": ["勉強しました", "習いました", "教えました", "見ました", "書きました", "聞きました", "選びました"] },
+                "英語を": { "meaning": "영어를", "verbs": ["勉強しました", "習いました", "教えました", "見ました", "書きました", "聞きました", "選びました"] },
+                "宿題を": { "meaning": "숙제를", "verbs": ["しました", "確認しました", "見ました", "書きました"] },
+                "仕事を": { "meaning": "일을", "verbs": ["しました", "確認しました", "見ました"] },
+                "本を": { "meaning": "책을", "verbs": ["読みました", "買いました", "送りました", "選びました", "見ました"] },
+                "映画を": { "meaning": "영화를", "verbs": ["見ました", "選びました", "買いました"] },
+                "テレビを": { "meaning": "TV를", "verbs": ["見ました", "選びました", "買いました"] },
+                "音楽を": { "meaning": "음악을", "verbs": ["聞きました", "選びました", "買いました"] },
+                "メールを": { "meaning": "메일을", "verbs": ["書きました", "送りました", "もらいました", "読みました", "見ました", "確認しました"] },
+                "手紙を": { "meaning": "편지를", "verbs": ["書きました", "送りました", "もらいました", "読みました", "見ました", "確認しました"] },
+                "服を": { "meaning": "옷을", "verbs": ["買いました", "選びました", "送りました", "見ました", "作りました"] },
+                "靴を": { "meaning": "신발을", "verbs": ["買いました", "選びました", "送りました", "見ました"] },
+                "写真を": { "meaning": "사진을", "verbs": ["撮りました", "見ました", "送りました", "選びました", "もらいました"] }
+            },
+            "verbs": [
+                { "text": "たべました", "kanji": "食べました", "meaning": "먹었습니다" },
+                { "text": "のみました", "kanji": "飲みました", "meaning": "마셨습니다" },
+                { "text": "みました", "kanji": "見ました", "meaning": "보았습니다" },
+                { "text": "よみました", "kanji": "読みました", "meaning": "읽었습니다" },
+                { "text": "ききました", "kanji": "聞きました", "meaning": "들었습니다" },
+                { "text": "かきました", "kanji": "書きました", "meaning": "썼습니다" },
+                { "text": "かいました", "kanji": "買いました", "meaning": "샀습니다" },
+                { "text": "つくりました", "kanji": "作りました", "meaning": "만들었습니다" },
+                { "text": "べんきょうしました", "kanji": "勉強しました", "meaning": "공부했습니다" },
+                { "text": "ならいました", "kanji": "習いました", "meaning": "배웠습니다" },
+                { "text": "おしえました", "kanji": "教えました", "meaning": "가르쳤습니다" },
+                { "text": "おくりました", "kanji": "送りました", "meaning": "보냈습니다" },
+                { "text": "もらいました", "kanji": "もらいました", "meaning": "받았습니다" },
+                { "text": "かくにんしました", "kanji": "確認しました", "meaning": "확인했습니다" },
+                { "text": "しました", "kanji": "しました", "meaning": "했습니다" },
+                { "text": "えらびました", "kanji": "選びました", "meaning": "고르거나 선택했습니다" },
+                { "text": "とりました", "kanji": "撮りました", "meaning": "찍었습니다" }
+            ],
+            "failEvents": [
+                { "type": "crocodile", "emoji": "🐊", "prob": 0.3 },
+                { "type": "can", "emoji": "🥫", "prob": 0.2 },
+                { "type": "fish", "emoji": "🐟", "prob": 0.2 },
+                { "type": "shoe", "emoji": "👟", "prob": 0.15 },
+                { "type": "ropeBreak", "emoji": "💥", "prob": 0.15 }
+            ]
+        };
+        */
+
+        // --- Game Logic ---
+        const REEL_HEIGHT = 200;
+        const SPIN_SPEED = 15; // Lowered from 40 for skill-based stopping
+
+        let reels = [[], [], []];
+        let reelElements = [null, null, null];
+        let spinIntervals = [null, null, null];
+        let reelOffsets = [0, 0, 0];
+        let stopping = [false, false, false];
+        let finalResult = [null, null, null];
+        let stopCount = 0;
+        let isRich = false;
+        let sirenInterval = null;
+        let userCoins = 0;
+
+        // Elements
+        let statusText, machineFrame, resultMeaning, charFace, resultItem, feedbackArea, feedbackContent, coinCountDisplay;
+
+        window.onload = function () {
+            statusText = document.getElementById('status-text');
+            machineFrame = document.getElementById('machine-frame');
+            resultMeaning = document.getElementById('result-meaning');
+            charFace = document.getElementById('char-face');
+            resultItem = document.getElementById('result-item');
+            feedbackArea = document.getElementById('feedback-area');
+            feedbackContent = document.getElementById('feedback-content');
+            coinCountDisplay = document.getElementById('coin-count');
+
+            // Load Coins from LocalStorage
+            const savedCoins = localStorage.getItem('shippo_coins');
+            if (savedCoins) {
+                userCoins = parseInt(savedCoins);
+                updateCoinUI(false);
+            }
+
+            reelElements = [
+                document.getElementById('reel-1'),
+                document.getElementById('reel-2'),
+                document.getElementById('reel-3')
+            ];
+
+            // Load external data
+            fetch('data/slots.json')
+                .then(response => response.json())
+                .then(data => {
+                    slotData = data;
+                    initGame();
+                })
+                .catch(err => {
+                    console.error('Data load error:', err);
+                    statusText.textContent = "Error: JSON data could not be loaded.";
+                });
+
+            // Keyboard Controls
+            document.addEventListener('keydown', (e) => {
+                if (e.repeat) return;
+
+                const isSpinning = spinIntervals.some(i => i !== null);
+
+                if (e.code === 'Space' || e.code === 'Enter') {
+                    e.preventDefault();
+                    if (!isSpinning) {
+                        // Gesture resume
+                        if (window.slotAudioCtx && window.slotAudioCtx.state === 'suspended') {
+                            window.slotAudioCtx.resume();
+                        }
+                        Utils.playSound('click');
+                        startSpin();
+                    } else {
+                        // Smart Stop: stop next available spinning reel
+                        const nextIdx = spinIntervals.findIndex(i => i !== null);
+                        if (nextIdx !== -1) stopReel(nextIdx);
+                    }
+                    return;
+                }
+
+                // Arrow keys for Stopping
+                if (isSpinning) {
+                    if (e.code === 'ArrowLeft') stopReel(0);
+                    if (e.code === 'ArrowDown') stopReel(1);
+                    if (e.code === 'ArrowRight') stopReel(2);
+                }
+            });
+        };
+
+        function updateCoinUI(animate = true) {
+            coinCountDisplay.textContent = userCoins.toLocaleString();
+            if (animate) {
+                coinCountDisplay.classList.remove('coin-animation');
+                void coinCountDisplay.offsetWidth; // Trigger reflow
+                coinCountDisplay.classList.add('coin-animation');
+            }
+            localStorage.setItem('shippo_coins', userCoins);
+        }
+
+        function addCoins(amount) {
+            userCoins += amount;
+            updateCoinUI(true);
+            Utils.playSound('click'); // Coin clink sound
+        }
+
+        function initGame() {
+            // Triple the items to allow smooth infinite loop
+            const sub = [...slotData.subjects];
+            reels[0] = [...sub, ...sub, ...sub];
+
+            const objKeys = Object.keys(slotData.objects).map(key => ({
+                text: key,
+                kanji: key,
+                meaning: slotData.objects[key].meaning
+            }));
+            reels[1] = [...objKeys, ...objKeys, ...objKeys];
+
+            const vrb = [...slotData.verbs];
+            reels[2] = [...vrb, ...vrb, ...vrb];
+
+            reelElements.forEach((el, i) => renderReel(el, reels[i]));
+
+            document.getElementById('start-lever').addEventListener('click', () => {
+                Utils.playSound('click');
+                startSpin();
+            });
+            document.getElementById('stop-1').addEventListener('click', () => stopReel(0));
+            document.getElementById('stop-2').addEventListener('click', () => stopReel(1));
+            document.getElementById('stop-3').addEventListener('click', () => stopReel(2));
+
+            // Rename buttons to Korean
+            document.getElementById('stop-1').textContent = "스톱 1";
+            document.getElementById('stop-2').textContent = "스톱 2";
+            document.getElementById('stop-3').textContent = "스톱 3";
+
+            statusText.textContent = "동전을 넣어주세요 (Start)";
+        }
+
+        function toggleStopButtons(index) {
+            // Sequential activation: Only one button active at a time
+            [1, 2, 3].forEach(i => {
+                const btn = document.getElementById(`stop-${i}`);
+                if (btn) {
+                    btn.disabled = (i !== index + 1);
+                    btn.style.opacity = (i === index + 1) ? 1 : 0.5;
+                }
+            });
+        }
+
+        function renderReel(element, items) {
+            element.innerHTML = '';
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'reel-item';
+                // Remove Hangul (item.meaning) from the spinning reels as requested
+                div.innerHTML = `<div class="kanji">${item.kanji}</div><div class="kana">${item.text}</div>`;
+                element.appendChild(div);
+            });
+        }
+
+        function startSpin() {
+            if (spinIntervals.some(i => i !== null)) return;
+
+            // Ensure AudioContext is initialized and resumed on user gesture
+            if (!window.slotAudioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (AudioContext) window.slotAudioCtx = new AudioContext();
+            }
+            if (window.slotAudioCtx && window.slotAudioCtx.state === 'suspended') {
+                window.slotAudioCtx.resume();
+            }
+
+            stopCount = 0;
+            stopping = [false, false, false];
+            isRich = false;
+            if (sirenInterval) { clearInterval(sirenInterval); sirenInterval = null; }
+            machineFrame.classList.remove('reach-active', 'celebration-active', 'celebration-shake');
+
+            statusText.textContent = "가즈아!!!";
+            statusText.className = "status-text";
+            resultMeaning.textContent = "";
+            resultItem.style.display = "none";
+            feedbackArea.style.display = "none";
+            resultMeaning.classList.remove('failed-sentence');
+
+            toggleStopButtons(0); // Only STOP 1 active initially
+
+            document.getElementById('start-lever').disabled = true;
+
+            const baseSpeed = SPIN_SPEED;
+            Utils.playSound('spin');
+            Utils.playSound('spin_loop');
+
+            [0, 1, 2].forEach(i => {
+                spinIntervals[i] = setInterval(() => {
+                    reelOffsets[i] = (reelOffsets[i] - baseSpeed) % (reels[i].length * REEL_HEIGHT);
+                    reelElements[i].style.top = `${reelOffsets[i]}px`;
+                }, 20);
+            });
+        }
+
+        function stopReel(index) {
+            if (stopping[index]) return;
+            stopping[index] = true;
+
+            const btn = document.getElementById(`stop-${index + 1}`);
+            if (btn) {
+                btn.disabled = true;
+                btn.style.opacity = 0.5;
+            }
+
+            Utils.playSound('stop');
+
+            if (spinIntervals[index]) {
+                clearInterval(spinIntervals[index]);
+                spinIntervals[index] = null;
+            }
+
+            // Real stopping logic: Land on the item currently visible in the middle
+            // reelOffsets[index] is negative and decreasing. 
+            // Current center item index is: Math.floor(Math.abs(reelOffsets[index] - REEL_HEIGHT) / REEL_HEIGHT) % (reels[index].length / 3)
+            const baseLen = reels[index].length / 3;
+            const currentAbsOffset = Math.abs(reelOffsets[index]);
+            const landedIdx = Math.round(currentAbsOffset / REEL_HEIGHT) % baseLen;
+
+            finalResult[index] = reels[index][landedIdx];
+
+            // Stop at the middle copy for visual consistency
+            const targetOffset = -(landedIdx + baseLen) * REEL_HEIGHT;
+            reelElements[index].style.transition = 'top 0.4s cubic-bezier(0.17, 0.67, 0.83, 1.2)';
+            reelElements[index].style.top = `${targetOffset}px`;
+
+            stopCount++;
+            reelOffsets[index] = targetOffset; // Update offset for next game start
+
+            if (index === 0) {
+                toggleStopButtons(1); // Enable STOP 2
+            } else if (index === 1) {
+                // Determine Reach (Rich) probability - Higher chance for exciting flow
+                // Check if Subject and Object have any logical connection
+                let potentialSuccess = false;
+                const currentObj = finalResult[1].text;
+                if (slotData.objects[currentObj]) {
+                    potentialSuccess = true; // Most things are SUCCESS now, so Reach happens often
+                }
+
+                if (potentialSuccess && Math.random() < 0.7) { // 70% chance of Reach if potentially logical
+                    isRich = true;
+                    machineFrame.classList.add('reach-active');
+                    statusText.textContent = "REACH!!! 🔥";
+                    Utils.playSound('win_small'); // Initial alert
+
+                    sirenInterval = setInterval(() => {
+                        Utils.playSound('siren');
+                    }, 600);
+
+                    // Slow down 3rd reel significantly for tension
+                    if (spinIntervals[2]) {
+                        clearInterval(spinIntervals[2]);
+                        spinIntervals[2] = setInterval(() => {
+                            reelOffsets[2] = (reelOffsets[2] - (SPIN_SPEED / 10)) % (reels[2].length * REEL_HEIGHT);
+                            reelElements[2].style.top = `${reelOffsets[2]}px`;
+                        }, 20);
+                    }
+                } else {
+                    // Normal slow down
+                    if (spinIntervals[2]) {
+                        clearInterval(spinIntervals[2]);
+                        spinIntervals[2] = setInterval(() => {
+                            reelOffsets[2] = (reelOffsets[2] - (SPIN_SPEED / 2.5)) % (reels[2].length * REEL_HEIGHT);
+                            reelElements[2].style.top = `${reelOffsets[2]}px`;
+                        }, 20);
+                    }
+                }
+                toggleStopButtons(2); // Enable STOP 3
+            } else if (index === 2) {
+                if (sirenInterval) { clearInterval(sirenInterval); sirenInterval = null; }
+                machineFrame.classList.remove('reach-active');
+                // Delay evaluation to sync with transition end
+                setTimeout(evaluate, 600);
+            }
+        }
+
+
+
+        function evaluate() {
+            Utils.playSound('spin_stop');
+            document.getElementById('start-lever').disabled = false;
+
+            const subject = finalResult[0];
+            const object = finalResult[1];
+            const verb = finalResult[2];
+
+            // Particles are now included in the strings
+            const sentence = `${subject.kanji} ${object.kanji} ${verb.kanji}`;
+            const meaning = `${subject.meaning} ${object.meaning} ${verb.meaning}`;
+            resultMeaning.innerHTML = `<div style="color:white; font-size:2rem; margin-bottom:5px;">${sentence}</div><div style="color:#aaa; font-size:1.2rem;">(${meaning})</div>`;
+
+            // Always speak the formed sentence
+            const speechText = sentence.replace(/は/g, 'わ');
+            setTimeout(() => Utils.speak(speechText), 500);
+
+            const isSuccess = slotData.objects[object.kanji] && slotData.objects[object.kanji].verbs.includes(verb.kanji);
+
+            if (isSuccess) {
+                handleSuccess(sentence, subject, object, verb);
+            } else {
+                handleFailure(sentence, subject, object, verb, speechText);
+            }
+        }
+
+        function handleSuccess(sentence, subject, object, verb) {
+            statusText.textContent = "성공!! 당첨이다!!";
+            statusText.classList.add('celebration-shake');
+            setFace('smile');
+            Utils.playSound('win');
+
+            if (isRich) {
+                machineFrame.classList.add('celebration-active');
+                statusText.textContent = "★초대박 당첨!!!★";
+                addCoins(500); // Massive Reward for Reach
+                // Keep the celebration for a few seconds
+                setTimeout(() => {
+                    machineFrame.classList.remove('celebration-active');
+                    statusText.classList.remove('celebration-shake');
+                }, 4000);
+            } else {
+                addCoins(100); // Standard Reward
+                setTimeout(() => {
+                    statusText.classList.remove('celebration-shake');
+                }, 2000);
+            }
+
+            // Item based on result (maybe different for objects?)
+            resultItem.textContent = "💰";
+            resultItem.style.display = "block";
+        }
+
+        function handleFailure(sentence, subject, object, verb, speechText) {
+            statusText.textContent = "에구구... 실패!";
+            setFace('angry');
+            Utils.playSound('error');
+            resultMeaning.classList.add('failed-sentence');
+
+            // Pick random fail event
+            const rand = Math.random();
+            let accum = 0;
+            let event = slotData.failEvents[0];
+            for (let e of slotData.failEvents) {
+                accum += e.prob;
+                if (rand <= accum) {
+                    event = e;
+                    break;
+                }
+            }
+
+            resultItem.textContent = event.emoji;
+            resultItem.style.display = "block";
+
+            // Educational Feedback
+            feedbackArea.style.display = "block";
+            const allowedVerbs = slotData.objects[object.kanji] ? slotData.objects[object.kanji].verbs : ["???"];
+            const correctVerbText = allowedVerbs[0];
+            const correctVerbObj = slotData.verbs.find(v => v.kanji === correctVerbText) || { meaning: "???" };
+
+            feedbackContent.innerHTML = `
+                <div style="font-size: 1.3rem; margin-bottom: 5px; margin-top: 10px;">
+                    <span>👉 </span><span class="correct-sentence">${subject.kanji} ${object.kanji} ${correctVerbText}</span> ✅
+                </div>
+                <div style="color: #ccc; font-size: 0.9rem;">
+                    (${subject.meaning} ${object.meaning} ${correctVerbObj.meaning})
+                </div>
+                <hr style="border: 0; border-top: 1px solid #444; margin: 10px 0;">
+                <small style="color: #aaa;">💡 팁: [${object.kanji}] 뒤에는 [${correctVerbText}] 등의 표현이 자연스럽습니다.</small>
+            `;
+        }
+
+        function setFace(mood) {
+            if (charFace) {
+                charFace.style.borderColor = (mood === 'tension' ? 'red' : (mood === 'smile' ? 'gold' : 'white'));
+            }
+        }
+    </script>
+</body>
+
+</html>

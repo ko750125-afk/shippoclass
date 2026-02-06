@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIPPO Grammar Notes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap');
+
+        :root {
+            --color-bg: #0a0a0a;
+            --color-gold: #FFD700;
+            --color-neon-blue: #00D4FF;
+            --font-jp: 'M PLUS Rounded 1c', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: white;
+            font-family: var(--font-jp);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 2rem;
+        }
+
+        .btn-nav {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--color-gold);
+            color: var(--color-gold);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .note-card {
+            background: linear-gradient(135deg, #222, #000);
+            border: 1px solid #444;
+            border-left: 5px solid var(--color-neon-blue);
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .note-card:hover {
+            border-color: var(--color-gold);
+            transform: translateX(10px);
+        }
+
+        .note-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .note-content {
+            margin-top: 15px;
+            color: #ccc;
+            line-height: 1.6;
+            display: none;
+            padding-top: 15px;
+            border-top: 1px dashed #444;
+        }
+
+        .note-card.active .note-content {
+            display: block;
+        }
+
+        .note-card.active .note-title {
+            color: var(--color-neon-blue);
+        }
+
+        .tag {
+            font-size: 0.8rem;
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: #888;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="btn-nav">← 로비로</a>
+        <h1 style="text-align:center; color: #FF0033;">비급 노트 (SECRET NOTES)</h1>
+        <div id="notes-list"></div>
+    </div>
+
+    <!-- INLINED JS ONLY - NO EXTERNAL SCRIPTS -->
+    <script>
+        const grammarNotes = [
+            {
+                "id": 1,
+                "title": "기본 문장 구조 (Basic Sentence)",
+                "content": "일본어의 기본 어순은 한국어와 같습니다.\n'주어 + 목적어 + 서술어' 순서로 말합니다.\n\n예: わたしは パンを たべます (저는 빵을 먹습니다)",
+                "tags": ["Level 1", "기본"]
+            },
+            {
+                "id": 2,
+                "title": "조사 'は'와 'が' (Particles)",
+                "content": "둘 다 주격을 나타내지만 뉘앙스가 다릅니다.\n'は'는 주제를, '가'는 주어가 강조될 때 주로 쓰입니다.",
+                "tags": ["Level 1", "조사"]
+            }
+        ];
+
+        window.onload = function () {
+            const container = document.getElementById('notes-list');
+            grammarNotes.forEach(note => {
+                const el = document.createElement('div');
+                el.className = 'note-card';
+                el.innerHTML = `
+                    <div class="note-title"><span>${note.title}</span><span>▼</span></div>
+                    <div style="margin-top:10px;">${note.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+                    <div class="note-content">${note.content.replace(/\n/g, '<br>')}</div>
+                `;
+                el.onclick = () => el.classList.toggle('active');
+                container.appendChild(el);
+            });
+        };
+    </script>
+</body>
+
+</html>

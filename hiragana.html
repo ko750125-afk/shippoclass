@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIPPO Hiragana Hall</title>
+    <style>
+        /* INLINED CSS from style.css */
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap');
+
+        :root {
+            --color-bg: #0a0a0a;
+            --color-gold: #FFD700;
+            --color-gold-shine: #FFF8DC;
+            --color-neon-red: #FF0033;
+            --color-neon-blue: #00D4FF;
+            --color-panel: rgba(20, 20, 20, 0.9);
+            --font-jp: 'M PLUS Rounded 1c', sans-serif;
+            --font-digit: 'Orbitron', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            background-image:
+                radial-gradient(circle at 50% 50%, #1a1a1a 0%, #000 100%),
+                repeating-linear-gradient(45deg, rgba(255, 215, 0, 0.05) 0px, rgba(255, 215, 0, 0.05) 2px, transparent 2px, transparent 10px);
+            color: white;
+            font-family: var(--font-jp);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .pachinko-frame {
+            border: 4px solid var(--color-gold);
+            box-shadow: 0 0 10px var(--color-gold), inset 0 0 20px var(--color-gold);
+            border-radius: 20px;
+            background: var(--color-panel);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .neon-text-blue {
+            color: #fff;
+            text-shadow: 0 0 5px var(--color-neon-blue), 0 0 10px var(--color-neon-blue), 0 0 20px var(--color-neon-blue);
+        }
+
+        .btn-nav {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--color-gold);
+            color: var(--color-gold);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .btn-nav:hover,
+        .btn-nav.active {
+            background: var(--color-gold);
+            color: black;
+            box-shadow: 0 0 15px var(--color-gold);
+        }
+
+        .btn-pachinko {
+            background: linear-gradient(180deg, #ff0000 0%, #8b0000 100%);
+            border: 2px solid var(--color-gold-shine);
+            border-radius: 50px;
+            color: white;
+            font-weight: 900;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 0 #500000, 0 0 15px var(--color-neon-red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        .btn-pachinko:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #500000;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        .header-title {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            font-weight: 900;
+        }
+
+        /* Hiragana Specific */
+        .hiragana-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .hiragana-grid.small-grid {
+            grid-template-columns: repeat(5, 1fr);
+            /* Keep 5 cols to preserve order */
+            max-width: 400px;
+            /* Force smaller size */
+            margin: 20px auto;
+            gap: 5px;
+        }
+
+        .hiragana-grid.small-grid .char-btn {
+            font-size: 1rem;
+            border-radius: 5px;
+        }
+
+        .char-btn {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000 100%);
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: white;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .char-btn:hover,
+        .char-btn:focus,
+        .char-btn:focus-visible {
+            border-color: var(--color-neon-blue) !important;
+            box-shadow: 0 0 15px var(--color-neon-blue) !important;
+            transform: scale(1.05);
+            z-index: 10;
+            outline: none;
+        }
+
+        .char-btn.active {
+            background: var(--color-neon-blue);
+            color: black;
+            box-shadow: 0 0 20px var(--color-neon-blue);
+        }
+
+        .char-btn .romaji {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            margin-top: 5px;
+            font-family: var(--font-digit);
+        }
+
+        .section-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .mode-switch {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #feedback-display {
+            font-size: 4rem;
+            font-weight: bold;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 20px white;
+        }
+
+        .correct {
+            color: var(--color-gold);
+            text-shadow: 0 0 20px var(--color-gold);
+            animation: flash-gold 0.5s;
+        }
+
+        .wrong {
+            color: var(--color-neon-red);
+            text-shadow: 0 0 20px var(--color-neon-red);
+            animation: effect-shake 0.5s;
+        }
+
+        @keyframes flash-gold {
+            0% {
+                background: transparent;
+            }
+
+            50% {
+                background: rgba(255, 215, 0, 0.3);
+            }
+
+            100% {
+                background: transparent;
+            }
+        }
+
+        @keyframes effect-shake {
+            0% {
+                transform: translate(1px, 1px);
+            }
+
+            50% {
+                transform: translate(-1px, 2px);
+            }
+
+            100% {
+                transform: translate(1px, -2px);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hiragana-grid {
+                gap: 5px;
+            }
+
+            .char-btn {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* FINAL Mode: Hide Romaji */
+        .hiragana-grid.final-mode .char-btn .romaji {
+            visibility: hidden;
+        }
+
+        .char-btn.empty {
+            visibility: hidden;
+            pointer-events: none;
+            border: none;
+            box-shadow: none;
+        }
+
+        /* FINAL Mode Carousel */
+        .final-carousel {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            min-height: 250px;
+        }
+
+        .final-card {
+            width: 140px;
+            height: 180px;
+            border: 2px solid #555;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            background: #1a1a1a;
+            color: #fff;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .final-card.active-slot {
+            width: 180px;
+            height: 240px;
+            border-color: var(--color-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+            font-size: 5rem;
+            z-index: 10;
+            background: linear-gradient(135deg, #222 0%, #000 100%);
+        }
+
+        .final-card.inactive-slot {
+            opacity: 0.3;
+            transform: scale(0.8);
+            filter: blur(1px);
+        }
+
+        .final-card.empty-slot {
+            visibility: hidden;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header style="text-align: center; margin-bottom: 30px;">
+            <a href="index.html" class="btn-nav">← 로비로</a>
+            <h1 class="header-title neon-text-blue">HIRAGANA <span
+                    style="font-size: 0.5em; display:block; color:white; text-shadow:none; margin-top:10px;">50음도
+                    연습장</span></h1>
+            <p id="instruction-text"
+                style="color: var(--color-gold); font-size: 1.5rem; font-weight: bold; margin-top: 15px; text-shadow: 0 0 5px var(--color-gold);">
+                🖱️ 마우스 클릭 또는 ⌨️ 방향키와 스페이스바로 조작 가능
+            </p>
+        </header>
+
+        <div class="pachinko-frame" style="padding: 20px;">
+            <div class="mode-switch" style="display: flex; justify-content: center; gap: 15px;">
+                <button id="btn-practice" class="btn-pachinko"
+                    style="font-size: 1.2rem; padding: 0.8rem 2rem; min-width: 120px; background: #333;">연습</button>
+                <button id="btn-challenge" class="btn-pachinko"
+                    style="font-size: 1.2rem; padding: 0.8rem 2rem; min-width: 120px;">도전</button>
+                <button id="btn-final" class="btn-pachinko"
+                    style="font-size: 1.2rem; padding: 0.8rem 2rem; min-width: 120px;">FINAL</button>
+            </div>
+
+            <div class="section-selector" id="column-selector"></div>
+            <div id="feedback-display"></div>
+            <div class="hiragana-grid" id="grid"></div>
+        </div>
+    </div>
+
+    <!-- INLINED JS ONLY - NO EXTERNAL SCRIPTS -->
+    <script>
+        // Utils
+        const Utils = {
+            speak: (text) => {
+                if (!window.speechSynthesis) return;
+                window.speechSynthesis.cancel();
+                // O-dan & U-dan fix logic (redundant here if overridden later, but good for safety)
+                let speechText = text;
+                let rate = 0.8;
+                let pitch = 1.0;
+
+                const oDan = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
+                const uDan = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
+
+                if (oDan.includes(text)) {
+                    speechText = text + 'ーー';
+                    rate = 0.5;
+                    pitch = 1.8;
+                } else if (uDan.includes(text)) {
+                    speechText = text + 'ーー';
+                    rate = 0.5;
+                    pitch = 1.5;
+                } else if (text.length === 1) {
+                    speechText = text + 'ー';
+                }
+
+                const utterance = new SpeechSynthesisUtterance(speechText);
+                utterance.lang = 'ja-JP';
+                utterance.rate = rate;
+                utterance.pitch = pitch;
+                window.speechSynthesis.speak(utterance);
+            },
+            // Web Audio API Sound
+            playSound: (type) => {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                const now = ctx.currentTime;
+
+                if (type === 'win') {
+                    // Ding-Dong! (Two-tone chime)
+                    // Tone 1: E5 (659.25Hz)
+                    const osc1 = ctx.createOscillator();
+                    const gain1 = ctx.createGain();
+                    osc1.connect(gain1);
+                    gain1.connect(ctx.destination);
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(659.25, now);
+                    gain1.gain.setValueAtTime(0, now);
+                    gain1.gain.linearRampToValueAtTime(0.3, now + 0.01);
+                    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                    osc1.start(now);
+                    osc1.stop(now + 0.6);
+
+                    // Tone 2: C5 (523.25Hz) - starts after 0.4s
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(523.25, now + 0.4);
+                    gain2.gain.setValueAtTime(0, now + 0.4);
+                    gain2.gain.linearRampToValueAtTime(0.3, now + 0.41);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 1.2);
+                    osc2.start(now + 0.4);
+                    osc2.stop(now + 1.2);
+                } else {
+                    // Ddeng! (Clean metallic hit - Wrong answer)
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.type = 'sine'; // Clean sound
+                    osc.frequency.setValueAtTime(330, now); // E4
+
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.5, now + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                }
+
+                // Cleanup
+                setTimeout(() => {
+                    if (ctx.state !== 'closed') ctx.close();
+                }, 1500);
+            },
+            randomItem: (array) => array[Math.floor(Math.random() * array.length)]
+        };
+
+        const hiraganaData = [
+            ['あ', 'い', 'う', 'え', 'お'],
+            ['か', 'き', 'く', 'け', 'こ'],
+            ['さ', 'し', 'す', 'せ', 'そ'],
+            ['た', 'ち', 'つ', 'て', 'と'],
+            ['な', 'に', 'ぬ', 'ね', 'の'],
+            ['は', 'ひ', 'ふ', 'へ', 'ほ'],
+            ['ま', 'み', 'む', 'め', 'も'],
+            ['や', '', 'ゆ', '', 'よ'],
+            ['ら', 'り', 'る', 'れ', 'ろ'],
+            ['わ', '', 'を', '', 'ん'],
+            ['が', 'ぎ', 'ぐ', 'げ', 'ご'], // Dakuon
+            ['ざ', 'じ', 'ず', 'ぜ', 'ぞ'],
+            ['だ', 'ぢ', 'づ', 'で', 'ど'],
+            ['ば', 'び', 'ぶ', 'べ', 'ぼ'],
+            ['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ']  // Handakuon
+        ];
+
+        const romajiData = [
+            ['a', 'i', 'u', 'e', 'o'],
+            ['ka', 'ki', 'ku', 'ke', 'ko'],
+            ['sa', 'shi', 'su', 'se', 'so'],
+            ['ta', 'chi', 'tsu', 'te', 'to'],
+            ['na', 'ni', 'nu', 'ne', 'no'],
+            ['ha', 'hi', 'fu', 'he', 'ho'],
+            ['ma', 'mi', 'mu', 'me', 'mo'],
+            ['ya', '', 'yu', '', 'yo'],
+            ['ra', 'ri', 'ru', 're', 'ro'],
+            ['wa', '', 'wo', '', 'n'],
+            ['ga', 'gi', 'gu', 'ge', 'go'],
+            ['za', 'ji', 'zu', 'ze', 'zo'],
+            ['da', 'ji', 'zu', 'de', 'do'],
+            ['ba', 'bi', 'bu', 'be', 'bo'],
+            ['pa', 'pi', 'pu', 'pe', 'po']
+        ];
+
+        const columns = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ', 'が', 'ざ', 'だ', 'ば', 'ぱ'];
+
+        let currentMode = 'practice';
+        let currentChallengeChar = null;
+        let isChallengeActive = false;
+        let currentFilterIndex = null; // Added to track current scope
+        let finalSet = [];
+        let finalIdx = 0;
+        let challengeRowSelected = false; // Flag to track if user selected a row in Challenge Mode
+
+        const gridEl = document.getElementById('grid');
+        const selectorEl = document.getElementById('column-selector');
+        const feedbackEl = document.getElementById('feedback-display');
+
+        window.onload = function () {
+            init();
+        };
+
+        function init() {
+            renderSelector();
+            renderGrid(null); // Show all by default
+
+            document.getElementById('btn-practice').addEventListener('click', () => setMode('practice'));
+            document.getElementById('btn-challenge').addEventListener('click', () => startChallenge());
+            document.getElementById('btn-final').addEventListener('click', () => setMode('final'));
+        }
+
+        function renderSelector() {
+            selectorEl.innerHTML = '';
+
+            // Mapping for Indices (Now using Hiragana keys)
+            const colMap = {
+                'あ': 0, 'か': 1, 'さ': 2, 'た': 3, 'な': 4,
+                'は': 5, 'ま': 6, 'や': 7, 'ら': 8, 'わ': 9,
+                'が': 10, 'ざ': 11, 'だ': 12, 'ば': 13, 'ぱ': 14
+            };
+
+            // 1. Separate 'ALL' Button with Unique Style
+            const allBtnContainer = document.createElement('div');
+            allBtnContainer.style.display = 'flex';
+            allBtnContainer.style.justifyContent = 'center';
+            allBtnContainer.style.width = '100%';
+            allBtnContainer.style.marginBottom = '25px';
+
+            const allBtn = document.createElement('button');
+            allBtn.className = 'btn-nav';
+            allBtn.textContent = '전체 보기';
+            allBtn.dataset.index = 'all'; // For highlighting
+            // Custom Styling
+            allBtn.style.background = 'linear-gradient(135deg, #00C9FF 0%, #92FE9D 100%)';
+            allBtn.style.color = '#000';
+            allBtn.style.fontWeight = 'bold';
+            allBtn.style.border = '2px solid #00C9FF';
+            allBtn.style.boxShadow = '0 0 10px #00C9FF';
+            allBtn.style.padding = '10px 40px';
+            allBtn.style.fontSize = '1.1rem';
+
+            allBtn.onclick = () => {
+                renderGrid(null);
+            };
+            allBtnContainer.appendChild(allBtn);
+            selectorEl.appendChild(allBtnContainer);
+
+            // Helper to create a row of buttons
+            const createRow = (cols) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.style.display = 'flex';
+                rowDiv.style.justifyContent = 'center';
+                rowDiv.style.flexWrap = 'wrap';
+                rowDiv.style.gap = '8px';
+                rowDiv.style.marginBottom = '12px';
+                rowDiv.style.width = '100%';
+
+                cols.forEach((col) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-nav';
+
+                    if (col === 'わ') {
+                        btn.textContent = '기타';
+                    } else {
+                        btn.textContent = col + '행';
+                    }
+
+                    const idx = colMap[col];
+                    btn.dataset.index = idx; // For highlighting
+
+                    btn.onclick = () => {
+                        challengeRowSelected = true; // User explicitly selected a row
+                        renderGrid(idx);
+                        // Delayed Audio Trigger: Only play when user explicitly selects a row
+                        if (currentMode === 'challenge' && isChallengeActive) {
+                            setTimeout(() => nextChallenge(), 50);
+                        }
+                    };
+                    rowDiv.appendChild(btn);
+                });
+                return rowDiv;
+            };
+
+            // Group 1: Basic (Seion)
+            const basicCols = ['あ', 'か', 'さ', 'た', 'な', 'は', 'ま', 'や', 'ら', 'わ'];
+            // Group 2: Dakuon + Handakuon
+            const dakuonCols = ['が', 'ざ', 'だ', 'ば', 'ぱ'];
+
+            selectorEl.appendChild(createRow(basicCols));
+            selectorEl.appendChild(createRow(dakuonCols));
+        }
+
+        // Re-define speak to handle O-dan specific length and pitch
+        Utils.speak = (text) => {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+
+            let speechText = text;
+            let rate = 0.8; // Default slow
+            let pitch = 1.0; // Default pitch
+
+            const oDan = ['お', 'こ', 'そ', 'と', 'の', 'ほ', 'も', 'よ', 'ろ', 'を', 'ご', 'ぞ', 'ど', 'ぼ', 'ぽ'];
+            const uDan = ['う', 'く', 'す', 'つ', 'ぬ', 'ふ', 'む', 'ゆ', 'る', 'ぐ', 'ず', 'づ', 'ぶ', 'ぷ'];
+
+            if (oDan.includes(text)) {
+                // O-dan: VERY HIGH pitch + very slow + double vowel
+                speechText = text + 'ーー';
+                rate = 0.5;
+                pitch = 1.8;
+            } else if (uDan.includes(text)) {
+                // U-dan: Moderately HIGH pitch + very slow + double vowel
+                speechText = text + 'ーー';
+                rate = 0.5;
+                pitch = 1.5;
+            } else if (text.length === 1) {
+                speechText = text + 'ー';
+            }
+
+            const utterance = new SpeechSynthesisUtterance(speechText);
+            utterance.lang = 'ja-JP';
+            utterance.rate = rate;
+            utterance.pitch = pitch;
+            window.speechSynthesis.speak(utterance);
+        };
+
+        function renderGrid(columnIdx) {
+            // Force ALL view if in FINAL mode
+            let effectiveColumnIdx = columnIdx;
+            if (currentMode === 'final') {
+                effectiveColumnIdx = null;
+            }
+
+            currentFilterIndex = columnIdx; // Update state
+
+            // FINAL Mode: Hide/Show Selector
+            if (currentMode === 'final') {
+                selectorEl.style.display = 'none';
+            } else {
+                selectorEl.style.display = 'block';
+            }
+
+            // Update Nav Buttons Active State using dataset
+            document.querySelectorAll('.btn-nav').forEach(btn => {
+                let isActive = false;
+                if (currentMode === 'final') {
+                    isActive = false;
+                } else if (currentMode === 'challenge' && !challengeRowSelected) {
+                    isActive = false; // Turn off lights if just switched to Challenge
+                } else {
+                    const btnIdx = btn.dataset.index;
+                    if (effectiveColumnIdx === null) {
+                        if (btnIdx === 'all') isActive = true;
+                    } else {
+                        // Compare as strings because dataset is string
+                        if (btnIdx == effectiveColumnIdx) isActive = true;
+                    }
+                }
+
+                if (isActive) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // --- FINAL MODE CAROUSEL BRANCH ---
+            if (currentMode === 'final') {
+                gridEl.className = ''; // Remove grid class
+                gridEl.style.display = 'block';
+                gridEl.innerHTML = '';
+
+                // Toggle Challenge Button inside Final Mode
+                const btnChallenge = document.getElementById('btn-challenge');
+                btnChallenge.disabled = false;
+                btnChallenge.style.opacity = '1';
+                btnChallenge.style.cursor = 'pointer';
+
+                // Container
+                const container = document.createElement('div');
+                container.className = 'final-carousel';
+
+                const indices = [finalIdx - 1, finalIdx, finalIdx + 1];
+
+                // Safety: If finalSet empty, init it
+                if (!finalSet || finalSet.length === 0) {
+                    finalSet = [];
+                    hiraganaData.forEach(row => row.forEach(c => {
+                        if (c) finalSet.push({ char: c, romaji: '' });
+                    }));
+                    // Shuffle
+                    for (let i = finalSet.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [finalSet[i], finalSet[j]] = [finalSet[j], finalSet[i]];
+                    }
+                }
+
+                indices.forEach((i, slotIndex) => {
+                    const slot = document.createElement('div');
+                    if (i >= 0 && i < finalSet.length) {
+                        const item = finalSet[i];
+                        slot.className = 'final-card';
+
+                        if (slotIndex === 1) { // Center
+                            slot.classList.add('active-slot');
+                            slot.onclick = () => Utils.speak(item.char); // Tap to speak center
+                        } else {
+                            slot.classList.add('inactive-slot');
+                        }
+                        slot.textContent = item.char;
+                    } else {
+                        slot.className = 'final-card empty-slot';
+                    }
+                    container.appendChild(slot);
+                });
+
+                gridEl.appendChild(container);
+                return; // STOP HERE FOR FINAL MODE
+            }
+
+            // --- STANDARD MODE LOGIC (Practice / Challenge) ---
+
+            // Handle "ALL" View Logic (Small Grid)
+            if (effectiveColumnIdx === null) {
+                gridEl.className = 'hiragana-grid';
+                gridEl.style.display = 'grid'; // Restore grid
+                gridEl.classList.add('small-grid');
+                gridEl.classList.remove('final-mode');
+
+                const btnChallenge = document.getElementById('btn-challenge');
+                // Disable Challenge button in ALL view
+                btnChallenge.disabled = true;
+                btnChallenge.style.opacity = '0.3';
+                btnChallenge.style.cursor = 'not-allowed';
+
+                if (currentMode === 'challenge') {
+                    setMode('practice');
+                }
+
+            } else {
+                gridEl.className = 'hiragana-grid';
+                gridEl.style.display = 'grid'; // Restore grid
+                gridEl.classList.remove('small-grid');
+                gridEl.classList.remove('final-mode');
+                const btnChallenge = document.getElementById('btn-challenge');
+                btnChallenge.disabled = false;
+                btnChallenge.style.opacity = '1';
+                btnChallenge.style.cursor = 'pointer';
+            }
+
+            gridEl.innerHTML = '';
+            let dataToRender = [];
+
+            if (effectiveColumnIdx === null) {
+                hiraganaData.forEach((row, rIdx) => {
+                    // Separators (Only in Practice/Standard All view, NOT in Final/Shuffle)
+                    if (currentMode !== 'final') {
+                        if (rIdx === 10) dataToRender.push({ type: 'separator', label: '탁음 (Dakuon)' });
+                        if (rIdx === 14) dataToRender.push({ type: 'separator', label: '반탁음 (Handakuon)' });
+                    }
+                    row.forEach((char, cIdx) => {
+                        if (currentMode === 'practice') {
+                            if (char) dataToRender.push({ char, romaji: romajiData[rIdx][cIdx] });
+                            else dataToRender.push({ type: 'empty' });
+                        } else {
+                            if (char) dataToRender.push({ char, romaji: romajiData[rIdx][cIdx] });
+                        }
+                    });
+                });
+            } else {
+                if (hiraganaData[effectiveColumnIdx]) {
+                    hiraganaData[effectiveColumnIdx].forEach((char, cIdx) => {
+                        const rData = romajiData[effectiveColumnIdx];
+                        if (currentMode === 'practice') {
+                            if (char) dataToRender.push({ char, romaji: rData[cIdx] });
+                            else dataToRender.push({ type: 'empty' });
+                        } else {
+                            if (char) dataToRender.push({ char, romaji: rData[cIdx] });
+                        }
+                    });
+                }
+            }
+
+            // Shuffle if in Challenge Mode (Standard)
+            if (currentMode === 'challenge') {
+                for (let i = dataToRender.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [dataToRender[i], dataToRender[j]] = [dataToRender[j], dataToRender[i]];
+                }
+            }
+
+            // Render Standard Grid Items
+            dataToRender.forEach((item, index) => {
+                if (item.type === 'separator') {
+                    const sep = document.createElement('div');
+                    sep.className = 'grid-separator';
+                    sep.innerHTML = `<span style="opacity:0.6; font-size:0.9rem; color: var(--color-gold);">${item.label}</span>`;
+                    sep.style.gridColumn = '1 / -1';
+                    sep.style.marginTop = '20px';
+                    sep.style.marginBottom = '10px';
+                    sep.style.borderBottom = '1px dashed #444';
+                    sep.style.display = 'flex';
+                    sep.style.alignItems = 'end';
+                    sep.style.paddingBottom = '5px';
+                    gridEl.appendChild(sep);
+                    return;
+                }
+                if (item.type === 'empty') {
+                    const btn = document.createElement('div');
+                    btn.className = 'char-btn empty';
+                    gridEl.appendChild(btn);
+                    return;
+                }
+                const btn = document.createElement('div');
+                btn.className = 'char-btn';
+                btn.tabIndex = 0;
+                btn.dataset.index = index;
+                btn.innerHTML = `<span>${item.char}</span><span class="romaji">${item.romaji}</span>`;
+                btn.onclick = () => handleCharClick(item.char, btn);
+                btn.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleCharClick(item.char, btn);
+                    }
+                };
+                gridEl.appendChild(btn);
+            });
+        }
+
+        // Keyboard Navigation Support
+        document.addEventListener('keydown', (e) => {
+            // FINAL MODE CAROUSEL NAV
+            if (currentMode === 'final') {
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    if (finalIdx < finalSet.length - 1) {
+                        finalIdx++;
+                        renderGrid(null);
+                    }
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    if (finalIdx > 0) {
+                        finalIdx--;
+                        renderGrid(null);
+                    }
+                } else if (e.key === ' ') {
+                    e.preventDefault();
+                    if (finalSet[finalIdx]) {
+                        Utils.speak(finalSet[finalIdx].char);
+                        const centerCard = document.querySelector('.final-card.active-slot');
+                        if (centerCard) {
+                            centerCard.style.color = '#FFD700'; // Flash gold
+                            centerCard.style.transform = 'scale(1.2)';
+                            setTimeout(() => {
+                                centerCard.style.color = '#fff';
+                                centerCard.style.transform = 'scale(1.1)';
+                            }, 300);
+                        }
+                    }
+                }
+                return;
+            }
+
+            const btns = document.querySelectorAll('.char-btn');
+            if (btns.length === 0) return;
+
+            const focused = document.activeElement;
+            let index = Array.from(btns).indexOf(focused);
+
+            if (index === -1 && (e.key.startsWith('Arrow') || e.key === ' ')) {
+                // If nothing focused, focus first one
+                if (btns[0]) btns[0].focus();
+                e.preventDefault();
+                return;
+            }
+
+            if (index === -1) return; // Not focusing a char button
+
+            let nextIndex = index;
+            const cols = 5; // We know it's 5 cols from CSS
+
+            switch (e.key) {
+                case 'ArrowRight': nextIndex++; break;
+                case 'ArrowLeft': nextIndex--; break;
+                case 'ArrowDown': nextIndex += cols; break;
+                case 'ArrowUp': nextIndex -= cols; break;
+                default: return; // Ignore other keys
+            }
+
+            if (nextIndex >= 0 && nextIndex < btns.length) {
+                e.preventDefault();
+                btns[nextIndex].focus();
+            }
+        });
+
+        function handleCharClick(char, btnElement) {
+            // Practice OR Final: Simply speak and highlight
+            if (currentMode === 'practice' || currentMode === 'final') {
+                Utils.speak(char);
+                highlightBtn(btnElement);
+            } else if (currentMode === 'challenge' && isChallengeActive) {
+                checkAnswer(char, btnElement);
+            }
+        }
+
+        function highlightBtn(btn) {
+            btn.classList.add('active');
+            setTimeout(() => btn.classList.remove('active'), 300);
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            isChallengeActive = false;
+            challengeRowSelected = false; // Reset selection flag on ANY mode switch
+            feedbackEl.textContent = '';
+
+            // Update Instruction Text
+            const instructionEl = document.getElementById('instruction-text');
+            if (instructionEl) {
+                if (mode === 'final') {
+                    instructionEl.innerHTML = "FINAL 챌린지: ⌨️ 좌우 방향키로 이동, 스페이스바로 확인하세요!";
+
+                    // INIT FINAL SET
+                    finalSet = [];
+                    hiraganaData.forEach(row => row.forEach(c => {
+                        if (c) finalSet.push({ char: c, romaji: '' });
+                    }));
+                    // Shuffle
+                    for (let i = finalSet.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [finalSet[i], finalSet[j]] = [finalSet[j], finalSet[i]];
+                    }
+                    finalIdx = 0; // Reset Index
+
+                } else {
+                    instructionEl.innerHTML = "🖱️ 마우스 클릭 또는 ⌨️ 방향키와 스페이스바로 조작 가능";
+                }
+            }
+
+            const btnPractice = document.getElementById('btn-practice');
+            const btnChallenge = document.getElementById('btn-challenge');
+            const btnFinal = document.getElementById('btn-final');
+
+            const activeStyle = "linear-gradient(180deg, #ff0000 0%, #8b0000 100%)";
+            const inactiveStyle = "#333";
+
+            btnPractice.style.background = mode === 'practice' ? activeStyle : inactiveStyle;
+            btnChallenge.style.background = mode === 'challenge' ? activeStyle : inactiveStyle;
+            btnFinal.style.background = mode === 'final' ? activeStyle : inactiveStyle;
+
+            renderGrid(currentFilterIndex);
+        }
+
+        function startChallenge() {
+            setMode('challenge');
+            isChallengeActive = true;
+            // No auto-trigger. User selects row manually.
+        }
+
+        function nextChallenge() {
+            feedbackEl.textContent = "🔊 잘 듣고 맞춰보세요!";
+            feedbackEl.className = '';
+
+            // Filter pool based on current selection
+            let pool = [];
+            if (currentFilterIndex === null) {
+                pool = hiraganaData.flat().filter(c => c !== '');
+            } else {
+                // Should only be one row if an index is selected
+                pool = hiraganaData[currentFilterIndex].filter(c => c !== '');
+            }
+
+            currentChallengeChar = Utils.randomItem(pool);
+            setTimeout(() => Utils.speak(currentChallengeChar), 500);
+        }
+
+        function checkAnswer(char, btn) {
+            if (char === currentChallengeChar) {
+                feedbackEl.textContent = ""; // User requested no text
+                feedbackEl.className = "correct";
+                Utils.playSound('win');
+                // Voice removed as per request, just sound effect
+                isChallengeActive = false;
+                btn.style.background = "gold";
+                btn.style.color = "black";
+                setTimeout(() => {
+                    btn.style.background = "";
+                    btn.style.color = "";
+                    if (challengeRowSelected) {
+                        isChallengeActive = true;
+                        renderGrid(currentFilterIndex); // Shuffle grid for next question
+                        nextChallenge();
+                    } else {
+                        startChallenge();
+                    }
+                }, 1500);
+            } else {
+                feedbackEl.textContent = ""; // User requested no text
+                feedbackEl.className = "wrong";
+                Utils.playSound('error'); // Added error sound
+                Utils.speak(currentChallengeChar);
+            }
+        }
+    </script>
+</body>
+
+</html>
