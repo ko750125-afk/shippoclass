@@ -186,6 +186,51 @@
             white-space: nowrap;
             border: 2px solid var(--color-neon-blue);
         }
+
+        /* Subscriber Gate Overlay */
+        #youtube-gate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .gate-content {
+            max-width: 400px;
+            background: #111;
+            border: 3px solid var(--color-gold);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px var(--color-gold);
+        }
+
+        .gate-btn {
+            background: #ff0000;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            transition: transform 0.2s;
+        }
+
+        .gate-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 
@@ -229,11 +274,41 @@
             © 2026 SHIPPO PROJECT. ALL RIGHTS RESERVED. (십뽀 프로젝트)
         </footer>
 
-        <div class="shippo-lobby">
+        <a href="https://www.youtube.com/@shippo-jp" target="_blank" class="shippo-lobby" id="shippo-btn">
             <img src="assets/shippo_v5.png" alt="Shippo">
-            <div class="shippo-lobby-label">WELCOME! 😸</div>
+            <div class="shippo-lobby-label">YOUTUBE 📺</div>
+        </a>
+
+        <!-- YouTube Referrer Gate -->
+        <div id="youtube-gate" style="display: none;">
+            <div class="gate-content">
+                <h2 style="color: var(--color-gold); margin-bottom: 10px;">환영합니다! 😸</h2>
+                <p style="color: #ccc; line-height: 1.6;">본 사이트는 <b>'십뽀의 일본어 교실'</b> 구독자분들을 위한 특별 선물입니다!</p>
+                <p style="color: #aaa; font-size: 0.9rem;">매번 유튜브 채널을 통해 방문해 주시면 채널 성장에 큰 힘이 됩니다. 아래 버튼을 눌러 채널을 확인하고 입장해
+                    주세요!</p>
+                <a href="https://www.youtube.com/@shippo-jp" target="_blank" class="gate-btn" onclick="enterSite()">유튜브
+                    보고 입장하기</a>
+            </div>
         </div>
     </div>
+
+    <script>
+        function enterSite() {
+            document.getElementById('youtube-gate').style.display = 'none';
+            localStorage.setItem('gate_passed', Date.now());
+        }
+
+        window.onload = function () {
+            const isFromYoutube = document.referrer.includes('youtube.com');
+            const lastPassed = localStorage.getItem('gate_passed');
+            const oneHour = 60 * 60 * 1000;
+
+            // If not from youtube AND haven't passed in last hour
+            if (!isFromYoutube && (!lastPassed || (Date.now() - lastPassed > oneHour))) {
+                document.getElementById('youtube-gate').style.display = 'flex';
+            }
+        }
+    </script>
 
 </body>
 
