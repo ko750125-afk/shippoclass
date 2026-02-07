@@ -515,15 +515,17 @@
                     }, 80); // Slow speed
                 }
 
-                // Always trigger Reach!
-                Utils.playSound('reach');
-                Utils.speak('リーチ！'); // RIICHI!
-                statusText.textContent = "REACH!!";
-                statusText.style.color = "var(--color-neon-red)";
+                // Trigger Reach with 30% probability
+                if (Math.random() < 0.3) {
+                    Utils.playSound('reach');
+                    Utils.speak('リーチ！'); // RIICHI!
+                    statusText.textContent = "REACH!!";
+                    statusText.style.color = "var(--color-neon-red)";
 
-                // ADD RICH EFFECT
-                document.querySelector('.slot-machine').classList.add('reach-active');
-                document.querySelector('.container').classList.add('reach-background');
+                    // ADD RICH EFFECT
+                    document.querySelector('.slot-machine').classList.add('reach-active');
+                    document.querySelector('.container').classList.add('reach-background');
+                }
             }
 
             if (stopCount === 3) finishSpin();
