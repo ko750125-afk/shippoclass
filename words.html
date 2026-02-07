@@ -221,7 +221,7 @@
 
         <div id="start-screen" style="margin-top: 50px;">
             <p style="font-size: 1.2rem; margin-bottom: 30px;">
-                제한시간 30초!<br>
+                제한시간 60초!<br>
                 단어의 짝을 찾아주세요.<br>
                 (일본어 - 한국어)
             </p>
@@ -299,7 +299,7 @@
 
         let vocabData = [];
         let score = 0;
-        let timeLeft = 30;
+        let timeLeft = 60;
         let timerInterval;
         let selectedCards = [];
         let isProcessing = false;
@@ -320,7 +320,7 @@
             document.getElementById('game-grid').style.display = 'grid';
             score = 0;
             updateScore();
-            timeLeft = 30;
+            timeLeft = 60;
             generateBoard();
             startTimer();
         }
@@ -336,7 +336,7 @@
                     gameOver();
                     return;
                 }
-                fill.style.width = (timeLeft / 30 * 100) + '%';
+                fill.style.width = (timeLeft / 60 * 100) + '%';
                 if (timeLeft <= 10 && timeLeft > 0) {
                     fill.style.background = '#ff4b4b';
                     if (Math.round(timeLeft * 10) % 10 === 0) Utils.playSound('tick');
