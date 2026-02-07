@@ -541,7 +541,7 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">🏠 로비</a>
-            <span class="ver-badge">필수단어 300 v3.9 (STABILITY FIX)</span>
+            <span class="ver-badge">필수단어 300 v4.0 (ULTRA STABILITY)</span>
         </div>
 
         <h1 id="screen-title" style="display:none;">단어 마스터 챌린지</h1>
@@ -704,13 +704,26 @@
 
         async function init() {
             try {
-                const resp = await fetch('data/vocab_courses.json?v=' + Date.now());
+                const url = 'data/vocab_courses.json?v=' + Date.now();
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error("Network response was not ok: " + resp.status);
+
                 const data = await resp.json();
-                courseData = data.courses;
+                if (!data || !data.courses) throw new Error("JSON data is missing 'courses' field");
+
+                courseData = data.courses || [];
                 renderCourseList();
             } catch (e) {
                 console.error("Init error:", e);
-                alert("데이터를 불러오지 못했습니다. (Error: " + e.message + ")");
+                const list = document.getElementById('course-list');
+                list.innerHTML = `
+                    <div style="padding:40px; text-align:center; color:#f43f5e; background:rgba(244,63,94,0.1); border-radius:20px; border:1px solid var(--color-primary);">
+                        <div style="font-size:3rem; margin-bottom:10px;">⚠️</div>
+                        <div style="font-weight:bold; margin-bottom:5px;">데이터를 불러올 수 없습니다.</div>
+                        <div style="font-size:0.7rem; opacity:0.8;">${e.message}</div>
+                        <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; border-radius:10px; border:none; background:var(--color-primary); color:#fff; cursor:pointer;">다시 시도</button>
+                    </div>
+                `;
             }
         }
 
@@ -1002,7 +1015,7 @@
             document.getElementById('game-over-screen').style.display = 'flex';
         }
 
-        window.onload = init;
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 
