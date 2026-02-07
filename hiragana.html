@@ -10,18 +10,25 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
         rel="stylesheet">
+
+
+
+
     <style>
         :root {
-            --color-red: #ff4b4b;
-            --color-gold: #FFD700;
-            --color-bg: #1a1a1a;
-            --color-card: #2d2d2d;
+            --color-red: #ff6b6b;
+            --color-gold: #ffd93d;
+            --color-bg: #1e1e24;
+            --color-card: #2b2d42;
+            --color-pastel-blue: #a9def9;
+            --color-pastel-pink: #ff99c8;
+            --color-pastel-purple: #e4c1f9;
             --font-main: 'Noto Sans KR', sans-serif;
             --font-jp: 'Noto Sans JP', sans-serif;
         }
 
         body {
-            background-color: var(--color-bg);
+            background: linear-gradient(135deg, #141416 0%, #202025 100%);
             color: #fff;
             font-family: var(--font-main);
             margin: 0;
@@ -530,8 +537,7 @@
             const allBtn = document.createElement('button');
             allBtn.className = 'col-btn' + (currentFilterIndex === null ? ' active' : '');
             allBtn.textContent = '전체';
-            allBtn.style.color = '#888'; // Slightly different style for All
-            if (currentFilterIndex === null) allBtn.style.color = '#000'; // Active style override
+            if (currentFilterIndex !== null) allBtn.style.color = 'rgba(255,255,255,0.6)';
             allBtn.onclick = () => {
                 currentFilterIndex = null;
                 challengeRowSelected = false;
@@ -565,7 +571,7 @@
             data.forEach(item => {
                 const el = document.createElement('div');
                 if (item.type === 'separator') {
-                    el.style.gridColumn = '1 / -1'; el.innerHTML = `<span style="color:var(--color-gold); font-size:0.8rem;">${item.label}</span>`;
+                    el.style.gridColumn = '1 / -1'; el.innerHTML = `<span style="color:var(--color-pastel-blue); font-size:0.9rem; margin-top:10px; display:inline-block;">${item.label}</span>`;
                 } else {
                     el.className = 'char-btn' + (item.type === 'empty' ? ' empty' : ' animate-pop');
                     if (item.char) {
