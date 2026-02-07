@@ -7,6 +7,9 @@
     <title>단어 마스터 100 - 십뽀교실</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
         rel="stylesheet">
@@ -93,6 +96,44 @@
             font-size: 0.8rem;
             margin-left: 5px;
             font-weight: normal;
+        }
+
+        .study-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .btn-tts {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-tts:hover {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: var(--color-accent);
+            transform: scale(1.1);
+        }
+
+        .btn-tts svg {
+            width: 20px;
+            height: 20px;
+            fill: #94a3b8;
+            transition: 0.2s;
+        }
+
+        .btn-tts:hover svg {
+            fill: var(--color-accent);
         }
 
         /* Nav controls */
@@ -552,12 +593,12 @@
                 const isActive = myChecks.includes(w.jp) ? 'active' : '';
                 return `
                 <div class="study-item">
-                    <div class="study-check ${isActive}" onclick="toggleCheck('${w.jp}')">★</div>
+                    <div class="study-check ${isActive}" onclick="toggleCheck('${w.jp}')" title="별표 체크">★</div>
                     <div class="study-info">
                         <div class="study-jp">${Utils.parseJP(w.jp, true)}</div>
                         <div class="study-ko">${w.ko}</div>
                     </div>
-                    <button class="btn-tts" onclick="event.stopPropagation(); Utils.speak('${w.jp}')">
+                    <button class="btn-tts" onclick="event.stopPropagation(); Utils.speak('${w.jp}')" title="발음 듣기">
                         <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                     </button>
                 </div>
