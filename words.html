@@ -541,7 +541,7 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">🏠 로비</a>
-            <span class="ver-badge">필수단어 300 v3.0 (MASTERY SYSTEM)</span>
+            <span class="ver-badge">필수단어 300 v3.6 (ULTRA SYNC)</span>
         </div>
 
         <h1 id="screen-title" style="display:none;">단어 마스터 챌린지</h1>
@@ -767,24 +767,24 @@
                 const isFinished = percent === 100;
 
                 // UI REVERSAL: 
-                // Incomplete = Sleek Blue (Serious Study Mode)
-                // Finished = HYPER NEON GOLD (Achievement/Money Reward)
+                // Incomplete = Slate Grey/Blue (Focused Study)
+                // Finished = HYPER NEON GOLD 💰 (The Reward)
                 const cardStyle = isFinished
-                    ? 'border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.1);'
-                    : 'border-color: #475569; background: transparent;';
+                    ? 'border-color: #ffcc00; box-shadow: 0 0 25px rgba(255, 204, 0, 0.5); background: rgba(255, 204, 0, 0.15);'
+                    : 'border-color: #334155; background: rgba(30, 41, 59, 0.5);';
 
                 const icon = isFinished ? '💰' : '📁';
-                const folderColor = isFinished ? '#fbbf24' : '#94a3b8';
-                const badgeStyle = isFinished ? 'background:#f59e0b; color:#fff;' : 'background:#334155; color:#94a3b8;';
+                const folderColor = isFinished ? '#ffcc00' : '#94a3b8';
+                const badgeStyle = isFinished ? 'background:#ffcc00; color:#000; font-weight:800;' : 'background:#334155; color:#94a3b8;';
 
                 return `
                 <div class="folder-card" onclick="startStudy(${i})" style="${cardStyle}">
-                    <span class="folder-icon" style="opacity: ${isFinished ? 1 : 0.6}">${icon}</span>
-                    <div style="font-weight:bold; color:${folderColor};">폴더 ${i + 1}</div>
-                    <div style="font-size:0.7rem; color:${isFinished ? '#d97706' : '#64748b'};">${i * 25 + 1} ~ ${Math.min((i + 1) * 25, mainCategory.words.length)}번</div>
+                    <span class="folder-icon" style="opacity: ${isFinished ? 1 : 0.6}; filter: ${isFinished ? 'drop-shadow(0 0 8px #ffcc00)' : 'none'}">${icon}</span>
+                    <div style="font-weight:bold; color:${folderColor}; text-shadow: ${isFinished ? '0 0 10px rgba(255,204,0,0.5)' : 'none'}">폴더 ${i + 1}</div>
+                    <div style="font-size:0.7rem; color:${isFinished ? '#b45309' : '#64748b'};">${i * 25 + 1} ~ ${Math.min((i + 1) * 25, mainCategory.words.length)}번</div>
                     <div class="mastered-badge" style="${badgeStyle}">${masteredCount} / ${totalCount} 정복</div>
-                    <div class="progress-container" style="background:rgba(0,0,0,0.2);">
-                        <div class="progress-bar" style="width: ${percent}%; background: ${isFinished ? '#fbbf24' : 'var(--color-primary)'};"></div>
+                    <div class="progress-container" style="background:rgba(0,0,0,0.2); height:6px;">
+                        <div class="progress-bar" style="width: ${percent}%; background: ${isFinished ? '#fff' : 'var(--color-primary)'}; box-shadow: ${isFinished ? '0 0 10px #fff' : 'none'};"></div>
                     </div>
                 </div>
             `}).join('');
