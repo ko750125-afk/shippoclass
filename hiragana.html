@@ -250,6 +250,11 @@
             <p id="instruction-text" style="opacity: 0.8; font-size: 0.9rem;">글자를 눌러서 소리를 들어보세요!</p>
         </header>
 
+        <div id="sound-init-bar"
+            style="display:none; background: var(--color-gold); color: black; text-align: center; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 10px; margin-bottom: 15px; width: 100%; max-width: 400px;">
+            🔊 탭하여 소리 켜기 (Sound On)
+        </div>
+
         <div class="mode-selector">
             <button class="mode-btn" id="btn-practice">연습 모드</button>
             <button class="mode-btn" id="btn-challenge">도전 모드</button>
@@ -288,12 +293,24 @@
             loadVoices();
         }
 
+        function warmUpTTS() {
+            if (!window.speechSynthesis) return;
+            const u = new SpeechSynthesisUtterance('');
+            u.volume = 0;
+            window.speechSynthesis.speak(u);
+        }
+
         function resumeAudio() {
             if (!hiraganaAudioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) hiraganaAudioCtx = new AudioContext();
             }
             if (hiraganaAudioCtx && hiraganaAudioCtx.state === 'suspended') hiraganaAudioCtx.resume();
+
+            warmUpTTS();
+
+            const bar = document.getElementById('sound-init-bar');
+            if (bar) bar.style.display = 'none';
         }
 
         const Utils = {
@@ -407,10 +424,12 @@
         const feedbackEl = document.getElementById('feedback-display');
 
         function init() {
-            // No Init Bar - User requested removal (auto-unlock logic was deemed unnecessary or annoying if it works)
-            // But we keep the element hidden or removed.
+            // Sound Bar - Show if needed for interaction unlock
             const bar = document.getElementById('sound-init-bar');
-            if (bar) bar.remove();
+            if (bar) {
+                bar.style.display = 'block';
+                bar.onclick = resumeAudio;
+            }
 
             renderSelector();
             renderGrid(null);

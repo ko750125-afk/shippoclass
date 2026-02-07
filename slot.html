@@ -249,12 +249,27 @@
             loadVoices();
         }
 
+        // Silent TTS Warm-up
+        function warmUpTTS() {
+            if (!window.speechSynthesis) return;
+            const u = new SpeechSynthesisUtterance('');
+            u.volume = 0;
+            window.speechSynthesis.speak(u);
+        }
+
         function resumeAudio() {
             if (!slotAudioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (AudioContext) slotAudioCtx = new AudioContext();
             }
             if (slotAudioCtx && slotAudioCtx.state === 'suspended') slotAudioCtx.resume();
+
+            // Warm up TTS as well
+            warmUpTTS();
+
+            // Hide bar if visible
+            const bar = document.getElementById('sound-init-bar');
+            if (bar) bar.style.display = 'none';
         }
 
         const Utils = {
@@ -334,9 +349,12 @@
         let stopCount = 0;
 
         async function init() {
-            // Remove Sound Bar if present
+            // Sound Bar - Show to ensure sound plays
             const bar = document.getElementById('sound-init-bar');
-            if (bar) bar.remove();
+            if (bar) {
+                bar.style.display = 'block';
+                bar.onclick = resumeAudio;
+            }
 
             const resp = await fetch('data/slots.json');
             slotData = await resp.json();
