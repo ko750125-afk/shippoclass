@@ -22,6 +22,87 @@
             --font-kr: 'Noto Sans KR', sans-serif;
         }
 
+        /* --- Folder/Subselection --- */
+        .sub-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .folder-card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid #334155;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .folder-card:hover {
+            border-color: var(--color-accent);
+            transform: translateY(-3px);
+        }
+
+        .folder-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* --- Study Screen --- */
+        .study-list {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .study-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #334155;
+            gap: 10px;
+        }
+
+        .study-check {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #475569;
+            transition: 0.2s;
+        }
+
+        .study-check.active {
+            color: #fbbf24;
+        }
+
+        .study-jp {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .jp-ruby {
+            color: var(--color-accent);
+            font-size: 0.8rem;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+
+        /* Nav controls */
+        .nav-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
         body {
             background-color: var(--color-bg);
             color: var(--color-text);
@@ -145,60 +226,6 @@
             color: #fff;
             padding: 2px 8px;
             border-radius: 10px;
-        }
-
-        /* --- Study Screen --- */
-        .study-list {
-            background: #1e293b;
-            border-radius: 16px;
-            padding: 10px;
-            max-height: 400px;
-            overflow-y: auto;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .study-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 20px;
-            border-bottom: 1px solid #334155;
-        }
-
-        .study-jp {
-            font-family: var(--font-jp);
-            font-weight: bold;
-            color: var(--color-accent);
-            font-size: 1.2rem;
-        }
-
-        .study-ko {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-top: 2px;
-        }
-
-        .btn-tts {
-            background: none;
-            border: none;
-            color: var(--color-secondary);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-tts:hover {
-            background: rgba(16, 185, 129, 0.2);
-        }
-
-        .btn-tts svg {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
         }
 
         /* --- Game Screen --- */
@@ -344,39 +371,57 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">🏠 로비</a>
-            <span class="ver-badge">필수단어 300 v2.1 (NEW)</span>
+            <span class="ver-badge">필수단어 300 v2.5 (FOLDER/CHECK)</span>
         </div>
 
-        <h1 id="screen-title" style="margin: 0 0 20px 0; font-size: 1.5rem; color: #fff;">단어 마스터 챌린지</h1>
+        <h1 id="screen-title" style="margin: 0 0 10px 0; font-size: 1.3rem; color: #fff;">단어 마스터 챌린지</h1>
 
-        <!-- 1. Selection Screen -->
+        <!-- 1. Category Selection -->
         <div id="selection-screen" class="screen active">
-            <p style="color: #94a3b8; margin-bottom: 20px;">초보자 필수단어 300개를 정복하세요!</p>
+            <p style="color: #94a3b8; margin-bottom: 15px; font-size: 0.9rem;">공부할 카테고리를 선택하세요!</p>
             <div id="course-list" class="course-grid"></div>
 
-            <div style="margin-top: 40px; border-top: 1px solid #334155; padding-top: 20px;">
-                <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 10px;">화면이 안 바뀌면 아래 버튼을 눌러주세요!</p>
+            <div style="margin-top: 30px; border-top: 1px solid #334155; padding-top: 15px;">
                 <button onclick="forceUpdate()"
-                    style="background:#334155; color:#fff; border:none; padding:10px 20px; border-radius:10px; font-size:0.8rem; cursor:pointer; font-weight:bold;">
-                    캐시 초기화 및 데이터 새로고침
+                    style="background:#334155; color:#64748b; border:none; padding:8px 15px; border-radius:10px; font-size:0.7rem;">
+                    데이터 강제 초기화
                 </button>
             </div>
         </div>
 
-        <!-- 2. Study Screen -->
-        <div id="study-screen" class="screen">
-            <h2 id="study-course-title" style="color: var(--color-accent); margin-bottom: 15px;"></h2>
-            <div class="study-list" id="study-list"></div>
-            <button class="start-btn" onclick="startGame()">학습 완료! 게임 시작</button>
+        <!-- 2. Sub-Folder Selection -->
+        <div id="subselection-screen" class="screen">
+            <div class="nav-controls">
+                <button onclick="switchScreen('selection')" class="btn-nav">◀ 뒤로가기</button>
+                <h2 id="category-title" style="margin:0; font-size: 1.1rem; color: var(--color-accent);"></h2>
+            </div>
+            <p style="color: #94a3b8; margin-bottom: 15px; font-size: 0.8rem;">25개씩 묶인 폴더를 선택하세요.</p>
+            <div id="sub-folder-list" class="sub-grid"></div>
         </div>
 
-        <!-- 3. Game Screen -->
+        <!-- 3. Study Screen -->
+        <div id="study-screen" class="screen">
+            <div class="nav-controls">
+                <button onclick="switchScreen('subselection')" class="btn-nav">◀ 폴더 목록</button>
+                <div style="text-align: right;">
+                    <span id="checked-count" style="font-size: 0.8rem; color: var(--color-accent);">0개 선택됨</span>
+                </div>
+            </div>
+            <h2 id="study-folder-title" style="color: #fff; margin-bottom: 10px; font-size: 1.1rem;"></h2>
+            <p style="font-size: 0.75rem; color: #64748b; margin-bottom: 10px;">★ 모르는 단어를 체크하여 집중 게임을 즐기세요!</p>
+            <div class="study-list" id="study-list"></div>
+            <button class="start-btn" onclick="startGame()">체크한 단어로 게임 시작!</button>
+        </div>
+
+        <!-- 4. Game Screen -->
         <div id="game-screen" class="screen">
             <div class="score-board">SCORE: <span id="score">0</span></div>
             <div class="timer-bar">
                 <div class="timer-fill" id="timer-fill"></div>
             </div>
             <div id="game-grid" class="game-grid"></div>
+            <button onclick="location.reload()"
+                style="background:none; border:none; color:#444; margin-top:20px; cursor:pointer;">그만하기</button>
         </div>
     </div>
 
@@ -386,17 +431,20 @@
             <h2 style="color: var(--color-primary); font-size: 2rem; margin: 0;">TIME OVER</h2>
             <p style="font-size: 1.2rem; margin: 20px 0;">SCORE: <span id="final-score"
                     style="color: var(--color-accent);">0</span></p>
-            <button class="start-btn" onclick="location.reload()">다시 하기</button>
+            <button class="start-btn" onclick="location.reload()">처음으로</button>
         </div>
     </div>
 
     <script>
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx = null;
-        let selectedCourse = null;
+        let mainCategory = null;
+        let currentChunk = [];
+        let chunkId = "";
         let score = 0, timeLeft = 30, timerInterval = null, isProcessing = false;
         let selectedCards = [];
         let courseData = [];
+        let checkedWords = JSON.parse(localStorage.getItem('shippo_checked_v2') || '{}');
 
         function resumeAudio() {
             if (!audioCtx) audioCtx = new AudioContext();
@@ -415,22 +463,31 @@
             speak: (text) => {
                 if (!window.speechSynthesis) return;
                 window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(text); u.lang = 'ja-JP'; u.rate = 1.0;
+                // Strip furigana for TTS
+                const cleanText = text.replace(/\(.*\)/g, "");
+                const u = new SpeechSynthesisUtterance(cleanText); u.lang = 'ja-JP'; u.rate = 1.0;
                 window.speechSynthesis.speak(u);
+            },
+            parseJP: (text, useRuby) => {
+                if (!text.includes('(')) return text;
+                const match = text.match(/(.*)\((.*)\)(.*)/);
+                if (!match) return text;
+                if (useRuby) {
+                    return `${match[1]}<span class="jp-ruby">${match[2]}</span>${match[3]}`;
+                } else {
+                    return `${match[1]}${match[3]}`; // Strips furigana for game
+                }
             }
         };
 
         async function init() {
             try {
-                // FORCE REFRESH EVERY TIME
                 const resp = await fetch('data/vocab_courses.json?v=' + Date.now());
                 const data = await resp.json();
                 courseData = data.courses;
                 renderCourseList();
-                console.log("Vocab Data Loaded:", courseData.length, "courses");
             } catch (e) {
-                console.error("Fetch failed, using local emergency fallback...");
-                alert("데이터 로드 중! 잠시만 기다리시거나 새로고침 해주세요.");
+                alert("데이터를 불러오지 못했습니다.");
             }
         }
 
@@ -442,27 +499,77 @@
         function renderCourseList() {
             const list = document.getElementById('course-list');
             list.innerHTML = courseData.map((c, i) => `
-                <div class="course-card" onclick="startStudy(${i})">
+                <div class="course-card" onclick="showSubFolders(${i})">
                     <span class="word-count-tag">${c.words.length} 단어</span>
                     <h3>${c.title}</h3>
                     <p>${c.description}</p>
                 </div>
             `).join('');
+            switchScreen('selection');
         }
 
-        function startStudy(idx) {
+        function showSubFolders(idx) {
             Utils.playSound('click');
-            selectedCourse = courseData[idx];
-            document.getElementById('study-course-title').textContent = selectedCourse.title;
-            document.getElementById('study-list').innerHTML = selectedCourse.words.map(w => `
+            mainCategory = courseData[idx];
+            const list = document.getElementById('sub-folder-list');
+            document.getElementById('category-title').textContent = mainCategory.title;
+
+            // Chunk words by 25
+            const chunks = [];
+            for (let i = 0; i < mainCategory.words.length; i += 25) {
+                chunks.push(mainCategory.words.slice(i, i + 25));
+            }
+
+            list.innerHTML = chunks.map((chunk, i) => `
+                <div class="folder-card" onclick="startStudy(${i})">
+                    <span class="folder-icon">📂</span>
+                    <div style="font-weight:bold; color:#fff;">폴더 ${i + 1}</div>
+                    <div style="font-size:0.7rem; color:#64748b;">${i * 25 + 1} ~ ${Math.min((i + 1) * 25, mainCategory.words.length)}번</div>
+                </div>
+            `).join('');
+            switchScreen('subselection');
+        }
+
+        function startStudy(chunkIdx) {
+            Utils.playSound('click');
+            const startIdx = chunkIdx * 25;
+            currentChunk = mainCategory.words.slice(startIdx, startIdx + 25);
+            chunkId = `${mainCategory.id}_${chunkIdx}`;
+
+            document.getElementById('study-folder-title').textContent = `${mainCategory.title} - 폴더 ${chunkIdx + 1}`;
+            renderStudyList();
+            switchScreen('study');
+        }
+
+        function renderStudyList() {
+            const list = document.getElementById('study-list');
+            const myChecks = checkedWords[chunkId] || [];
+            document.getElementById('checked-count').textContent = `${myChecks.length}개 선택됨`;
+
+            list.innerHTML = currentChunk.map(w => {
+                const isActive = myChecks.includes(w.jp) ? 'active' : '';
+                return `
                 <div class="study-item">
-                    <div class="study-info"><div class="study-jp">${w.jp}</div><div class="study-ko">${w.ko}</div></div>
+                    <div class="study-check ${isActive}" onclick="toggleCheck('${w.jp}')">★</div>
+                    <div class="study-info">
+                        <div class="study-jp">${Utils.parseJP(w.jp, true)}</div>
+                        <div class="study-ko">${w.ko}</div>
+                    </div>
                     <button class="btn-tts" onclick="event.stopPropagation(); Utils.speak('${w.jp}')">
                         <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                     </button>
                 </div>
-            `).join('');
-            switchScreen('study');
+            `}).join('');
+        }
+
+        function toggleCheck(jp) {
+            if (!checkedWords[chunkId]) checkedWords[chunkId] = [];
+            const idx = checkedWords[chunkId].indexOf(jp);
+            if (idx > -1) checkedWords[chunkId].splice(idx, 1);
+            else checkedWords[chunkId].push(jp);
+
+            localStorage.setItem('shippo_checked_v2', JSON.stringify(checkedWords));
+            renderStudyList();
         }
 
         function switchScreen(id) {
@@ -471,6 +578,11 @@
         }
 
         function startGame() {
+            const myChecks = checkedWords[chunkId] || [];
+            if (myChecks.length < 2) {
+                alert("게임을 하려면 최소 2개 이상의 단어를 별표(★) 체크해주세요!");
+                return;
+            }
             Utils.playSound('click'); switchScreen('game');
             score = 0; timeLeft = 30;
             updateScore(); generateBoard(); startTimer();
@@ -488,10 +600,13 @@
 
         function generateBoard() {
             const grid = document.getElementById('game-grid'); grid.innerHTML = '';
-            const pool = [...selectedCourse.words].sort(() => Math.random() - 0.5).slice(0, 6);
+            const myChecks = checkedWords[chunkId] || [];
+            const pool = currentChunk.filter(w => myChecks.includes(w.jp)).sort(() => Math.random() - 0.5).slice(0, 6);
+
             let cards = [];
             pool.forEach(w => {
-                cards.push({ id: w.jp, text: w.jp, type: 'jp' });
+                // For game, we use stripped Kanji for display, but keep original for ID
+                cards.push({ id: w.jp, text: Utils.parseJP(w.jp, false), type: 'jp' });
                 cards.push({ id: w.jp, text: w.ko, type: 'ko' });
             });
             cards.sort(() => Math.random() - 0.5).forEach(c => {
@@ -504,7 +619,7 @@
 
         function handleCardClick(el, data) {
             if (isProcessing || el.classList.contains('matched') || el.classList.contains('selected')) return;
-            Utils.playSound('click'); if (data.type === 'jp') Utils.speak(data.text);
+            Utils.playSound('click'); if (data.type === 'jp') Utils.speak(data.id);
             el.classList.add('selected'); selectedCards.push({ el, data });
             if (selectedCards.length === 2) { isProcessing = true; checkMatch(); }
         }
@@ -517,7 +632,9 @@
                     c1.el.classList.add('matched'); c2.el.classList.add('matched');
                     score += 10; timeLeft += 3; updateScore();
                     isProcessing = false; selectedCards = [];
-                    if (document.querySelectorAll('.matched').length >= 12) generateBoard();
+                    const matches = document.querySelectorAll('.matched').length;
+                    const poolSize = (checkedWords[chunkId].length > 6 ? 6 : checkedWords[chunkId].length) * 2;
+                    if (matches >= poolSize) generateBoard();
                 }, 300);
             } else {
                 Utils.playSound('wrong');
