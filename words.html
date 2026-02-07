@@ -541,7 +541,7 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">🏠 로비</a>
-            <span class="ver-badge">필수단어 300 v3.6 (ULTRA SYNC)</span>
+            <span class="ver-badge">필수단어 300 v3.7 (AUDIO FEEDBACK)</span>
         </div>
 
         <h1 id="screen-title" style="display:none;">단어 마스터 챌린지</h1>
@@ -647,9 +647,34 @@
                 resumeAudio(); const now = audioCtx.currentTime;
                 const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
                 osc.connect(gain); gain.connect(audioCtx.destination);
-                if (type === 'click') { osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.05, now); osc.start(now); osc.stop(now + 0.05); }
-                else if (type === 'match') { osc.frequency.setValueAtTime(523, now); gain.gain.setValueAtTime(0.1, now); osc.start(now); osc.stop(now + 0.3); }
-                else if (type === 'wrong') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); gain.gain.setValueAtTime(0.1, now); osc.start(now); osc.stop(now + 0.2); }
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.05, now); osc.start(now); osc.stop(now + 0.05);
+                }
+                else if (type === 'mastery') {
+                    // Pleasant two-tone chime (Success!)
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.1, now + 0.05);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                }
+                else if (type === 'unmastery') {
+                    // Soft subtle pop (Back to study)
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
+                    gain.gain.setValueAtTime(0, now);
+                    gain.gain.linearRampToValueAtTime(0.05, now + 0.02);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                    osc.start(now); osc.stop(now + 0.1);
+                }
+                else if (type === 'wrong') {
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); gain.gain.setValueAtTime(0.1, now); osc.start(now); osc.stop(now + 0.2);
+                }
+                else if (type === 'match') { // Used in game
+                    osc.frequency.setValueAtTime(523, now); gain.gain.setValueAtTime(0.1, now); osc.start(now); osc.stop(now + 0.3);
+                }
             },
             speak: (text) => {
                 if (!window.speechSynthesis) return;
@@ -851,10 +876,13 @@
         function toggleCheck(jp) {
             if (!checkedWords[chunkId]) checkedWords[chunkId] = [];
             const idx = checkedWords[chunkId].indexOf(jp);
-            if (idx > -1) checkedWords[chunkId].splice(idx, 1);
+            if (idx > -1) {
+                checkedWords[chunkId].splice(idx, 1);
+                Utils.playSound('unmastery'); // Back to study sound
+            }
             else {
                 checkedWords[chunkId].push(jp);
-                Utils.playSound('match'); // Achievement sound
+                Utils.playSound('mastery'); // Level up sound!
             }
 
             localStorage.setItem('shippo_mastered_v3', JSON.stringify(checkedWords));
