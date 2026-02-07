@@ -218,8 +218,56 @@
             transition: transform 0.2s;
         }
 
+        @keyframes rumble {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            10% {
+                transform: translate(-2px, -2px);
+            }
+
+            20% {
+                transform: translate(2px, 2px);
+            }
+
+            30% {
+                transform: translate(-2px, 2px);
+            }
+
+            40% {
+                transform: translate(2px, -2px);
+            }
+
+            50% {
+                transform: translate(-1px, -1px);
+            }
+
+            60% {
+                transform: translate(1px, 1px);
+            }
+
+            70% {
+                transform: translate(-1px, 1px);
+            }
+
+            80% {
+                transform: translate(1px, -1px);
+            }
+
+            90% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
         .reach-background {
             background-color: rgba(255, 0, 0, 0.1) !important;
+            animation: rumble 0.2s linear infinite;
+            border: 2px solid red !important;
         }
     </style>
 </head>
@@ -419,14 +467,11 @@
 
             reels.forEach((_, i) => {
                 let pos = 0;
-                // LAST REEL SLOW-DOWN Logic (for skill stop)
-                // Reel 1, 2: 20ms (Fast) | Reel 3: 80ms (Slow - Aimable)
-                const speed = (i === 2) ? 80 : 20;
-
+                // Init all reels FAST (20ms)
                 spinIntervals[i] = setInterval(() => {
                     pos -= 20; if (pos <= -180 * reels[i].length / 3) pos = 0;
                     reelElements[i].style.top = pos + "px";
-                }, speed);
+                }, 20);
                 document.getElementById(`stop-${i + 1}`).disabled = false;
             });
             Utils.playSound('spin');
@@ -446,8 +491,22 @@
 
             // Check Reach (after 2nd reel stops)
             if (stopCount === 2) {
-                const r1 = Math.round(parseFloat(reelElements[0].style.top) / 180);
-                const r2 = Math.round(parseFloat(reelElements[1].style.top) / 180);
+                // Determine which reel is still spinning (should be index 2 if user stopped 0 and 1)
+                // But user might stop in any order. The requirement implies "last remaining reel".
+                // Let's find the unstopped reel index.
+                const lastReelIndex = stopping.findIndex(s => !s);
+
+                if (lastReelIndex !== -1) {
+                    // Slow down the last reel!
+                    clearInterval(spinIntervals[lastReelIndex]);
+                    let pos = parseFloat(reelElements[lastReelIndex].style.top);
+                    spinIntervals[lastReelIndex] = setInterval(() => {
+                        pos -= 20; if (pos <= -180 * reels[lastReelIndex].length / 3) pos = 0;
+                        reelElements[lastReelIndex].style.top = pos + "px";
+                    }, 80); // Slow speed
+                }
+
+                // ... rest of reach logic ...
                 // Simple visual logic: if top positions align, it's a "row" match? 
                 // Wait, logic is index based.
                 // Actually, Reach is usually just excitement. Let's play 'reach' sound if exists.
