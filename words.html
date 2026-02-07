@@ -108,9 +108,15 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
+        .study-item:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
         .mastered .study-item {
-            opacity: 0.6;
+            opacity: 0.5;
             border-style: dashed;
+            background: rgba(16, 185, 129, 0.05);
         }
 
         .study-item-header {
@@ -784,15 +790,14 @@
 
             // Helper to render an item card
             const createItemCard = (w, isMastered) => `
-                <div class="study-item">
-                    <div class="study-jp">${Utils.parseJP(w.jp, true)}</div>
-                    <div class="study-ko">${w.ko}</div>
-                    <div class="study-actions">
-                        <button class="btn-mini-action" onclick="Utils.speak('${w.jp}')" title="발음">
+                <div class="study-item" onclick="toggleCheck('${w.jp}')" style="cursor:pointer;" title="${isMastered ? '미정복으로' : '정복 완료'}">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <div class="study-jp">${Utils.parseJP(w.jp, true)}</div>
+                            <div class="study-ko">${w.ko}</div>
+                        </div>
+                        <button class="btn-mini-action" onclick="event.stopPropagation(); Utils.speak('${w.jp}')" title="발음 듣기">
                             <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                        </button>
-                        <button class="btn-mini-action check-btn ${isMastered ? 'active' : ''}" onclick="toggleCheck('${w.jp}')" title="${isMastered ? '미정복으로' : '정복 완료'}">
-                            ${isMastered ? '✅' : '⬜'}
                         </button>
                     </div>
                 </div>
