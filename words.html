@@ -148,15 +148,20 @@
         }
 
         .btn-mini-action {
-            background: none;
+            background: rgba(255, 255, 255, 0.08);
             border: none;
             cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
+            padding: 10px;
+            /* Increased padding */
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: 0.2s;
+            flex-shrink: 0;
+            /* Prevent shrinking */
+            margin-left: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .btn-mini-action:hover {
@@ -173,9 +178,14 @@
         }
 
         .btn-mini-action svg {
-            width: 16px;
-            height: 16px;
-            fill: #64748b;
+            width: 22px;
+            /* Increased icon size */
+            height: 22px;
+            fill: #94a3b8;
+        }
+
+        .btn-mini-action:hover svg {
+            fill: var(--color-accent);
         }
 
         .mastered-badge {
@@ -793,10 +803,10 @@
             // Helper to render an item card
             const createItemCard = (w, isMastered) => `
                 <div class="study-item" onclick="toggleCheck('${w.jp}')" style="cursor:pointer;" title="${isMastered ? '미정복으로' : '정복 완료'}">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div>
-                            <div class="study-jp">${Utils.parseJP(w.jp, true)}</div>
-                            <div class="study-ko">${w.ko}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="min-width: 0; flex: 1;">
+                            <div class="study-jp" style="font-size: 1.05rem;">${Utils.parseJP(w.jp, true)}</div>
+                            <div class="study-ko" style="font-size: 0.75rem; color: #64748b; margin-top:3px; word-break: break-all;">${w.ko}</div>
                         </div>
                         <button class="btn-mini-action" onclick="event.stopPropagation(); Utils.speak('${w.jp}')" title="발음 듣기">
                             <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
