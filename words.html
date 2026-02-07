@@ -599,7 +599,7 @@
                 </div>
             </div>
 
-            <button class="start-btn" onclick="startGame()">남은 단어로 복습 게임!</button>
+            <button id="btn-start-game" class="start-btn" onclick="startGame()">남은 단어로 복습 게임!</button>
         </div>
 
         <!-- 4. Game Screen -->
@@ -764,13 +764,15 @@
                 const percent = (masteredCount / totalCount) * 100;
 
                 return `
-                <div class="folder-card" onclick="startStudy(${i})">
-                    <span class="folder-icon">${percent === 100 ? '👑' : '📂'}</span>
-                    <div style="font-weight:bold; color:#fff;">폴더 ${i + 1}</div>
+                <div class="folder-card" onclick="startStudy(${i})" style="${percent === 100 ? 'border-color:var(--color-secondary); background:rgba(16,185,129,0.05);' : ''}">
+                    <span class="folder-icon" style="filter: drop-shadow(0 0 5px ${percent === 100 ? 'rgba(16,185,129,0.5)' : 'transparent'});">
+                        ${percent === 100 ? '�' : '�'}
+                    </span>
+                    <div style="font-weight:bold; color:${percent === 100 ? 'var(--color-secondary)' : '#fff'};">폴더 ${i + 1}</div>
                     <div style="font-size:0.7rem; color:#94a3b8;">${i * 25 + 1} ~ ${Math.min((i + 1) * 25, mainCategory.words.length)}번</div>
-                    <div class="mastered-badge">${masteredCount} / ${totalCount} 정복</div>
+                    <div class="mastered-badge" style="${percent === 100 ? 'background:var(--color-secondary); color:#fff;' : ''}">${masteredCount} / ${totalCount} 정복</div>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: ${percent}%"></div>
+                        <div class="progress-bar" style="width: ${percent}%; ${percent === 100 ? 'background:#fff;' : ''}"></div>
                     </div>
                 </div>
             `}).join('');
@@ -816,10 +818,22 @@
             `;
 
             listUnmastered.innerHTML = unmasteredWords.length ? unmasteredWords.map(w => createItemCard(w, false)).join('')
-                : '<div style="color:#475569; font-size:0.7rem; padding:20px;">남은 단어 없음!</div>';
+                : '<div style="color:#10b981; font-weight:bold; font-size:0.8rem; padding:30px; text-align:center;">🎉 모든 단어를 정복했습니다!</div>';
 
             listMastered.innerHTML = masteredWords.length ? masteredWords.map(w => createItemCard(w, true)).join('')
-                : '<div style="color:#475569; font-size:0.7rem; padding:20px;">정복한 단어 없음</div>';
+                : '<div style="color:#475569; font-size:0.7rem; padding:20px;">아는 단어를 눌러보세요</div>';
+
+            // Game button control
+            const btnGame = document.getElementById('btn-start-game');
+            if (unmasteredWords.length < 2) {
+                btnGame.style.opacity = '0.5';
+                btnGame.style.pointerEvents = 'none';
+                btnGame.textContent = unmasteredWords.length === 0 ? "🎉 올 클리어! 공부 완료" : "단어가 부족합니다 (최소 2개)";
+            } else {
+                btnGame.style.opacity = '1';
+                btnGame.style.pointerEvents = 'auto';
+                btnGame.textContent = "남은 단어로 복습 게임!";
+            }
         }
 
         function toggleCheck(jp) {
@@ -843,9 +857,11 @@
         }
 
         function startGame() {
-            const myChecks = checkedWords[chunkId] || [];
-            if (myChecks.length < 2) {
-                alert("게임을 하려면 최소 2개 이상의 단어를 별표(★) 체크해주세요!");
+            const myMastered = checkedWords[chunkId] || [];
+            const unmasteredPoolSize = currentChunk.filter(w => !myMastered.includes(w.jp)).length;
+
+            if (unmasteredPoolSize < 2) {
+                alert("복습할 단어가 부족합니다. (최소 2개 이상)");
                 return;
             }
             Utils.playSound('click'); switchScreen('game');
