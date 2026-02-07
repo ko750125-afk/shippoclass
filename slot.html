@@ -438,6 +438,19 @@
                     gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                     osc.start(now); osc.stop(now + 0.5);
+                } else if (type === 'siren') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+                    osc.frequency.linearRampToValueAtTime(600, now + 0.4);
+                    osc.frequency.linearRampToValueAtTime(800, now + 0.6);
+                    osc.frequency.linearRampToValueAtTime(600, now + 0.8);
+
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.2, now + 0.8);
+                    gain.gain.linearRampToValueAtTime(0, now + 1.0);
+
+                    osc.start(now); osc.stop(now + 1.0);
                 }
             }
         };
@@ -543,9 +556,14 @@
                 const s2 = getSymbol(1);
 
                 if (s1 && s2 && s1.type !== 'fail' && s2.type !== 'fail') {
-                    Utils.playSound('reach');
+                    Utils.playSound('siren');
+
+                    const validVerbs = slotData.objects[s2.text] ? slotData.objects[s2.text].verbs : [];
+                    const hints = slotData.verbs.filter(v => validVerbs.includes(v.kanji)).map(v => v.meaning);
+                    const hintText = hints.length > 0 ? hints[0] : "???";
+
                     Utils.speak('リーチ！'); // RIICHI!
-                    statusText.textContent = "REACH!!";
+                    statusText.innerHTML = `REACH!!<br><span style="font-size:0.6em; color:#fff;">(Hint: ${hintText}?)</span>`;
                     statusText.style.color = "var(--color-neon-red)";
 
                     // ADD RICH EFFECT
