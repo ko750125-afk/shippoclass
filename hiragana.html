@@ -358,6 +358,14 @@
                 } else if (type === 'click') {
                     osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.1, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1); osc.start(now); osc.stop(now + 0.1);
+                } else if (type === 'swipe') {
+                    // Quick swoosh
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + 0.15);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
                 } else {
                     // Default / Confirm
                     osc.frequency.setValueAtTime(330, now); gain.gain.setValueAtTime(0, now);
@@ -428,12 +436,22 @@
         }
 
         function setMode(mode) {
-            currentMode = mode; isChallengeActive = false; challengeRowSelected = false; feedbackEl.textContent = '';
-
-            // Reset filter if leaving practice or entering challenge to clear "lit up" rows
-            if (mode === 'challenge' || mode === 'practice') {
+            // Keep filter if moving between practice/challenge, BUT if challenge and filter is null, force index 0
+            if (mode === 'challenge') {
+                if (currentFilterIndex === null) currentFilterIndex = 0;
+                challengeRowSelected = true;
+                isChallengeActive = true;
+                setTimeout(() => nextChallenge(), 100);
+            } else if (mode === 'practice') {
+                // Keep filter
+            } else {
+                // Final mode
+                feedbackEl.textContent = '';
                 currentFilterIndex = null;
             }
+
+            currentMode = mode;
+            if (mode !== 'challenge') isChallengeActive = false;
 
             updateInstructions();
             if (mode === 'final') {
@@ -446,6 +464,7 @@
                 finalIdx = 0;
             }
             updateModeButtons();
+            renderSelector();
             renderGrid(currentFilterIndex);
         }
 
@@ -521,11 +540,23 @@
             const item = finalSet[finalIdx]; if (!item) return;
             const container = document.createElement('div'); container.className = 'final-carousel';
             const prev = document.createElement('button'); prev.className = 'col-btn'; prev.textContent = '◀';
-            prev.onclick = () => { if (finalIdx > 0) { finalIdx--; renderGrid(null); } };
+            prev.onclick = () => {
+                if (finalIdx > 0) {
+                    Utils.playSound('swipe');
+                    finalIdx--;
+                    renderGrid(null);
+                }
+            };
             const card = document.createElement('div'); card.className = 'final-card active-slot animate-pop';
             card.innerHTML = `<div class="char">${item.char}</div>`; card.onclick = () => Utils.speak(item.char);
             const next = document.createElement('button'); next.className = 'col-btn'; next.textContent = '▶';
-            next.onclick = () => { if (finalIdx < finalSet.length - 1) { finalIdx++; renderGrid(null); } };
+            next.onclick = () => {
+                if (finalIdx < finalSet.length - 1) {
+                    Utils.playSound('swipe');
+                    finalIdx++;
+                    renderGrid(null);
+                }
+            };
             container.appendChild(prev); container.appendChild(card); container.appendChild(next); gridEl.appendChild(container);
             const counter = document.createElement('div'); counter.style.textAlign = 'center';
             counter.textContent = `${finalIdx + 1} / ${finalSet.length}`; gridEl.appendChild(counter);
