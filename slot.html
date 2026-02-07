@@ -178,6 +178,49 @@
                 display: none;
             }
         }
+
+        /* Reach Effect Animation */
+        @keyframes rainbow-border {
+            0% {
+                border-color: red;
+                box-shadow: 0 0 10px red;
+            }
+
+            20% {
+                border-color: orange;
+                box-shadow: 0 0 20px orange;
+            }
+
+            40% {
+                border-color: yellow;
+                box-shadow: 0 0 40px yellow;
+            }
+
+            60% {
+                border-color: green;
+                box-shadow: 0 0 20px green;
+            }
+
+            80% {
+                border-color: blue;
+                box-shadow: 0 0 10px blue;
+            }
+
+            100% {
+                border-color: purple;
+                box-shadow: 0 0 10px purple;
+            }
+        }
+
+        .reach-active {
+            animation: rainbow-border 0.5s linear infinite !important;
+            transform: scale(1.02);
+            transition: transform 0.2s;
+        }
+
+        .reach-background {
+            background-color: rgba(255, 0, 0, 0.1) !important;
+        }
     </style>
 </head>
 
@@ -189,11 +232,6 @@
                 style="border: 2px solid var(--color-gold); padding: 5px 15px; border-radius: 20px; color: var(--color-gold);">
                 💰 <span id="coin-count">0</span>
             </div>
-        </div>
-
-        <div id="sound-init-bar"
-            style="display:none; background: var(--color-gold); color: black; text-align: center; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 10px; margin-bottom: 15px;">
-            🔊 클릭해서 소리를 켜주세요! (Sound Start)
         </div>
 
         <div class="slot-machine">
@@ -374,12 +412,21 @@
             stopCount = 0; stopping = [false, false, false];
             resultMeaning.textContent = "";
 
+            // Reset Reach Effects
+            document.querySelector('.slot-machine').classList.remove('reach-active');
+            document.querySelector('.container').classList.remove('reach-background');
+            statusText.style.color = "var(--color-neon-red)";
+
             reels.forEach((_, i) => {
                 let pos = 0;
+                // LAST REEL SLOW-DOWN Logic (for skill stop)
+                // Reel 1, 2: 20ms (Fast) | Reel 3: 80ms (Slow - Aimable)
+                const speed = (i === 2) ? 80 : 20;
+
                 spinIntervals[i] = setInterval(() => {
                     pos -= 20; if (pos <= -180 * reels[i].length / 3) pos = 0;
                     reelElements[i].style.top = pos + "px";
-                }, 20);
+                }, speed);
                 document.getElementById(`stop-${i + 1}`).disabled = false;
             });
             Utils.playSound('spin');
@@ -410,6 +457,10 @@
                 Utils.playSound('reach');
                 statusText.textContent = "REACH!!";
                 statusText.style.color = "var(--color-neon-red)";
+
+                // ADD RICH EFFECT
+                document.querySelector('.slot-machine').classList.add('reach-active');
+                document.querySelector('.container').classList.add('reach-background');
             }
 
             if (stopCount === 3) finishSpin();
@@ -437,6 +488,10 @@
 
             // Speak regardless, but maybe tone differs? For now just speak.
             Utils.speak(sentence);
+
+            // Cleanup Reach Effects
+            document.querySelector('.slot-machine').classList.remove('reach-active');
+            document.querySelector('.container').classList.remove('reach-background');
 
             if (isWin) {
                 userCoins += 50;
