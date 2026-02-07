@@ -463,19 +463,21 @@
             speak: (text) => {
                 if (!window.speechSynthesis) return;
                 window.speechSynthesis.cancel();
-                // Strip furigana for TTS
-                const cleanText = text.replace(/\(.*\)/g, "");
+                // Strip furigana for TTS using non-greedy regex
+                const cleanText = text.replace(/\([^)]*\)/g, "");
                 const u = new SpeechSynthesisUtterance(cleanText); u.lang = 'ja-JP'; u.rate = 1.0;
                 window.speechSynthesis.speak(u);
             },
             parseJP: (text, useRuby) => {
                 if (!text.includes('(')) return text;
-                const match = text.match(/(.*)\((.*)\)(.*)/);
-                if (!match) return text;
                 if (useRuby) {
-                    return `${match[1]}<span class="jp-ruby">${match[2]}</span>${match[3]}`;
+                    // Replace all 漢字(かんじ) with 漢字<span class="jp-ruby">かんじ</span>
+                    return text.replace(/(.*)\(([^)]*)\)(.*)/g, (match, p1, p2, p3) => {
+                        return `${p1}<span class="jp-ruby">${p2}</span>${p3}`;
+                    });
                 } else {
-                    return `${match[1]}${match[3]}`; // Strips furigana for game
+                    // Strips all furigana for game
+                    return text.replace(/\([^)]*\)/g, "");
                 }
             }
         };
