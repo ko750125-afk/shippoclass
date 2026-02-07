@@ -287,37 +287,9 @@
             <div class="shippo-lobby-label">YOUTUBE 📺</div>
         </a>
 
-        <!-- YouTube Referrer Gate -->
-        <div id="youtube-gate" style="display: none;">
-            <div class="gate-content">
-                <h2 style="color: var(--color-gold); margin-bottom: 10px;">환영합니다! 😸</h2>
-                <p style="color: #ccc; line-height: 1.6;">본 사이트는 <b>'십뽀의 일본어 교실'</b> 유튜브 구독자님들을 위한 전용 학습 공간입니다!</p>
-                <p style="color: #aaa; font-size: 0.9rem; margin-top: 10px;">매번 유튜브 채널을 통해 방문해 주시면 채널 운영에 큰 힘이 됩니다. 아래
-                    버튼을 눌러 채널 홈을 방문하신 후 입장해 주세요!</p>
-                <a href="https://www.youtube.com/@ShippoClass" target="_blank" class="gate-btn" onclick="enterSite()">채널
-                    방문 후 입장하기</a>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function enterSite() {
-            document.getElementById('youtube-gate').style.display = 'none';
-            // Use sessionStorage to require a fresh visit every time they open the site in a new tab/window
-            sessionStorage.setItem('gate_passed_session', 'true');
-        }
-
-        window.onload = function () {
-            // Check if referring site is YouTube
-            const isFromYoutube = document.referrer.includes('youtube.com');
-            const hasPassedThisSession = sessionStorage.getItem('gate_passed_session');
-
-            // If not from youtube AND haven't passed in this session, show gate
-            if (!isFromYoutube && !hasPassedThisSession) {
-                document.getElementById('youtube-gate').style.display = 'flex';
-            }
-        }
-    </script>
+        <script>
+            // Gate logic removed as requested
+        </script>
 
 </body>
 

@@ -266,10 +266,6 @@
 
             // Warm up TTS as well
             warmUpTTS();
-
-            // Hide bar if visible
-            const bar = document.getElementById('sound-init-bar');
-            if (bar) bar.style.display = 'none';
         }
 
         const Utils = {
@@ -349,13 +345,7 @@
         let stopCount = 0;
 
         async function init() {
-            // Sound Bar - Show to ensure sound plays
-            const bar = document.getElementById('sound-init-bar');
-            if (bar) {
-                bar.style.display = 'block';
-                bar.onclick = resumeAudio;
-            }
-
+            // Sound bar logic removed
             const resp = await fetch('data/slots.json');
             slotData = await resp.json();
 
