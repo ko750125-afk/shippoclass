@@ -504,9 +504,15 @@
             speak: (text) => {
                 if (!window.speechSynthesis) return;
                 window.speechSynthesis.cancel();
-                // Strip furigana for TTS using non-greedy regex
-                const cleanText = text.replace(/\([^)]*\)/g, "");
-                const u = new SpeechSynthesisUtterance(cleanText); u.lang = 'ja-JP'; u.rate = 1.0;
+
+                // Use furigana for TTS if available for better accuracy
+                // e.g., 私(わたし) -> わたし
+                let speechText = text;
+                if (text.includes('(')) {
+                    speechText = text.replace(/[^()]+\(([^)]+)\)/g, '$1');
+                }
+
+                const u = new SpeechSynthesisUtterance(speechText); u.lang = 'ja-JP'; u.rate = 1.0;
                 window.speechSynthesis.speak(u);
             },
             parseJP: (text, useRuby) => {
@@ -563,13 +569,21 @@
                 chunks.push(mainCategory.words.slice(i, i + 25));
             }
 
-            list.innerHTML = chunks.map((chunk, i) => `
+            list.innerHTML = chunks.map((chunk, i) => {
+                const cId = `${mainCategory.id}_${i}`;
+                const checkedInFolder = (checkedWords[cId] || []).length;
+                const statusHtml = checkedInFolder > 0
+                    ? `<div style="font-size:0.7rem; color:var(--color-accent); margin-top:5px;">★ ${checkedInFolder}개 복습 중</div>`
+                    : `<div style="font-size:0.7rem; color:#475569; margin-top:5px;">체크된 단어 없음</div>`;
+
+                return `
                 <div class="folder-card" onclick="startStudy(${i})">
-                    <span class="folder-icon">📂</span>
+                    <span class="folder-icon">${checkedInFolder > 0 ? '⭐' : '📂'}</span>
                     <div style="font-weight:bold; color:#fff;">폴더 ${i + 1}</div>
                     <div style="font-size:0.7rem; color:#64748b;">${i * 25 + 1} ~ ${Math.min((i + 1) * 25, mainCategory.words.length)}번</div>
+                    ${statusHtml}
                 </div>
-            `).join('');
+            `}).join('');
             switchScreen('subselection');
         }
 
