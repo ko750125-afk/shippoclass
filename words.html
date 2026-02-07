@@ -541,7 +541,7 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">🏠 로비</a>
-            <span class="ver-badge">필수단어 300 v4.0 (ULTRA STABILITY)</span>
+            <span class="ver-badge">필수단어 300 v4.1 (ENDLESS CHALLENGE)</span>
         </div>
 
         <h1 id="screen-title" style="display:none;">단어 마스터 챌린지</h1>
@@ -620,7 +620,11 @@
             <h2 style="color: var(--color-primary); font-size: 2rem; margin: 0;">TIME OVER</h2>
             <p style="font-size: 1.2rem; margin: 20px 0;">SCORE: <span id="final-score"
                     style="color: var(--color-accent);">0</span></p>
-            <button class="start-btn" onclick="location.reload()">처음으로</button>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <button class="start-btn" onclick="retryGame()">다시 도전! 🔥</button>
+                <button class="start-btn" onclick="quitGame()" style="background:#334155; box-shadow:none;">공부
+                    폴더로</button>
+            </div>
         </div>
     </div>
 
@@ -1011,8 +1015,19 @@
 
         function updateScore() { document.getElementById('score').textContent = score; }
         function gameOver() {
+            if (timerInterval) clearInterval(timerInterval);
             document.getElementById('final-score').textContent = score;
             document.getElementById('game-over-screen').style.display = 'flex';
+        }
+
+        function retryGame() {
+            document.getElementById('game-over-screen').style.display = 'none';
+            startGame();
+        }
+
+        function quitGame() {
+            document.getElementById('game-over-screen').style.display = 'none';
+            switchScreen('study');
         }
 
         document.addEventListener('DOMContentLoaded', init);
