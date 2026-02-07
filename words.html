@@ -221,7 +221,8 @@
 
         <div id="start-screen" style="margin-top: 50px;">
             <p style="font-size: 1.2rem; margin-bottom: 30px;">
-                제한시간 60초!<br>
+                제한시간 30초!<br>
+                (정답 시 +3초)<br>
                 단어의 짝을 찾아주세요.<br>
                 (일본어 - 한국어)
             </p>
@@ -244,6 +245,8 @@
     <script>
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx = null;
+        let bgmNodes = [];
+        let bgmTimer = null;
 
         function resumeAudio() {
             if (!audioCtx) audioCtx = new AudioContext();
@@ -251,6 +254,41 @@
         }
 
         const Utils = {
+            playBGM: () => {
+                if (!audioCtx) return;
+                Utils.stopBGM();
+                const ctx = audioCtx;
+
+                const playLoop = () => {
+                    const t = ctx.currentTime;
+                    // Simple BGM: Soft Arpeggio
+                    const notes = [130.81, 164.81, 196.00, 261.63]; // C3 E3 G3 C4
+                    notes.forEach((freq, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.value = freq;
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+
+                        const startTime = t + i * 0.5;
+                        gain.gain.setValueAtTime(0, startTime);
+                        gain.gain.linearRampToValueAtTime(0.015, startTime + 0.1);
+                        gain.gain.linearRampToValueAtTime(0, startTime + 0.4);
+
+                        osc.start(startTime);
+                        osc.stop(startTime + 0.5);
+                        bgmNodes.push(osc);
+                    });
+                    bgmTimer = setTimeout(playLoop, 2000);
+                };
+                playLoop();
+            },
+            stopBGM: () => {
+                if (bgmTimer) clearTimeout(bgmTimer);
+                bgmNodes.forEach(n => { try { n.stop(); } catch (e) { } });
+                bgmNodes = [];
+            },
             playSound: (type) => {
                 if (!audioCtx) return;
                 const ctx = audioCtx;
@@ -299,7 +337,7 @@
 
         let vocabData = [];
         let score = 0;
-        let timeLeft = 60;
+        let timeLeft = 30;
         let timerInterval;
         let selectedCards = [];
         let isProcessing = false;
@@ -316,11 +354,12 @@
 
         function startGame() {
             resumeAudio();
+            Utils.playBGM();
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('game-grid').style.display = 'grid';
             score = 0;
             updateScore();
-            timeLeft = 60;
+            timeLeft = 30;
             generateBoard();
             startTimer();
         }
@@ -336,7 +375,7 @@
                     gameOver();
                     return;
                 }
-                fill.style.width = (timeLeft / 60 * 100) + '%';
+                fill.style.width = Math.min(100, (timeLeft / 30 * 100)) + '%';
                 if (timeLeft <= 10 && timeLeft > 0) {
                     fill.style.background = '#ff4b4b';
                     if (Math.round(timeLeft * 10) % 10 === 0) Utils.playSound('tick');
@@ -416,6 +455,7 @@
                     c1.el.classList.add('matched');
                     c2.el.classList.add('matched');
                     score += 10;
+                    timeLeft += 3;
                     updateScore();
                     checkRoundClear();
                     isProcessing = false;
@@ -455,6 +495,7 @@
         }
 
         function gameOver() {
+            Utils.stopBGM();
             document.getElementById('final-score').textContent = score;
             document.getElementById('game-over-screen').style.display = 'flex';
         }
