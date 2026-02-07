@@ -542,12 +542,9 @@
                 if (!window.speechSynthesis) return;
                 window.speechSynthesis.cancel();
 
-                // Use furigana for TTS if available for better accuracy
-                // e.g., 私(わたし) -> わたし
-                let speechText = text;
-                if (text.includes('(')) {
-                    speechText = text.replace(/[^()]+\(([^)]+)\)/g, '$1');
-                }
+                // Improved accuracy: Replace only the Kanji/Katakana part with its reading
+                // This preserves hiragana prefixes like 'お' (o-cha, o-kaasan)
+                const speechText = text.replace(/([\u4e00-\u9fff々\u30a0-\u30ff\u30fc]+)\(([^)]+)\)/g, '$2');
 
                 const u = new SpeechSynthesisUtterance(speechText); u.lang = 'ja-JP'; u.rate = 1.0;
                 window.speechSynthesis.speak(u);
@@ -555,10 +552,8 @@
             parseJP: (text, useRuby) => {
                 if (!text.includes('(')) return text;
                 if (useRuby) {
-                    // Replace all 漢字(かんじ) with 漢字<span class="jp-ruby">かんじ</span>
-                    return text.replace(/(.*)\(([^)]*)\)(.*)/g, (match, p1, p2, p3) => {
-                        return `${p1}<span class="jp-ruby">${p2}</span>${p3}`;
-                    });
+                    // Only apply ruby-style formatting to the relevant Kanji/Katakana
+                    return text.replace(/([\u4e00-\u9fff々\u30a0-\u30ff\u30fc]+)\(([^)]+)\)/g, '$1<span class="jp-ruby">$2</span>');
                 } else {
                     // Strips all furigana for game
                     return text.replace(/\([^)]*\)/g, "");
