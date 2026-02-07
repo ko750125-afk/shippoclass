@@ -762,17 +762,26 @@
                 const masteredCount = (checkedWords[cId] || []).length;
                 const totalCount = chunk.length;
                 const percent = (masteredCount / totalCount) * 100;
+                const isFinished = percent === 100;
+
+                // UI Logic: Incomplete folders get the "Active Neon Glow"
+                // Finished folders get the "Solid Gold Reward" look
+                const cardStyle = !isFinished
+                    ? 'border-color: var(--color-primary); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);'
+                    : 'border-color: #f59e0b; background: rgba(245, 158, 11, 0.05);';
+
+                const icon = isFinished ? '💰' : '📁';
+                const folderColor = isFinished ? '#f59e0b' : '#fff';
+                const badgeStyle = isFinished ? 'background:#f59e0b; color:#fff;' : '';
 
                 return `
-                <div class="folder-card" onclick="startStudy(${i})" style="${percent === 100 ? 'border-color:var(--color-secondary); background:rgba(16,185,129,0.05);' : ''}">
-                    <span class="folder-icon" style="filter: drop-shadow(0 0 5px ${percent === 100 ? 'rgba(16,185,129,0.5)' : 'transparent'});">
-                        ${percent === 100 ? '�' : '�'}
-                    </span>
-                    <div style="font-weight:bold; color:${percent === 100 ? 'var(--color-secondary)' : '#fff'};">폴더 ${i + 1}</div>
+                <div class="folder-card" onclick="startStudy(${i})" style="${cardStyle}">
+                    <span class="folder-icon">${icon}</span>
+                    <div style="font-weight:bold; color:${folderColor};">폴더 ${i + 1}</div>
                     <div style="font-size:0.7rem; color:#94a3b8;">${i * 25 + 1} ~ ${Math.min((i + 1) * 25, mainCategory.words.length)}번</div>
-                    <div class="mastered-badge" style="${percent === 100 ? 'background:var(--color-secondary); color:#fff;' : ''}">${masteredCount} / ${totalCount} 정복</div>
+                    <div class="mastered-badge" style="${badgeStyle}">${masteredCount} / ${totalCount} 정복</div>
                     <div class="progress-container">
-                        <div class="progress-bar" style="width: ${percent}%; ${percent === 100 ? 'background:#fff;' : ''}"></div>
+                        <div class="progress-bar" style="width: ${percent}%; ${isFinished ? 'background:#f59e0b;' : ''}"></div>
                     </div>
                 </div>
             `}).join('');
