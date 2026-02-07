@@ -541,7 +541,7 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">🏠 로비</a>
-            <span class="ver-badge">필수단어 300 v3.7 (AUDIO FEEDBACK)</span>
+            <span class="ver-badge">필수단어 300 v3.8 (ELITE UPDATE)</span>
         </div>
 
         <h1 id="screen-title" style="display:none;">단어 마스터 챌린지</h1>
@@ -652,22 +652,25 @@
                     osc.frequency.setValueAtTime(800, now); gain.gain.setValueAtTime(0.05, now); osc.start(now); osc.stop(now + 0.05);
                 }
                 else if (type === 'mastery') {
-                    // Pleasant two-tone chime (Success!)
-                    osc.frequency.setValueAtTime(523.25, now); // C5
-                    osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                    // High-end Arpeggio (C5 -> E5 -> G5)
+                    osc.type = 'sine';
+                    const frequencies = [523.25, 659.25, 783.99];
+                    frequencies.forEach((freq, idx) => {
+                        osc.frequency.setValueAtTime(freq, now + (idx * 0.06));
+                    });
                     gain.gain.setValueAtTime(0, now);
-                    gain.gain.linearRampToValueAtTime(0.1, now + 0.05);
-                    gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                    osc.start(now); osc.stop(now + 0.3);
+                    gain.gain.linearRampToValueAtTime(0.12, now + 0.05);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.35);
+                    osc.start(now); osc.stop(now + 0.35);
                 }
                 else if (type === 'unmastery') {
-                    // Soft subtle pop (Back to study)
-                    osc.frequency.setValueAtTime(300, now);
-                    osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.15);
                     gain.gain.setValueAtTime(0, now);
                     gain.gain.linearRampToValueAtTime(0.05, now + 0.02);
-                    gain.gain.linearRampToValueAtTime(0, now + 0.1);
-                    osc.start(now); osc.stop(now + 0.1);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
                 }
                 else if (type === 'wrong') {
                     osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); gain.gain.setValueAtTime(0.1, now); osc.start(now); osc.stop(now + 0.2);
@@ -731,20 +734,26 @@
                     masteredInCourse += (checkedWords[cId] || []).length;
                 }
                 totalMastered += masteredInCourse;
-                const percent = (masteredInCourse / courseWords.length) * 100;
+                const isFinished = percent === 100;
+                const cardStyle = isFinished
+                    ? 'border-color: #ffcc00; box-shadow: 0 0 25px rgba(255, 204, 0, 0.3); background: rgba(255,204,0,0.1);'
+                    : '';
+                const progressColor = isFinished ? '#ffcc00' : 'var(--color-secondary)';
 
                 return `
-                <div class="course-card" onclick="showSubFolders(${i})">
-                    <span class="word-count-tag">${courseWords.length} 단어</span>
-                    <h3 style="margin-bottom:10px;">${c.title}</h3>
+                <div class="course-card" onclick="showSubFolders(${i})" style="${cardStyle}">
+                    <span class="word-count-tag" style="${isFinished ? 'background:#ffcc00; color:#000;' : ''}">
+                        ${isFinished ? '🏆 올클리어' : courseWords.length + ' 단어'}
+                    </span>
+                    <h3 style="margin-bottom:10px; color:${isFinished ? '#ffcc00' : '#fff'};">${c.title}</h3>
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                        <span style="font-size:0.85rem; color:var(--color-secondary); font-weight:bold;">
+                        <span style="font-size:0.85rem; color:${progressColor}; font-weight:bold;">
                             ${masteredInCourse} / ${courseWords.length} 정복
                         </span>
                         <span style="font-size:0.85rem; color:#64748b;">${Math.round(percent)}%</span>
                     </div>
                     <div class="progress-container" style="background:rgba(0,0,0,0.3); margin-top:0;">
-                        <div class="progress-bar" style="width: ${percent}%"></div>
+                        <div class="progress-bar" style="width: ${percent}%; background:${progressColor};"></div>
                     </div>
                 </div>
                 `;
