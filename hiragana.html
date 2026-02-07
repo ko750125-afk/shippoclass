@@ -613,6 +613,7 @@
         function startChallenge() { setMode('challenge'); isChallengeActive = true; feedbackEl.innerHTML = "행을 선택하면 문제가 시작됩니다!"; }
 
         function nextChallenge() {
+            if (currentMode !== 'challenge') return;
             feedbackEl.textContent = "🔊 잘 듣고 맞춰보세요!"; feedbackEl.className = '';
 
             // If queue is empty, fill it with all available characters for current filter
