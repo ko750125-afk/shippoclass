@@ -12,19 +12,20 @@
         rel="stylesheet">
     <style>
         :root {
-            --color-bg: #1e1e24;
+            --color-bg: #0f172a;
             --color-card-front: #ffffff;
-            --color-card-back: #333;
-            --color-primary: #ff6b6b;
-            --color-secondary: #4ecdc4;
-            --color-accent: #ffe66d;
+            --color-card-back: #1e293b;
+            --color-primary: #f43f5e;
+            --color-secondary: #10b981;
+            --color-accent: #f59e0b;
+            --color-text: #f8fafc;
             --font-jp: 'Noto Sans JP', sans-serif;
             --font-kr: 'Noto Sans KR', sans-serif;
         }
 
         body {
             background-color: var(--color-bg);
-            color: white;
+            color: var(--color-text);
             font-family: var(--font-kr);
             margin: 0;
             padding: 0;
@@ -34,6 +35,7 @@
             min-height: 100vh;
             user-select: none;
             -webkit-user-select: none;
+            overflow-x: hidden;
         }
 
         .container {
@@ -46,15 +48,123 @@
 
         .header {
             margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
+        .btn-nav {
+            align-self: flex-start;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn-nav:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- Screens --- */
+        .screen {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Course Selection --- */
+        .course-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .course-card {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-card:hover {
+            border-color: var(--color-accent);
+            transform: scale(1.02);
+            background: #273548;
+        }
+
+        .course-card h3 {
+            margin: 0 0 5px 0;
+            color: var(--color-accent);
+            font-size: 1.25rem;
+        }
+
+        .course-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        /* --- Study Screen --- */
+        .study-list {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .study-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 20px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .study-item:last-child {
+            border-bottom: none;
+        }
+
+        .study-jp {
+            font-family: var(--font-jp);
+            font-weight: bold;
+            color: var(--color-accent);
+            font-size: 1.1rem;
+        }
+
+        /* --- Game Screen --- */
         .timer-bar {
             width: 100%;
             height: 10px;
-            background: #333;
+            background: #334155;
             border-radius: 5px;
             overflow: hidden;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .timer-fill {
@@ -64,29 +174,34 @@
             transition: width 0.1s linear;
         }
 
+        .score-board {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
         .game-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-bottom: 20px;
             perspective: 1000px;
         }
 
         .card {
             background: var(--color-card-back);
-            border-radius: 10px;
+            border-radius: 12px;
             height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            border: 2px solid #444;
+            transition: all 0.2s;
+            border: 2px solid #334155;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
+            word-break: break-all;
+            padding: 5px;
         }
 
         .card.jp {
@@ -96,7 +211,7 @@
 
         .card.selected {
             border-color: var(--color-secondary);
-            background: rgba(78, 205, 196, 0.2);
+            background: rgba(16, 185, 129, 0.2);
             transform: scale(0.95);
         }
 
@@ -141,36 +256,22 @@
             }
         }
 
-        .score-board {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-        }
-
+        /* --- Common UI --- */
         .start-btn {
             padding: 15px 40px;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             background: var(--color-secondary);
             color: #fff;
             border: none;
             border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
-            animation: pulse 2s infinite;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+            transition: transform 0.2s;
         }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.05);
-            }
-
-            100% {
-                transform: scale(1);
-            }
+        .start-btn:active {
+            transform: scale(0.95);
         }
 
         #game-over-screen {
@@ -179,7 +280,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(15, 23, 42, 0.95);
             display: none;
             flex-direction: column;
             align-items: center;
@@ -188,22 +289,13 @@
         }
 
         .result-box {
-            background: #222;
+            background: #1e293b;
             padding: 40px;
-            border-radius: 20px;
+            border-radius: 24px;
             border: 2px solid var(--color-accent);
             text-align: center;
-        }
-
-        .btn-nav {
-            display: inline-block;
-            padding: 8px 16px;
-            background: #333;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
+            max-width: 320px;
+            width: 80%;
         }
     </style>
 </head>
@@ -212,33 +304,47 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">← 로비로</a>
-            <h1>매칭 챌린지</h1>
+            <h1 id="screen-title" style="margin: 5px 0;">단어 챌린지</h1>
+        </div>
+
+        <!-- 1. Selection Screen -->
+        <div id="selection-screen" class="screen active">
+            <p style="color: #94a3b8; margin-bottom: 20px;">공부할 코스를 선택해주세요.</p>
+            <div id="course-list" class="course-grid">
+                <!-- Courses injected here -->
+            </div>
+        </div>
+
+        <!-- 2. Study Screen -->
+        <div id="study-screen" class="screen">
+            <div id="study-content">
+                <h2 id="study-course-title" style="color: var(--color-accent);"></h2>
+                <div class="study-list" id="study-list">
+                    <!-- Words list injected here -->
+                </div>
+                <button class="start-btn" onclick="startGame()">학습 완료! 도전하기</button>
+            </div>
+        </div>
+
+        <!-- 3. Game Screen -->
+        <div id="game-screen" class="screen">
             <div class="score-board">점수: <span id="score">0</span></div>
             <div class="timer-bar">
                 <div class="timer-fill" id="timer-fill"></div>
             </div>
-        </div>
-
-        <div id="start-screen" style="margin-top: 50px;">
-            <p style="font-size: 1.2rem; margin-bottom: 30px;">
-                제한시간 30초!<br>
-                (정답 시 +3초)<br>
-                단어의 짝을 찾아주세요.<br>
-                (일본어 - 한국어)
-            </p>
-            <button class="start-btn" onclick="startGame()">START!</button>
-        </div>
-
-        <div id="game-grid" class="game-grid" style="display: none;">
-            <!-- Cards will be generated here -->
+            <div id="game-grid" class="game-grid">
+                <!-- Cards injected here -->
+            </div>
         </div>
     </div>
 
+    <!-- Game Over Screen -->
     <div id="game-over-screen">
         <div class="result-box">
-            <h2 style="color: var(--color-accent); font-size: 2rem;">TIME OVER!</h2>
-            <p style="font-size: 1.5rem;">최종 점수: <span id="final-score">0</span>점</p>
-            <button class="start-btn" onclick="location.reload()">다시 하기</button>
+            <h2 style="color: var(--color-primary); font-size: 2rem; margin-top: 0;">TIME OVER!</h2>
+            <p style="font-size: 1.2rem; margin: 20px 0;">최종 점수: <span id="final-score"
+                    style="font-weight: bold; color: var(--color-accent);">0</span>점</p>
+            <button class="start-btn" onclick="showSelection()">처음으로</button>
         </div>
     </div>
 
@@ -258,11 +364,9 @@
                 if (!audioCtx) return;
                 Utils.stopBGM();
                 const ctx = audioCtx;
-
                 const playLoop = () => {
                     const t = ctx.currentTime;
-                    // Simple BGM: Soft Arpeggio
-                    const notes = [130.81, 164.81, 196.00, 261.63]; // C3 E3 G3 C4
+                    const notes = [130.81, 164.81, 196.00, 261.63];
                     notes.forEach((freq, i) => {
                         const osc = ctx.createOscillator();
                         const gain = ctx.createGain();
@@ -270,14 +374,11 @@
                         osc.frequency.value = freq;
                         osc.connect(gain);
                         gain.connect(ctx.destination);
-
                         const startTime = t + i * 0.5;
                         gain.gain.setValueAtTime(0, startTime);
                         gain.gain.linearRampToValueAtTime(0.015, startTime + 0.1);
                         gain.gain.linearRampToValueAtTime(0, startTime + 0.4);
-
-                        osc.start(startTime);
-                        osc.stop(startTime + 0.5);
+                        osc.start(startTime); osc.stop(startTime + 0.5);
                         bgmNodes.push(osc);
                     });
                     bgmTimer = setTimeout(playLoop, 2000);
@@ -291,72 +392,91 @@
             },
             playSound: (type) => {
                 if (!audioCtx) return;
-                const ctx = audioCtx;
-                const now = ctx.currentTime;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
+                const ctx = audioCtx; const now = ctx.currentTime;
+                const osc = ctx.createOscillator(); const gain = ctx.createGain();
+                osc.connect(gain); gain.connect(ctx.destination);
 
                 if (type === 'click') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(800, now);
-                    gain.gain.setValueAtTime(0.1, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.type = 'sine'; osc.frequency.setValueAtTime(800, now);
+                    gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
                     osc.start(now); osc.stop(now + 0.1);
                 } else if (type === 'match') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(523.25, now); // C5
-                    osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-                    osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-
-                    gain.gain.setValueAtTime(0, now);
-                    gain.gain.linearRampToValueAtTime(0.2, now + 0.05);
-                    gain.gain.setValueAtTime(0.2, now + 0.2);
+                    osc.type = 'triangle'; osc.frequency.setValueAtTime(523.25, now);
+                    gain.gain.setValueAtTime(0, now); gain.gain.linearRampToValueAtTime(0.2, now + 0.05);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-
                     osc.start(now); osc.stop(now + 0.6);
                 } else if (type === 'wrong') {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(150, now);
-                    osc.frequency.linearRampToValueAtTime(100, now + 0.3);
-
-                    gain.gain.setValueAtTime(0.2, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now);
+                    gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                     osc.start(now); osc.stop(now + 0.3);
-                } else if (type === 'tick') {
-                    osc.type = 'square';
-                    osc.frequency.setValueAtTime(800, now);
-                    gain.gain.setValueAtTime(0.05, now);
-                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-                    osc.start(now); osc.stop(now + 0.05);
                 }
             }
         };
 
-        let vocabData = [];
+        let courseData = [];
+        let selectedCourse = null;
         let score = 0;
         let timeLeft = 30;
         let timerInterval;
         let selectedCards = [];
         let isProcessing = false;
 
-        async function loadVocab() {
+        async function init() {
             try {
-                const resp = await fetch('data/vocab_5.json');
-                vocabData = await resp.json();
+                const resp = await fetch('data/vocab_courses.json');
+                const data = await resp.json();
+                courseData = data.courses;
+                renderCourseList();
             } catch (e) {
-                console.error("Failed to load vocab:", e);
+                console.error("Failed to load courses:", e);
                 alert("데이터 로드 실패!");
             }
         }
 
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId + '-screen').classList.add('active');
+
+            // Update title
+            const titleMap = { selection: '코스 선택', study: '학습하기', game: '매칭 챌린지' };
+            let title = titleMap[screenId] || '십뽀교실';
+            if (selectedCourse && (screenId === 'study' || screenId === 'game')) {
+                title += ` - ${selectedCourse.title}`;
+            }
+            document.getElementById('screen-title').textContent = title;
+        }
+
+        function renderCourseList() {
+            const list = document.getElementById('course-list');
+            list.innerHTML = courseData.map((course, idx) => `
+                <div class="course-card" onclick="startStudy(${idx})">
+                    <h3>${course.title}</h3>
+                    <p>${course.description}</p>
+                </div>
+            `).join('');
+            switchScreen('selection');
+        }
+
+        function startStudy(idx) {
+            resumeAudio();
+            Utils.playSound('click');
+            selectedCourse = courseData[idx];
+            document.getElementById('study-course-title').textContent = selectedCourse.title;
+            const studyList = document.getElementById('study-list');
+            studyList.innerHTML = selectedCourse.words.map(w => `
+                <div class="study-item">
+                    <span class="study-jp">${w.jp}</span>
+                    <span class="study-ko">${w.ko}</span>
+                </div>
+            `).join('');
+            switchScreen('study');
+        }
+
         function startGame() {
             resumeAudio();
+            Utils.playSound('click');
             Utils.playBGM();
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('game-grid').style.display = 'grid';
+            switchScreen('game');
             score = 0;
             updateScore();
             timeLeft = 30;
@@ -366,51 +486,39 @@
 
         function startTimer() {
             const fill = document.getElementById('timer-fill');
+            if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timeLeft -= 0.1;
                 if (timeLeft <= 0) {
                     timeLeft = 0;
                     clearInterval(timerInterval);
-                    fill.style.width = '0%';
                     gameOver();
                     return;
                 }
                 fill.style.width = Math.min(100, (timeLeft / 30 * 100)) + '%';
-                if (timeLeft <= 10 && timeLeft > 0) {
-                    fill.style.background = '#ff4b4b';
-                    if (Math.round(timeLeft * 10) % 10 === 0) Utils.playSound('tick');
-                } else fill.style.background = '#ff6b6b';
+                if (timeLeft <= 5) fill.style.background = '#f43f5e';
+                else fill.style.background = '#10b981';
             }, 100);
         }
 
         function generateBoard() {
-            // Pick 9 words randomly? 
-            // Wait, 9 cards total is odd. It must be pairs.
-            // User said "9 cards with 5 level words". 
-            // Maybe 9 PAIRS? Total 18 cards?
-            // Or 9 slots? 
-            // If it's matching game, we need even number of cards.
-            // Let's do 4 pairs (8 cards) or 6 pairs (12 cards) per round.
-            // Let's try 6 pairs (12 cards) for a grid. 3x4.
-
             const grid = document.getElementById('game-grid');
             grid.innerHTML = '';
 
-            // Randomly select 6 words
+            // Pick 6 random words from the selected course
+            const pool = [...selectedCourse.words];
             const roundWords = [];
-            const tempVocab = [...vocabData];
             for (let i = 0; i < 6; i++) {
-                if (tempVocab.length === 0) break;
-                const rIdx = Math.floor(Math.random() * tempVocab.length);
-                roundWords.push(tempVocab[rIdx]);
-                tempVocab.splice(rIdx, 1);
+                if (pool.length === 0) break;
+                const rIdx = Math.floor(Math.random() * pool.length);
+                roundWords.push(pool[rIdx]);
+                pool.splice(rIdx, 1);
             }
 
-            // Create cards (JP and KR)
             let cards = [];
             roundWords.forEach(w => {
-                cards.push({ id: w.jp, text: w.jp, type: 'jp', pair: w.ko });
-                cards.push({ id: w.jp, text: w.ko, type: 'kr', pair: w.jp });
+                cards.push({ id: w.jp, text: w.jp, type: 'jp' });
+                cards.push({ id: w.jp, text: w.ko, type: 'kr' });
             });
 
             // Shuffle
@@ -423,7 +531,6 @@
                 const el = document.createElement('div');
                 el.className = `card ${c.type}`;
                 el.textContent = c.text;
-                el.dataset.id = c.id;
                 el.onclick = () => handleCardClick(el, c);
                 grid.appendChild(el);
             });
@@ -431,11 +538,9 @@
 
         function handleCardClick(el, cardData) {
             if (isProcessing || el.classList.contains('matched') || el.classList.contains('selected')) return;
-
             Utils.playSound('click');
             el.classList.add('selected');
             selectedCards.push({ el, data: cardData });
-
             if (selectedCards.length === 2) {
                 isProcessing = true;
                 checkMatch();
@@ -445,62 +550,48 @@
         function checkMatch() {
             const [c1, c2] = selectedCards;
             const match = (c1.data.id === c2.data.id);
-
             if (match) {
-                // Correct
                 Utils.playSound('match');
                 setTimeout(() => {
-                    c1.el.classList.remove('selected');
-                    c2.el.classList.remove('selected');
                     c1.el.classList.add('matched');
                     c2.el.classList.add('matched');
                     score += 10;
                     timeLeft += 3;
                     updateScore();
-                    checkRoundClear();
                     isProcessing = false;
                     selectedCards = [];
+                    if (document.querySelectorAll('.matched').length >= 12) {
+                        setTimeout(generateBoard, 500);
+                    }
                 }, 300);
             } else {
-                // Wrong
                 Utils.playSound('wrong');
                 setTimeout(() => {
                     c1.el.classList.add('wrong');
                     c2.el.classList.add('wrong');
+                    setTimeout(() => {
+                        c1.el.classList.remove('wrong', 'selected');
+                        c2.el.classList.remove('wrong', 'selected');
+                        isProcessing = false;
+                        selectedCards = [];
+                    }, 400);
                 }, 300);
-
-                setTimeout(() => {
-                    c1.el.classList.remove('wrong', 'selected');
-                    c2.el.classList.remove('wrong', 'selected');
-                    isProcessing = false;
-                    selectedCards = [];
-                }, 800);
             }
         }
 
-        function checkRoundClear() {
-            const matched = document.querySelectorAll('.matched').length;
-            if (matched >= 12) { // 6 pairs * 2
-                // Round Clear!
-                setTimeout(() => {
-                    score += 5; // Bonus
-                    updateScore();
-                    generateBoard(); // Next round
-                }, 500);
-            }
-        }
-
-        function updateScore() {
-            document.getElementById('score').textContent = score;
-        }
-
+        function updateScore() { document.getElementById('score').textContent = score; }
         function gameOver() {
             Utils.stopBGM();
             document.getElementById('final-score').textContent = score;
             document.getElementById('game-over-screen').style.display = 'flex';
         }
+        function showSelection() {
+            Utils.stopBGM();
+            document.getElementById('game-over-screen').style.display = 'none';
+            renderCourseList();
+        }
 
-        window.onload = loadVocab;
+        window.onload = init;
     </script>
 </body>
 
