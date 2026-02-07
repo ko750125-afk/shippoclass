@@ -515,24 +515,15 @@
                     }, 80); // Slow speed
                 }
 
-                const getSymbol = (reelIdx) => {
-                    const top = parseFloat(reelElements[reelIdx].style.top);
-                    const idx = (Math.abs(Math.round(top / 180)) % reels[reelIdx].length);
-                    return reels[reelIdx][idx];
-                };
+                // Always trigger Reach!
+                Utils.playSound('reach');
+                Utils.speak('リーチ！'); // RIICHI!
+                statusText.textContent = "REACH!!";
+                statusText.style.color = "var(--color-neon-red)";
 
-                // Only if 0 and 1 are stopped can we definately say Reach for the standard left-to-right case.
-                if (stopping[0] && stopping[1]) {
-                    // Always trigger Reach!
-                    Utils.playSound('reach');
-                    Utils.speak('リーチ！'); // RIICHI!
-                    statusText.textContent = "REACH!!";
-                    statusText.style.color = "var(--color-neon-red)";
-
-                    // ADD RICH EFFECT
-                    document.querySelector('.slot-machine').classList.add('reach-active');
-                    document.querySelector('.container').classList.add('reach-background');
-                }
+                // ADD RICH EFFECT
+                document.querySelector('.slot-machine').classList.add('reach-active');
+                document.querySelector('.container').classList.add('reach-background');
             }
 
             if (stopCount === 3) finishSpin();
