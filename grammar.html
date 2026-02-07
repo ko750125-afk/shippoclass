@@ -98,41 +98,54 @@
 <body>
     <div class="container">
         <a href="index.html" class="btn-nav">← 로비로</a>
-        <h1 style="text-align:center; color: #FF0033;">비급 노트 (SECRET NOTES)</h1>
-        <div id="notes-list"></div>
+        <h1 style="text-align:center; color: #FF0033; margin-bottom: 40px;">십뽀의 비급 노트 📖</h1>
+
+        <!-- 이 파일(grammar.html)을 직접 수정하지 마시고, 
+             data/grammar.json 파일을 열어서 내용을 추가해주세요! -->
+
+        <div id="notes-list">
+            <p style="text-align:center; color:#888;">데이터를 불러오는 중입니다...</p>
+        </div>
     </div>
 
-    <!-- INLINED JS ONLY - NO EXTERNAL SCRIPTS -->
     <script>
-        const grammarNotes = [
-            {
-                "id": 1,
-                "title": "기본 문장 구조 (Basic Sentence)",
-                "content": "일본어의 기본 어순은 한국어와 같습니다.\n'주어 + 목적어 + 서술어' 순서로 말합니다.\n\n예: わたしは パンを たべます (저는 빵을 먹습니다)",
-                "tags": ["Level 1", "기본"]
-            },
-            {
-                "id": 2,
-                "title": "조사 'は'와 'が' (Particles)",
-                "content": "둘 다 주격을 나타내지만 뉘앙스가 다릅니다.\n'は'는 주제를, '가'는 주어가 강조될 때 주로 쓰입니다.",
-                "tags": ["Level 1", "조사"]
-            }
-        ];
-
-        window.onload = function () {
+        async function loadNotes() {
             const container = document.getElementById('notes-list');
-            grammarNotes.forEach(note => {
-                const el = document.createElement('div');
-                el.className = 'note-card';
-                el.innerHTML = `
-                    <div class="note-title"><span>${note.title}</span><span>▼</span></div>
-                    <div style="margin-top:10px;">${note.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
-                    <div class="note-content">${note.content.replace(/\n/g, '<br>')}</div>
-                `;
-                el.onclick = () => el.classList.toggle('active');
-                container.appendChild(el);
-            });
+            try {
+                // 외부 JSON 파일에서 데이터 불러오기
+                const response = await fetch('data/grammar.json');
+                const data = await response.json();
+
+                container.innerHTML = ''; // 로딩 메시지 삭제
+
+                data.forEach((note, index) => {
+                    const el = document.createElement('div');
+                    el.className = 'note-card';
+                    // 줄바꿈 문자를 <br>로 변환
+                    const formattedContent = note.content.replace(/\n/g, '<br>');
+
+                    el.innerHTML = `
+                        <div class="note-title">
+                            <span>${index + 1}. ${note.title}</span>
+                            <span style="font-size: 0.8rem; opacity: 0.5;">▼</span>
+                        </div>
+                        <div style="margin-top:10px;">
+                            ${note.tags ? note.tags.map(t => `<span class="tag">#${t}</span>`).join('') : ''}
+                        </div>
+                        <div class="note-content">${formattedContent}</div>
+                    `;
+                    el.onclick = () => {
+                        el.classList.toggle('active');
+                    };
+                    container.appendChild(el);
+                });
+            } catch (error) {
+                container.innerHTML = `<p style="text-align:center; color:red;">노트 데이터를 불러오는데 실패했습니다.<br>data/grammar.json 파일이 있는지 확인해주세요.</p>`;
+                console.error("Error loading notes:", error);
+            }
         };
+
+        window.onload = loadNotes;
     </script>
 </body>
 
