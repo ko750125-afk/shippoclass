@@ -280,6 +280,19 @@
             animation: rumble 0.2s linear infinite;
             border: 2px solid red !important;
         }
+
+        #result-meaning {
+            background-color: rgba(200, 0, 0, 0.8);
+            border: 2px solid #ff4b4b;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            display: none;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -446,10 +459,12 @@
             const resp = await fetch('data/slots.json');
             slotData = await resp.json();
 
-            reels[0] = [...slotData.subjects, ...slotData.subjects, ...slotData.subjects];
+            const fails = (slotData.failEvents || []).map(f => ({ kanji: f.emoji, text: "X", meaning: "", type: 'fail' }));
+
+            reels[0] = [...slotData.subjects, ...fails, ...slotData.subjects];
             const objKeys = Object.keys(slotData.objects).map(k => ({ text: k, kanji: k, meaning: slotData.objects[k].meaning }));
-            reels[1] = [...objKeys, ...objKeys, ...objKeys];
-            reels[2] = [...slotData.verbs, ...slotData.verbs, ...slotData.verbs];
+            reels[1] = [...objKeys, ...fails, ...objKeys];
+            reels[2] = [...slotData.verbs, ...fails, ...slotData.verbs];
 
             reels.forEach((r, i) => {
                 reelElements[i].innerHTML = r.map(item => `<div class="reel-item"><div class="kanji">${item.kanji}</div><div class="kana">${item.text}</div></div>`).join('');
@@ -470,6 +485,7 @@
             resumeAudio();
             stopCount = 0; stopping = [false, false, false];
             resultMeaning.textContent = "";
+            resultMeaning.style.display = 'none';
 
             // Reset Reach Effects
             document.querySelector('.slot-machine').classList.remove('reach-active');
@@ -515,8 +531,18 @@
                     }, 80); // Slow speed
                 }
 
-                // Trigger Reach with 30% probability
-                if (Math.random() < 0.3) {
+                // Check if Natural (Valid Subject + Valid Object)
+                const getSymbol = (i) => {
+                    const r = reels[i];
+                    const top = parseFloat(reelElements[i].style.top);
+                    const idx = (Math.abs(Math.round(top / 180)) % r.length);
+                    return r[idx];
+                };
+
+                const s1 = getSymbol(0);
+                const s2 = getSymbol(1);
+
+                if (s1 && s2 && s1.type !== 'fail' && s2.type !== 'fail') {
                     Utils.playSound('reach');
                     Utils.speak('リーチ！'); // RIICHI!
                     statusText.textContent = "REACH!!";
@@ -550,6 +576,7 @@
             const isWin = validVerbs.includes(verbKanji);
 
             resultMeaning.textContent = meaning + (isWin ? " (Great!)" : " (?)");
+            resultMeaning.style.display = 'block';
 
             // Speak regardless, but maybe tone differs? For now just speak.
             Utils.speak(sentence);
