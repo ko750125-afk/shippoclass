@@ -54,39 +54,122 @@
             display: block;
         }
 
-        /* --- Study Screen --- */
-        .study-list {
+        /* --- Study Screen (Split View) --- */
+        .study-split-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            height: 500px;
+            /* Fixed height for split view */
+        }
+
+        .study-column {
             background: #1e293b;
             border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #334155;
+            overflow: hidden;
+        }
+
+        .column-header {
             padding: 10px;
-            max-height: 500px;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #94a3b8;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .column-list {
+            flex: 1;
             overflow-y: auto;
-            margin-bottom: 20px;
-            text-align: left;
+            padding: 5px;
         }
 
         .study-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            padding: 10px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid #334155;
-            gap: 10px;
+            flex-direction: column;
+            gap: 5px;
+            position: relative;
+            transition: 0.2s;
         }
 
-        .study-check {
+        .to-master .study-item:hover {
+            border-color: #334155;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .mastered .study-item {
+            opacity: 0.6;
+            border-style: dashed;
+        }
+
+        .study-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .study-jp {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            line-height: 1.2;
+            word-break: break-all;
+        }
+
+        .study-ko {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        .study-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 5px;
+            justify-content: flex-end;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 5px;
+        }
+
+        .btn-mini-action {
+            background: none;
+            border: none;
             cursor: pointer;
-            font-size: 1.5rem;
-            color: #475569;
-            transition: 0.2s;
+            padding: 4px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: 0.2s;
         }
 
-        .study-check.active {
+        .btn-mini-action:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-mini-action.check-btn {
+            color: #475569;
+            font-size: 1.2rem;
+        }
+
+        .btn-mini-action.check-btn.active {
             color: #10b981;
-            /* Green for mastered */
+        }
+
+        .btn-mini-action svg {
+            width: 16px;
+            height: 16px;
+            fill: #64748b;
         }
 
         .mastered-badge {
@@ -204,14 +287,15 @@
         }
 
         .btn-nav {
-            padding: 8px 16px;
+            padding: 8px 12px;
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
             text-decoration: none;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
             transition: 0.2s;
             border: 1px solid #444;
+            white-space: nowrap;
         }
 
         .btn-nav:hover {
@@ -477,14 +561,26 @@
                 </div>
             </div>
             <h2 id="study-folder-title" style="color: #fff; margin-bottom: 10px; font-size: 1.1rem;"></h2>
-            <p style="font-size: 0.75rem; color: #64748b; margin-bottom: 10px;">✅ 아는 단어를 체크해서 목록에서 지워나가세요!</p>
-            <div class="study-list" id="study-list"></div>
 
-            <div id="study-footer" style="margin-bottom: 20px;">
-                <button onclick="toggleShowAll()" id="btn-show-all"
-                    style="background:none; border:none; color:#64748b; font-size:0.8rem; cursor:pointer; text-decoration:underline;">
-                    정복한 단어 보기
-                </button>
+            <!-- Split Study Area -->
+            <div class="study-split-container">
+                <!-- Left: Unknown -->
+                <div class="study-column to-master">
+                    <div class="column-header">
+                        <span>공부할 단어</span>
+                        <span id="count-unmastered" style="color:var(--color-primary);">0</span>
+                    </div>
+                    <div class="column-list" id="list-unmastered"></div>
+                </div>
+
+                <!-- Right: Mastered -->
+                <div class="study-column mastered">
+                    <div class="column-header">
+                        <span>정복한 단어</span>
+                        <span id="count-mastered" style="color:var(--color-secondary);">0</span>
+                    </div>
+                    <div class="column-list" id="list-mastered"></div>
+                </div>
             </div>
 
             <button class="start-btn" onclick="startGame()">남은 단어로 복습 게임!</button>
@@ -675,47 +771,38 @@
         }
 
         function renderStudyList() {
-            const list = document.getElementById('study-list');
+            const listUnmastered = document.getElementById('list-unmastered');
+            const listMastered = document.getElementById('list-mastered');
             const myMastered = checkedWords[chunkId] || [];
 
-            // Filter words based on mastery and toggle status
-            const displayWords = currentChunk.filter(w => showAll || !myMastered.includes(w.jp));
+            const unmasteredWords = currentChunk.filter(w => !myMastered.includes(w.jp));
+            const masteredWords = currentChunk.filter(w => myMastered.includes(w.jp));
 
-            document.getElementById('checked-count').textContent = `${myMastered.length} / ${currentChunk.length} 정복`;
-            document.getElementById('btn-show-all').textContent = showAll ? "정복한 단어 숨기기" : "정복한 단어 보기";
+            document.getElementById('count-unmastered').textContent = unmasteredWords.length;
+            document.getElementById('count-mastered').textContent = masteredWords.length;
+            document.getElementById('checked-count').textContent = `${masteredWords.length} / ${currentChunk.length} 정복`;
 
-            if (displayWords.length === 0 && !showAll) {
-                list.innerHTML = `
-                    <div style="padding:40px; text-align:center; color:#94a3b8;">
-                        <div style="font-size:3rem; margin-bottom:10px;">🎉</div>
-                        <div>해당 폴더의 모든 단어를 정복했습니다!</div>
+            // Helper to render an item card
+            const createItemCard = (w, isMastered) => `
+                <div class="study-item">
+                    <div class="study-jp">${Utils.parseJP(w.jp, true)}</div>
+                    <div class="study-ko">${w.ko}</div>
+                    <div class="study-actions">
+                        <button class="btn-mini-action" onclick="Utils.speak('${w.jp}')" title="발음">
+                            <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                        </button>
+                        <button class="btn-mini-action check-btn ${isMastered ? 'active' : ''}" onclick="toggleCheck('${w.jp}')" title="${isMastered ? '미정복으로' : '정복 완료'}">
+                            ${isMastered ? '✅' : '⬜'}
+                        </button>
                     </div>
-                `;
-                return;
-            }
-
-            list.innerHTML = displayWords.map(w => {
-                const isMastered = myMastered.includes(w.jp);
-                const activeClass = isMastered ? 'active' : '';
-                return `
-                <div class="study-item" style="opacity: ${isMastered ? 0.5 : 1}">
-                    <div class="study-check ${activeClass}" onclick="toggleCheck('${w.jp}')" title="정복 체크">
-                        ${isMastered ? '✅' : '⬜'}
-                    </div>
-                    <div class="study-info">
-                        <div class="study-jp">${Utils.parseJP(w.jp, true)}</div>
-                        <div class="study-ko">${w.ko}</div>
-                    </div>
-                    <button class="btn-tts" onclick="event.stopPropagation(); Utils.speak('${w.jp}')" title="발음 듣기">
-                        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                    </button>
                 </div>
-            `}).join('');
-        }
+            `;
 
-        function toggleShowAll() {
-            showAll = !showAll;
-            renderStudyList();
+            listUnmastered.innerHTML = unmasteredWords.length ? unmasteredWords.map(w => createItemCard(w, false)).join('')
+                : '<div style="color:#475569; font-size:0.7rem; padding:20px;">남은 단어 없음!</div>';
+
+            listMastered.innerHTML = masteredWords.length ? masteredWords.map(w => createItemCard(w, true)).join('')
+                : '<div style="color:#475569; font-size:0.7rem; padding:20px;">정복한 단어 없음</div>';
         }
 
         function toggleCheck(jp) {
