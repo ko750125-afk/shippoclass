@@ -421,6 +421,7 @@
         let finalSet = [];
         let finalIdx = 0;
         let challengeRowSelected = false;
+        let challengeQueue = []; // Queue to ensure all items are asked
 
         const gridEl = document.getElementById('grid');
         const selectorEl = document.getElementById('column-selector');
@@ -441,6 +442,7 @@
                 if (currentFilterIndex === null) currentFilterIndex = 0;
                 challengeRowSelected = true;
                 isChallengeActive = true;
+                challengeQueue = []; // Reset queue for new challenge
                 setTimeout(() => nextChallenge(), 100);
             } else if (mode === 'practice') {
                 // Keep filter
@@ -487,7 +489,7 @@
             const allBtn = document.createElement('button');
             allBtn.className = 'col-btn' + (currentFilterIndex === null ? ' active' : '');
             allBtn.textContent = '전체';
-            allBtn.onclick = () => { currentFilterIndex = null; challengeRowSelected = false; renderSelector(); renderGrid(null); };
+            allBtn.onclick = () => { currentFilterIndex = null; challengeRowSelected = false; challengeQueue = []; renderSelector(); renderGrid(null); };
             selectorEl.appendChild(allBtn);
             columns.forEach((col, idx) => {
                 const btn = document.createElement('button');
@@ -495,6 +497,7 @@
                 btn.textContent = col;
                 btn.onclick = () => {
                     resumeAudio(); currentFilterIndex = idx;
+                    challengeQueue = []; // Reset queue on new filter
                     if (currentMode === 'challenge') { challengeRowSelected = true; isChallengeActive = true; nextChallenge(); }
                     renderSelector(); renderGrid(idx);
                 };
@@ -573,8 +576,21 @@
 
         function nextChallenge() {
             feedbackEl.textContent = "🔊 잘 듣고 맞춰보세요!"; feedbackEl.className = '';
-            let pool = (currentFilterIndex === null) ? hiraganaData.flat().filter(c => c) : hiraganaData[currentFilterIndex].filter(c => c);
-            currentChallengeChar = Utils.randomItem(pool); setTimeout(() => Utils.speak(currentChallengeChar), 500);
+
+            // If queue is empty, fill it with all available characters for current filter
+            if (challengeQueue.length === 0) {
+                let pool = (currentFilterIndex === null) ? hiraganaData.flat().filter(c => c) : hiraganaData[currentFilterIndex].filter(c => c);
+                // Shuffle pool
+                for (let i = pool.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                }
+                challengeQueue = pool;
+            }
+
+            // Pop one from queue
+            currentChallengeChar = challengeQueue.pop();
+            setTimeout(() => Utils.speak(currentChallengeChar), 500);
         }
 
         function checkAnswer(char, btn) {
