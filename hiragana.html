@@ -138,24 +138,32 @@
 
         .column-selector {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
             margin-bottom: 20px;
             background: rgba(255, 255, 255, 0.05);
             padding: 15px;
             border-radius: 15px;
         }
 
+        .selector-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
         .col-btn {
             background: #333;
             color: #fff;
             border: 1px solid #555;
-            padding: 8px 15px;
+            padding: 8px 12px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: 0.2s;
+            min-width: 40px;
         }
 
         .col-btn.active {
@@ -486,23 +494,50 @@
 
         function renderSelector() {
             selectorEl.innerHTML = '';
-            const allBtn = document.createElement('button');
-            allBtn.className = 'col-btn' + (currentFilterIndex === null ? ' active' : '');
-            allBtn.textContent = '전체';
-            allBtn.onclick = () => { currentFilterIndex = null; challengeRowSelected = false; challengeQueue = []; renderSelector(); renderGrid(null); };
-            selectorEl.appendChild(allBtn);
-            columns.forEach((col, idx) => {
+
+            const createBtn = (idx) => {
                 const btn = document.createElement('button');
                 btn.className = 'col-btn' + (currentFilterIndex === idx ? ' active' : '');
-                btn.textContent = col;
+                btn.textContent = columns[idx];
                 btn.onclick = () => {
                     resumeAudio(); currentFilterIndex = idx;
                     challengeQueue = []; // Reset queue on new filter
                     if (currentMode === 'challenge') { challengeRowSelected = true; isChallengeActive = true; nextChallenge(); }
                     renderSelector(); renderGrid(idx);
                 };
-                selectorEl.appendChild(btn);
-            });
+                return btn;
+            };
+
+            const row1Indices = [0, 1, 2, 3, 4, 5, 6]; // A Ka Sa Ta Na Ha Ma
+            const row2Indices = [7, 8, 9];             // Ya Ra Wa
+            const row3Indices = [10, 11, 12, 13, 14];  // Ga Za Da Ba Pa
+
+            const r1 = document.createElement('div'); r1.className = 'selector-row';
+            row1Indices.forEach(i => r1.appendChild(createBtn(i)));
+            selectorEl.appendChild(r1);
+
+            const r2 = document.createElement('div'); r2.className = 'selector-row';
+            row2Indices.forEach(i => r2.appendChild(createBtn(i)));
+            selectorEl.appendChild(r2);
+
+            const r3 = document.createElement('div'); r3.className = 'selector-row';
+            row3Indices.forEach(i => r3.appendChild(createBtn(i)));
+
+            // Add 'All' button to Row 3
+            const allBtn = document.createElement('button');
+            allBtn.className = 'col-btn' + (currentFilterIndex === null ? ' active' : '');
+            allBtn.textContent = '전체';
+            allBtn.style.color = '#888'; // Slightly different style for All
+            if (currentFilterIndex === null) allBtn.style.color = '#000'; // Active style override
+            allBtn.onclick = () => {
+                currentFilterIndex = null;
+                challengeRowSelected = false;
+                challengeQueue = [];
+                renderSelector();
+                renderGrid(null);
+            };
+            r3.appendChild(allBtn);
+            selectorEl.appendChild(r3);
         }
 
         function renderGrid(filterIdx) {
