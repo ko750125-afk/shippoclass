@@ -571,7 +571,7 @@
         <!-- 3. Study Screen -->
         <div id="study-screen" class="screen">
             <div class="nav-controls">
-                <button onclick="switchScreen('subselection')" class="btn-nav">◀ 폴더 목록</button>
+                <button onclick="showSubFolders(currentCourseIdx)" class="btn-nav">◀ 폴더 목록</button>
                 <div style="text-align: right;">
                     <span id="checked-count" style="font-size: 0.8rem; color: var(--color-accent);">0개 선택됨</span>
                 </div>
@@ -628,6 +628,7 @@
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx = null;
         let mainCategory = null;
+        let currentCourseIdx = -1; // Added for sync
         let currentChunk = [];
         let chunkId = "";
         let score = 0, timeLeft = 30, timerInterval = null, isProcessing = false;
@@ -747,6 +748,7 @@
 
         function showSubFolders(idx) {
             Utils.playSound('click');
+            currentCourseIdx = idx; // Store for back-sync
             mainCategory = courseData[idx];
             const list = document.getElementById('sub-folder-list');
             document.getElementById('category-title').textContent = mainCategory.title;
@@ -764,24 +766,25 @@
                 const percent = (masteredCount / totalCount) * 100;
                 const isFinished = percent === 100;
 
-                // UI Logic: Incomplete folders get the "Active Neon Glow"
-                // Finished folders get the "Solid Gold Reward" look
-                const cardStyle = !isFinished
-                    ? 'border-color: var(--color-primary); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);'
-                    : 'border-color: #f59e0b; background: rgba(245, 158, 11, 0.05);';
+                // UI REVERSAL: 
+                // Incomplete = Sleek Blue (Serious Study Mode)
+                // Finished = HYPER NEON GOLD (Achievement/Money Reward)
+                const cardStyle = isFinished
+                    ? 'border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.1);'
+                    : 'border-color: #475569; background: transparent;';
 
                 const icon = isFinished ? '💰' : '📁';
-                const folderColor = isFinished ? '#f59e0b' : '#fff';
-                const badgeStyle = isFinished ? 'background:#f59e0b; color:#fff;' : '';
+                const folderColor = isFinished ? '#fbbf24' : '#94a3b8';
+                const badgeStyle = isFinished ? 'background:#f59e0b; color:#fff;' : 'background:#334155; color:#94a3b8;';
 
                 return `
                 <div class="folder-card" onclick="startStudy(${i})" style="${cardStyle}">
-                    <span class="folder-icon">${icon}</span>
+                    <span class="folder-icon" style="opacity: ${isFinished ? 1 : 0.6}">${icon}</span>
                     <div style="font-weight:bold; color:${folderColor};">폴더 ${i + 1}</div>
-                    <div style="font-size:0.7rem; color:#94a3b8;">${i * 25 + 1} ~ ${Math.min((i + 1) * 25, mainCategory.words.length)}번</div>
+                    <div style="font-size:0.7rem; color:${isFinished ? '#d97706' : '#64748b'};">${i * 25 + 1} ~ ${Math.min((i + 1) * 25, mainCategory.words.length)}번</div>
                     <div class="mastered-badge" style="${badgeStyle}">${masteredCount} / ${totalCount} 정복</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width: ${percent}%; ${isFinished ? 'background:#f59e0b;' : ''}"></div>
+                    <div class="progress-container" style="background:rgba(0,0,0,0.2);">
+                        <div class="progress-bar" style="width: ${percent}%; background: ${isFinished ? '#fbbf24' : 'var(--color-primary)'};"></div>
                     </div>
                 </div>
             `}).join('');
