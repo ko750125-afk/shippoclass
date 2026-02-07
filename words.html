@@ -441,14 +441,13 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">🏠 로비</a>
-            <span class="ver-badge">필수단어 300 v2.5 (FOLDER/CHECK)</span>
+            <span class="ver-badge">필수단어 300 v3.0 (MASTERY SYSTEM)</span>
         </div>
 
         <h1 id="screen-title" style="margin: 0 0 10px 0; font-size: 1.3rem; color: #fff;">단어 마스터 챌린지</h1>
 
         <!-- 1. Category Selection -->
         <div id="selection-screen" class="screen active">
-            <p style="color: #94a3b8; margin-bottom: 15px; font-size: 0.9rem;">공부할 카테고리를 선택하세요!</p>
             <div id="course-list" class="course-grid"></div>
 
             <div style="margin-top: 30px; border-top: 1px solid #334155; padding-top: 15px;">
@@ -585,13 +584,55 @@
 
         function renderCourseList() {
             const list = document.getElementById('course-list');
-            list.innerHTML = courseData.map((c, i) => `
+            let totalMastered = 0;
+            let totalWords = 0;
+
+            const courseHtml = courseData.map((c, i) => {
+                let masteredInCourse = 0;
+                const courseWords = c.words;
+                totalWords += courseWords.length;
+
+                const chunkCount = Math.ceil(courseWords.length / 25);
+                for (let chunkIdx = 0; chunkIdx < chunkCount; chunkIdx++) {
+                    const cId = `${c.id}_${chunkIdx}`;
+                    masteredInCourse += (checkedWords[cId] || []).length;
+                }
+                totalMastered += masteredInCourse;
+                const percent = (masteredInCourse / courseWords.length) * 100;
+
+                return `
                 <div class="course-card" onclick="showSubFolders(${i})">
-                    <span class="word-count-tag">${c.words.length} 단어</span>
-                    <h3>${c.title}</h3>
-                    <p>${c.description}</p>
+                    <span class="word-count-tag">${courseWords.length} 단어</span>
+                    <h3 style="margin-bottom:10px;">${c.title}</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                        <span style="font-size:0.85rem; color:var(--color-secondary); font-weight:bold;">
+                            ${masteredInCourse} / ${courseWords.length} 정복
+                        </span>
+                        <span style="font-size:0.85rem; color:#64748b;">${Math.round(percent)}%</span>
+                    </div>
+                    <div class="progress-container" style="background:rgba(0,0,0,0.3); margin-top:0;">
+                        <div class="progress-bar" style="width: ${percent}%"></div>
+                    </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
+
+            const totalPercent = totalWords > 0 ? (totalMastered / totalWords) * 100 : 0;
+            const headerHtml = `
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 25px; border-radius: 20px; margin-bottom: 10px; border: 1px solid #334155; text-align: left; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
+                    <div style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">필수단어 전체 정복도</div>
+                    <div style="display: flex; align-items: baseline; gap: 10px;">
+                        <span style="font-size: 2.2rem; font-weight: 800; color: #fff;">${totalMastered}</span>
+                        <span style="font-size: 1rem; color: #475569;">/ ${totalWords} 단어</span>
+                        <span style="margin-left: auto; font-size: 1.2rem; font-weight: bold; color: var(--color-accent);">${Math.round(totalPercent)}%</span>
+                    </div>
+                    <div class="progress-container" style="height: 10px; margin-top: 15px; background: #334155;">
+                        <div class="progress-bar" style="width: ${totalPercent}%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                    </div>
+                </div>
+            `;
+
+            list.innerHTML = headerHtml + courseHtml;
             switchScreen('selection');
         }
 
