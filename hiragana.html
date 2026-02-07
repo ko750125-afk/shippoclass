@@ -598,6 +598,7 @@
                 feedbackEl.textContent = "정답! ✨"; feedbackEl.className = "correct"; Utils.playSound('win');
                 isChallengeActive = false; btn.classList.add('active');
                 setTimeout(() => {
+                    if (currentMode !== 'challenge') return; // Guard clause
                     btn.classList.remove('active');
                     if (challengeRowSelected) { isChallengeActive = true; nextChallenge(); }
                     else startChallenge();
