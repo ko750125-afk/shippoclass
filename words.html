@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>단어 챌린지 - 십뽀교실</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #1e1e24;
+            --color-card-front: #ffffff;
+            --color-card-back: #333;
+            --color-primary: #ff6b6b;
+            --color-secondary: #4ecdc4;
+            --color-accent: #ffe66d;
+            --font-jp: 'Noto Sans JP', sans-serif;
+            --font-kr: 'Noto Sans KR', sans-serif;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: white;
+            font-family: var(--font-kr);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 10px;
+            background: #333;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .timer-fill {
+            width: 100%;
+            height: 100%;
+            background: var(--color-primary);
+            transition: width 0.1s linear;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            perspective: 1000px;
+        }
+
+        .card {
+            background: var(--color-card-back);
+            border-radius: 10px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            border: 2px solid #444;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card.jp {
+            font-family: var(--font-jp);
+            color: var(--color-accent);
+        }
+
+        .card.selected {
+            border-color: var(--color-secondary);
+            background: rgba(78, 205, 196, 0.2);
+            transform: scale(0.95);
+        }
+
+        .card.matched {
+            background: var(--color-secondary);
+            color: #000;
+            border-color: var(--color-secondary);
+            animation: popOut 0.3s forwards;
+            pointer-events: none;
+        }
+
+        @keyframes popOut {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        .card.wrong {
+            background: var(--color-primary);
+            animation: shake 0.4s;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .score-board {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .start-btn {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: var(--color-secondary);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #game-over-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .result-box {
+            background: #222;
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid var(--color-accent);
+            text-align: center;
+        }
+
+        .btn-nav {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="btn-nav">← 로비로</a>
+            <h1>매칭 챌린지</h1>
+            <div class="score-board">점수: <span id="score">0</span></div>
+            <div class="timer-bar">
+                <div class="timer-fill" id="timer-fill"></div>
+            </div>
+        </div>
+
+        <div id="start-screen" style="margin-top: 50px;">
+            <p style="font-size: 1.2rem; margin-bottom: 30px;">
+                제한시간 30초!<br>
+                단어의 짝을 찾아주세요.<br>
+                (일본어 - 한국어)
+            </p>
+            <button class="start-btn" onclick="startGame()">START!</button>
+        </div>
+
+        <div id="game-grid" class="game-grid" style="display: none;">
+            <!-- Cards will be generated here -->
+        </div>
+    </div>
+
+    <div id="game-over-screen">
+        <div class="result-box">
+            <h2 style="color: var(--color-accent); font-size: 2rem;">TIME OVER!</h2>
+            <p style="font-size: 1.5rem;">최종 점수: <span id="final-score">0</span>점</p>
+            <button class="start-btn" onclick="location.reload()">다시 하기</button>
+        </div>
+    </div>
+
+    <script>
+        let vocabData = [];
+        let score = 0;
+        let timeLeft = 30;
+        let timerInterval;
+        let selectedCards = [];
+        let isProcessing = false;
+
+        async function loadVocab() {
+            try {
+                const resp = await fetch('data/vocab_5.json');
+                vocabData = await resp.json();
+            } catch (e) {
+                console.error("Failed to load vocab:", e);
+                alert("데이터 로드 실패!");
+            }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('game-grid').style.display = 'grid';
+            score = 0;
+            updateScore();
+            timeLeft = 30;
+            generateBoard();
+            startTimer();
+        }
+
+        function startTimer() {
+            const fill = document.getElementById('timer-fill');
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    clearInterval(timerInterval);
+                    fill.style.width = '0%';
+                    gameOver();
+                    return;
+                }
+                fill.style.width = (timeLeft / 30 * 100) + '%';
+                if (timeLeft <= 10) fill.style.background = '#ff4b4b';
+                else fill.style.background = '#ff6b6b';
+            }, 100);
+        }
+
+        function generateBoard() {
+            // Pick 9 words randomly? 
+            // Wait, 9 cards total is odd. It must be pairs.
+            // User said "9 cards with 5 level words". 
+            // Maybe 9 PAIRS? Total 18 cards?
+            // Or 9 slots? 
+            // If it's matching game, we need even number of cards.
+            // Let's do 4 pairs (8 cards) or 6 pairs (12 cards) per round.
+            // Let's try 6 pairs (12 cards) for a grid. 3x4.
+
+            const grid = document.getElementById('game-grid');
+            grid.innerHTML = '';
+
+            // Randomly select 6 words
+            const roundWords = [];
+            const tempVocab = [...vocabData];
+            for (let i = 0; i < 6; i++) {
+                if (tempVocab.length === 0) break;
+                const rIdx = Math.floor(Math.random() * tempVocab.length);
+                roundWords.push(tempVocab[rIdx]);
+                tempVocab.splice(rIdx, 1);
+            }
+
+            // Create cards (JP and KR)
+            let cards = [];
+            roundWords.forEach(w => {
+                cards.push({ id: w.jp, text: w.jp, type: 'jp', pair: w.ko });
+                cards.push({ id: w.jp, text: w.ko, type: 'kr', pair: w.jp });
+            });
+
+            // Shuffle
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+
+            cards.forEach(c => {
+                const el = document.createElement('div');
+                el.className = `card ${c.type}`;
+                el.textContent = c.text;
+                el.dataset.id = c.id;
+                el.onclick = () => handleCardClick(el, c);
+                grid.appendChild(el);
+            });
+        }
+
+        function handleCardClick(el, cardData) {
+            if (isProcessing || el.classList.contains('matched') || el.classList.contains('selected')) return;
+
+            el.classList.add('selected');
+            selectedCards.push({ el, data: cardData });
+
+            if (selectedCards.length === 2) {
+                isProcessing = true;
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [c1, c2] = selectedCards;
+            const match = (c1.data.id === c2.data.id);
+
+            if (match) {
+                // Correct
+                setTimeout(() => {
+                    c1.el.classList.remove('selected');
+                    c2.el.classList.remove('selected');
+                    c1.el.classList.add('matched');
+                    c2.el.classList.add('matched');
+                    score += 10;
+                    updateScore();
+                    checkRoundClear();
+                    isProcessing = false;
+                    selectedCards = [];
+                }, 300);
+            } else {
+                // Wrong
+                setTimeout(() => {
+                    c1.el.classList.add('wrong');
+                    c2.el.classList.add('wrong');
+                }, 300);
+
+                setTimeout(() => {
+                    c1.el.classList.remove('wrong', 'selected');
+                    c2.el.classList.remove('wrong', 'selected');
+                    isProcessing = false;
+                    selectedCards = [];
+                }, 800);
+            }
+        }
+
+        function checkRoundClear() {
+            const matched = document.querySelectorAll('.matched').length;
+            if (matched >= 12) { // 6 pairs * 2
+                // Round Clear!
+                setTimeout(() => {
+                    score += 5; // Bonus
+                    updateScore();
+                    generateBoard(); // Next round
+                }, 500);
+            }
+        }
+
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+
+        function gameOver() {
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('game-over-screen').style.display = 'flex';
+        }
+
+        window.onload = loadVocab;
+    </script>
+</body>
+
+</html>
