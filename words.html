@@ -534,7 +534,7 @@
             <span class="ver-badge">필수단어 300 v3.0 (MASTERY SYSTEM)</span>
         </div>
 
-        <h1 id="screen-title" style="margin: 0 0 10px 0; font-size: 1.3rem; color: #fff;">단어 마스터 챌린지</h1>
+        <h1 id="screen-title" style="display:none;">단어 마스터 챌린지</h1>
 
         <!-- 1. Category Selection -->
         <div id="selection-screen" class="screen active">
@@ -715,9 +715,11 @@
             }).join('');
 
             const totalPercent = totalWords > 0 ? (totalMastered / totalWords) * 100 : 0;
-            const headerHtml = `
-                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 25px; border-radius: 20px; margin-bottom: 10px; border: 1px solid #334155; text-align: left; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
-                    <div style="font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">필수단어 전체 정복도</div>
+            const headerHtml = i => `
+                <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 25px; border-radius: 20px; margin-bottom: 20px; border: 2px solid var(--color-accent); text-align: left; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                    <div style="font-size: 1.2rem; font-weight: bold; color: var(--color-accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <span>🔥</span> 단어 마스터 챌린지
+                    </div>
                     <div style="display: flex; align-items: baseline; gap: 10px;">
                         <span style="font-size: 2.2rem; font-weight: 800; color: #fff;">${totalMastered}</span>
                         <span style="font-size: 1rem; color: #475569;">/ ${totalWords} 단어</span>
@@ -729,7 +731,7 @@
                 </div>
             `;
 
-            list.innerHTML = headerHtml + courseHtml;
+            list.innerHTML = headerHtml() + courseHtml;
             switchScreen('selection');
         }
 
