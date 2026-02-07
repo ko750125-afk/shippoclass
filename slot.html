@@ -545,30 +545,34 @@
                 }
 
                 // Check if Natural (Valid Subject + Valid Object)
-                const getSymbol = (i) => {
-                    const r = reels[i];
-                    const top = parseFloat(reelElements[i].style.top);
-                    const idx = (Math.abs(Math.round(top / 180)) % r.length);
-                    return r[idx];
-                };
+                // Only trigger Reach if Reel 0 and 1 are stopped (waiting for Reel 2)
+                if (lastReelIndex === 2) {
+                    const getSymbol = (i) => {
+                        const r = reels[i];
+                        const top = parseFloat(reelElements[i].style.top);
+                        const idx = (Math.abs(Math.round(top / 180)) % r.length);
+                        return r[idx];
+                    };
 
-                const s1 = getSymbol(0);
-                const s2 = getSymbol(1);
+                    const s1 = getSymbol(0);
+                    const s2 = getSymbol(1);
 
-                if (s1 && s2 && s1.type !== 'fail' && s2.type !== 'fail') {
-                    Utils.playSound('siren');
+                    if (s1 && s2 && s1.type !== 'fail' && s2.type !== 'fail') {
+                        console.log(`[REACH] Subject: ${s1.kanji}, Object: ${s2.text}`);
+                        Utils.playSound('siren');
 
-                    const validVerbs = slotData.objects[s2.text] ? slotData.objects[s2.text].verbs : [];
-                    const hints = slotData.verbs.filter(v => validVerbs.includes(v.kanji)).map(v => v.meaning);
-                    const hintText = hints.length > 0 ? hints[0] : "???";
+                        const validVerbs = slotData.objects[s2.text] ? slotData.objects[s2.text].verbs : [];
+                        const hints = slotData.verbs.filter(v => validVerbs.includes(v.kanji)).map(v => v.meaning);
+                        const hintText = hints.length > 0 ? hints[0] : "???";
 
-                    Utils.speak('リーチ！'); // RIICHI!
-                    statusText.innerHTML = `REACH!!<br><span style="font-size:0.6em; color:#fff;">(Hint: ${hintText}?)</span>`;
-                    statusText.style.color = "var(--color-neon-red)";
+                        Utils.speak('リーチ！'); // RIICHI!
+                        statusText.innerHTML = `REACH!!<br><span style="font-size:0.6em; color:#fff;">(Hint: ${hintText}?)</span>`;
+                        statusText.style.color = "var(--color-neon-red)";
 
-                    // ADD RICH EFFECT
-                    document.querySelector('.slot-machine').classList.add('reach-active');
-                    document.querySelector('.container').classList.add('reach-background');
+                        // ADD RICH EFFECT
+                        document.querySelector('.slot-machine').classList.add('reach-active');
+                        document.querySelector('.container').classList.add('reach-background');
+                    }
                 }
             }
 
