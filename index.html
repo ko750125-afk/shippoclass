@@ -4,32 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHIPPO WORLD - Pachinko Style Learning</title>
+    <title>SHIPPO WORLD PRO - Pachinko Style Learning</title>
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="SHIPPO WORLD - 일본어 파칭코 학습">
     <meta property="og:description" content="십뽀의 일본어 교실 공식 학습 사이트! 히라가나, 작문 슬롯머신, 문법 노트까지 즐겁게 배워보세요.">
     <meta property="og:image" content="https://ko750125-afk.github.io/shippoclass/assets/shippo_v5.png">
-    <meta property="og:url" content="https://ko750125-afk.github.io/shippoclass/">
+    <meta property="og:url" content="index.html">
     <meta property="og:type" content="website">
-    <meta name="twitter:card" content="summary_large_image">
 
     <link rel="stylesheet" href="css/style.css">
     <style>
         .lobby-menu {
             display: flex;
             flex-direction: column;
-            gap: 30px;
+            gap: 25px;
             align-items: center;
-            margin-top: 40px;
+            margin-top: 30px;
         }
 
         .menu-item {
             width: 100%;
             max-width: 500px;
-            height: 120px;
+            height: 100px;
             position: relative;
-            background: black;
-            border: 2px solid #333;
+            background: #1a1a1a;
+            border: 2px solid #444;
             border-radius: 15px;
             display: flex;
             align-items: center;
@@ -38,30 +37,15 @@
             box-sizing: border-box;
             text-decoration: none;
             overflow: hidden;
-            transition: all 0.3s;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
         }
 
         .menu-item:hover {
             border-color: var(--color-gold);
             box-shadow: 0 0 30px var(--color-gold);
-            transform: scale(1.05);
-        }
-
-        .menu-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 50%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transform: skewX(-20deg);
-            transition: left 0.5s;
-        }
-
-        .menu-item:hover::before {
-            left: 150%;
+            transform: scale(1.05) translateY(-5px);
+            background: #252525;
         }
 
         .menu-label {
@@ -70,24 +54,24 @@
         }
 
         .menu-title {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 900;
             color: white;
             text-transform: uppercase;
         }
 
         .menu-sub {
-            font-size: 0.9rem;
-            color: #888;
+            font-size: 0.85rem;
+            color: #aaa;
         }
 
         .menu-icon {
-            font-size: 3rem;
+            font-size: 2.5rem;
         }
 
         .neon-sign {
             border: 4px solid #fff;
-            padding: 20px 40px;
+            padding: 15px 40px;
             border-radius: 20px;
             box-shadow:
                 0 0 10px #fff,
@@ -95,6 +79,14 @@
                 0 0 20px var(--color-neon-blue),
                 inset 0 0 20px var(--color-neon-blue);
             animation: flicker 3s infinite;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .neon-sign:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
         }
 
         @keyframes flicker {
@@ -108,11 +100,7 @@
             56%,
             100% {
                 opacity: 1;
-                text-shadow:
-                    0 0 5px #fff,
-                    0 0 10px #fff,
-                    0 0 20px var(--color-neon-blue),
-                    0 0 40px var(--color-neon-blue);
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--color-neon-blue), 0 0 40px var(--color-neon-blue);
             }
 
             20%,
@@ -123,42 +111,27 @@
             }
         }
 
-        /* --- MOBILE RESPONSIVENESS --- */
-        @media (max-width: 600px) {
-            .container {
-                padding: 1rem;
-            }
-
-            .neon-sign {
-                padding: 15px 30px;
-            }
-
-            .neon-sign h1 {
-                font-size: 2.2rem !important;
-            }
-
-            .shippo-lobby {
-                width: 120px !important;
-                height: 120px !important;
-                right: 15px !important;
-                bottom: 15px !important;
-            }
-        }
-
-        .shippo-lobby {
+        /* Renamed YouTube Button to avoid confusion */
+        .youtube-floating {
             position: fixed;
-            bottom: 40px;
-            right: 40px;
-            width: 180px;
-            height: 180px;
-            background:
-                radial-gradient(circle at 50% 100%, rgba(0, 212, 255, 0.3), transparent 70%),
-                radial-gradient(circle, #111, #000);
+            bottom: 30px;
+            right: 30px;
+            width: 150px;
+            height: 150px;
+            background: #ff0000;
+            /* Distinct YouTube Red */
             border-radius: 50%;
-            border: 4px solid var(--color-neon-blue);
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+            border: 4px solid white;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
             animation: float-lobby 4s ease-in-out infinite;
             z-index: 1000;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
         }
 
         @keyframes float-lobby {
@@ -169,129 +142,92 @@
             }
 
             50% {
-                transform: translateY(-20px) rotate(-3deg);
+                transform: translateY(-15px) rotate(-3deg);
             }
         }
 
-        .shippo-lobby img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .youtube-floating img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
             border-radius: 50%;
         }
 
-        .shippo-lobby-label {
+        .youtube-label {
             position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: -5px;
             background: white;
-            color: black;
+            color: #ff0000;
             padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
             font-weight: 900;
-            white-space: nowrap;
-            border: 2px solid var(--color-neon-blue);
+            border: 2px solid #ff0000;
         }
 
-        /* Subscriber Gate Overlay */
-        #youtube-gate {
+        .ver-badge {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .gate-content {
-            max-width: 400px;
-            background: #111;
-            border: 3px solid var(--color-gold);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 0 50px var(--color-gold);
-        }
-
-        .gate-btn {
-            background: #ff0000;
-            color: white;
-            padding: 15px 30px;
-            border-radius: 30px;
+            top: 20px;
+            left: 20px;
+            background: var(--color-gold);
+            color: black;
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-            font-size: 1.2rem;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-            transition: transform 0.2s;
-        }
-
-        .gate-btn:active {
-            transform: scale(0.95);
+            opacity: 0.7;
         }
     </style>
 </head>
 
 <body>
+    <div class="ver-badge">LOCL_V2.1</div>
 
     <div class="container">
-        <div style="text-align: center; margin-top: 40px; margin-bottom: 60px;">
-            <div class="neon-sign" style="display: inline-block;">
-                <h1 style="margin:0; font-size: 3.5rem;">SHIPPO</h1>
-                <p style="margin:0; letter-spacing: 5px;">WORLD</p>
-            </div>
+        <div style="text-align: center; margin-top: 30px; margin-bottom: 50px;">
+            <a href="index.html" class="neon-sign">
+                <h1 style="margin:0; font-size: 3rem; color: white;">SHIPPO</h1>
+                <p style="margin:0; letter-spacing: 5px; color: white;">WORLD</p>
+                <div style="font-size: 0.7rem; color: #fff; opacity: 0.6; margin-top: 5px;">(CLICK TO REFRESH HOME)
+                </div>
+            </a>
         </div>
 
         <nav class="lobby-menu">
             <a href="hiragana.html" class="menu-item">
                 <div class="menu-label">
-                    <span class="menu-title" style="color: var(--color-neon-blue); line-height: 1.1;">ひらがな<br><span
-                            style="font-size: 0.6em;">(히라가나)</span></span>
-                    <span class="menu-sub" style="margin-top: 5px;">50음도 트레이닝</span>
+                    <span class="menu-title" style="color: var(--color-neon-blue);">HIRAGANA</span>
+                    <span class="menu-sub">기초 50음도 완성</span>
                 </div>
                 <div class="menu-icon">あ</div>
             </a>
 
             <a href="slot.html" class="menu-item">
                 <div class="menu-label">
-                    <span class="menu-title" style="color: var(--color-gold); line-height: 1.1;">JP SLOTS<br><span
-                            style="font-size: 0.6em;">(작문)</span></span>
-                    <span class="menu-sub" style="margin-top: 5px;">일본어 문장 만들기 게임</span>
+                    <span class="menu-title" style="color: var(--color-gold);">JP SLOTS</span>
+                    <span class="menu-sub">작문 슬롯머신 게임</span>
                 </div>
                 <div class="menu-icon">🎰</div>
             </a>
 
             <a href="words.html" class="menu-item">
                 <div class="menu-label">
-                    <span class="menu-title" style="color: var(--color-neon-red);">단어 챌린지</span>
-                    <span class="menu-sub">짝맞추기 게임</span>
+                    <span class="menu-title" style="color: #f43f5e;">VOCAB 100</span>
+                    <span class="menu-sub">형용사 50+50 마스터 코스</span>
                 </div>
                 <div class="menu-icon">🔥</div>
             </a>
         </nav>
 
         <footer style="text-align: center; margin-top: 50px; color: #444; font-size: 0.8rem;">
-            © 2026 SHIPPO PROJECT. ALL RIGHTS RESERVED. (십뽀 프로젝트)
+            © 2026 SHIPPO PROJECT. ALL RIGHTS RESERVED. 십뽀교실 v2.1
         </footer>
+    </div>
 
-        <a href="https://www.youtube.com/@ShippoClass" target="_blank" class="shippo-lobby" id="shippo-btn">
-            <img src="assets/shippo_v5.png" alt="Shippo">
-            <div class="shippo-lobby-label">YOUTUBE 📺</div>
-        </a>
-
-        <script>
-            // Gate logic removed as requested
-        </script>
+    <a href="https://www.youtube.com/@ShippoClass" target="_blank" class="youtube-floating">
+        <img src="assets/shippo_v5.png" alt="Shippo">
+        <div class="youtube-label">YouTube 강의실</div>
+    </a>
 
 </body>
 
