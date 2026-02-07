@@ -541,7 +541,7 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">🏠 로비</a>
-            <span class="ver-badge">필수단어 300 v3.8 (ELITE UPDATE)</span>
+            <span class="ver-badge">필수단어 300 v3.9 (STABILITY FIX)</span>
         </div>
 
         <h1 id="screen-title" style="display:none;">단어 마스터 챌린지</h1>
@@ -709,7 +709,8 @@
                 courseData = data.courses;
                 renderCourseList();
             } catch (e) {
-                alert("데이터를 불러오지 못했습니다.");
+                console.error("Init error:", e);
+                alert("데이터를 불러오지 못했습니다. (Error: " + e.message + ")");
             }
         }
 
@@ -734,6 +735,7 @@
                     masteredInCourse += (checkedWords[cId] || []).length;
                 }
                 totalMastered += masteredInCourse;
+                const percent = (masteredInCourse / courseWords.length) * 100;
                 const isFinished = percent === 100;
                 const cardStyle = isFinished
                     ? 'border-color: #ffcc00; box-shadow: 0 0 25px rgba(255, 204, 0, 0.3); background: rgba(255,204,0,0.1);'
