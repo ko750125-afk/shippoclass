@@ -1,10 +1,10 @@
 const CACHE_NAME = "shippo-world-v1";
 const ASSETS = [
-    "/",
-    "/index.html",
-    "/hiragana.html",
-    "/words.html",
-    "/css/style.css",
+    "./",
+    "./index.html",
+    "./hiragana.html",
+    "./words.html",
+    "./css/style.css",
 ];
 
 self.addEventListener("install", (e) => {

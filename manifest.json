@@ -1,8 +1,7 @@
 {
     "name": "SHIPPO WORLD",
     "short_name": "SHIPPO",
-    "description": "십뽀 일본어 교실 — 히라가나, 필수단어 300",
-    "start_url": "/",
+    "start_url": "./",
     "display": "standalone",
     "background_color": "#111111",
     "theme_color": "#111111",
