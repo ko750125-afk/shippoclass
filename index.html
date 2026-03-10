@@ -12,6 +12,12 @@
     <meta property="og:url" content="index.html">
     <meta property="og:type" content="website">
 
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SHIPPO">
+    <link rel="apple-touch-icon" href="assets/shippo_v5.png">
+    <meta name="theme-color" content="#111111">
     <link rel="stylesheet" href="css/style.css">
     <style>
         .lobby-menu {
@@ -24,8 +30,8 @@
 
         .menu-item {
             width: 100%;
-            max-width: 500px;
-            height: 100px;
+            max-width: 420px;
+            height: 85px;
             position: relative;
             background: #1a1a1a;
             border: 2px solid #444;
@@ -54,7 +60,7 @@
         }
 
         .menu-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 900;
             color: white;
             text-transform: uppercase;
@@ -66,7 +72,7 @@
         }
 
         .menu-icon {
-            font-size: 2.5rem;
+            font-size: 2rem;
         }
 
         .neon-sign {
@@ -114,11 +120,11 @@
         /* Renamed YouTube Button to avoid confusion */
         .youtube-floating {
             position: fixed;
-            top: 30px;
-            right: 30px;
-            width: 100px;
+            top: 20px;
+            right: 20px;
+            width: 75px;
             /* Reduced size slightly to be less intrusive */
-            height: 100px;
+            height: 75px;
             background: #ff0000;
             /* Distinct YouTube Red */
             border-radius: 50%;
@@ -185,9 +191,9 @@
     <div class="ver-badge">LOCL_V2.1</div>
 
     <div class="container">
-        <div style="text-align: center; margin-top: 30px; margin-bottom: 50px;">
+        <div style="text-align: center; margin-top: 20px; margin-bottom: 40px;">
             <a href="index.html" class="neon-sign">
-                <h1 style="margin:0; font-size: 3rem; color: white;">SHIPPO</h1>
+                <h1 style="margin:0; font-size: 2.2rem; color: white;">SHIPPO</h1>
                 <p style="margin:0; letter-spacing: 5px; color: white;">WORLD</p>
                 <div style="font-size: 0.7rem; color: #fff; opacity: 0.6; margin-top: 5px;">(CLICK TO REFRESH HOME)
                 </div>
@@ -203,7 +209,7 @@
                 <div class="menu-icon">あ</div>
             </a>
 
-            <a href="words.html?v=4.1" class="menu-item">
+            <a href="words.html?v=4.2" class="menu-item">
                 <div class="menu-label">
                     <span class="menu-title" style="color: #f43f5e;">필수단어 300</span>
                     <span class="menu-sub">초보자 필수 300단어 마스터 코스</span>
@@ -230,6 +236,11 @@
         <div class="youtube-label">YouTube 강의실</div>
     </a>
 
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => { });
+        }
+    </script>
 </body>
 
 </html>

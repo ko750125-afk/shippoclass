@@ -60,7 +60,7 @@
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-bottom: 20px;
-            height: 500px;
+            height: 380px;
             /* Fixed height for split view */
         }
 
@@ -289,7 +289,7 @@
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 480px;
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
@@ -432,7 +432,7 @@
         .card {
             background: var(--color-card-back);
             border-radius: 12px;
-            height: 90px;
+            height: 65px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -541,7 +541,7 @@
     <div class="container">
         <div class="header">
             <a href="index.html" class="btn-nav">🏠 로비</a>
-            <span class="ver-badge">필수단어 300 v4.1 (ENDLESS CHALLENGE)</span>
+            <span class="ver-badge">필수단어 300 v4.2 (ENDLESS CHALLENGE)</span>
         </div>
 
         <h1 id="screen-title" style="display:none;">단어 마스터 챌린지</h1>
@@ -636,7 +636,7 @@
         let currentChunk = [];
         let chunkId = "";
         let score = 0, timeLeft = 30, timerInterval = null, isProcessing = false;
-        let selectedCards = [];
+        let selectedCards = [], matches = 0, currentBoardPairs = 0;
         let courseData = [];
         let checkedWords = JSON.parse(localStorage.getItem('shippo_mastered_v3') || '{}');
         let showAll = false;
@@ -793,6 +793,10 @@
                         <div class="progress-bar" style="width: ${totalPercent}%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
                     </div>
                 </div>
+                <!-- Challenge All Button -->
+                <button onclick="startAllWordsChallenge()" style="width:100%; padding:20px; border-radius:16px; background:linear-gradient(90deg, #f43f5e, #fb7185); color:#fff; border:none; font-weight:bold; font-size:1.1rem; cursor:pointer; margin-bottom:20px; box-shadow:0 0 15px rgba(244,63,94,0.4); display:flex; align-items:center; justify-content:center; gap:10px; transition:0.2s;" onactive="this.style.transform='scale(0.98)'">
+                    <span>🏆</span> 전체 300단어 랜덤 챌린지 (ENDLESS)
+                </button>
             `;
 
             list.innerHTML = headerHtml() + courseHtml;
@@ -925,15 +929,12 @@
         }
 
         function startGame() {
-            const myMastered = checkedWords[chunkId] || [];
-            const unmasteredPoolSize = currentChunk.filter(w => !myMastered.includes(w.jp)).length;
-
-            if (unmasteredPoolSize < 2) {
+            if (currentChunk.length < 2) {
                 alert("복습할 단어가 부족합니다. (최소 2개 이상)");
                 return;
             }
             Utils.playSound('click'); switchScreen('game');
-            score = 0; timeLeft = 30;
+            score = 0; timeLeft = 30; matches = 0;
             updateScore(); generateBoard(); startTimer();
         }
 
@@ -950,19 +951,16 @@
         function generateBoard() {
             const grid = document.getElementById('game-grid'); grid.innerHTML = '';
             const myMastered = checkedWords[chunkId] || [];
+            matches = 0;
 
-            // Game uses words that are NOT yet mastered (the ones left in the list)
-            const pool = currentChunk.filter(w => !myMastered.includes(w.jp)).sort(() => Math.random() - 0.5).slice(0, 6);
+            // Prioritize unmastered words but include mastered for endless review
+            const unmastered = currentChunk.filter(w => !myMastered.includes(w.jp)).sort(() => Math.random() - 0.5);
+            const mastered = currentChunk.filter(w => myMastered.includes(w.jp)).sort(() => Math.random() - 0.5);
 
-            if (pool.length < 2) {
-                // If too few remaining words, just use some random ones from chunk but prioritize unmastered
-                const unmastered = currentChunk.filter(w => !myMastered.includes(w.jp));
-                const extras = currentChunk.filter(w => myMastered.includes(w.jp)).sort(() => Math.random() - 0.5);
-                const finalPool = [...unmastered, ...extras].slice(0, 6);
-                renderBoardFromPool(finalPool);
-            } else {
-                renderBoardFromPool(pool);
-            }
+            const pool = [...unmastered, ...mastered].slice(0, 6);
+            currentBoardPairs = pool.length;
+
+            renderBoardFromPool(pool);
         }
 
         function renderBoardFromPool(pool) {
@@ -993,12 +991,15 @@
                 Utils.playSound('match');
                 setTimeout(() => {
                     c1.el.classList.add('matched'); c2.el.classList.add('matched');
+                    matches++;
                     score += 10; timeLeft += 3; updateScore();
                     isProcessing = false; selectedCards = [];
-                    const myMastered = checkedWords[chunkId] || [];
-                    const poolCount = currentChunk.filter(w => !myMastered.includes(w.jp)).length;
-                    const displayCount = poolCount > 6 ? 6 : (poolCount < 2 ? pool.length : poolCount);
-                    if (matches >= displayCount * 2) generateBoard();
+
+                    if (matches >= currentBoardPairs) {
+                        setTimeout(() => {
+                            generateBoard();
+                        }, 500);
+                    }
                 }, 300);
             } else {
                 Utils.playSound('wrong');
@@ -1020,6 +1021,12 @@
             document.getElementById('game-over-screen').style.display = 'flex';
         }
 
+        function startAllWordsChallenge() {
+            currentChunk = courseData.reduce((acc, course) => acc.concat(course.words), []);
+            chunkId = "all_words_challenge";
+            startGame();
+        }
+
         function retryGame() {
             document.getElementById('game-over-screen').style.display = 'none';
             startGame();
@@ -1027,7 +1034,11 @@
 
         function quitGame() {
             document.getElementById('game-over-screen').style.display = 'none';
-            switchScreen('study');
+            if (chunkId === "all_words_challenge") {
+                renderCourseList();
+            } else {
+                switchScreen('study');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', init);

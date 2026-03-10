@@ -60,7 +60,7 @@
 
         .container {
             width: 100%;
-            max-width: 600px;
+            max-width: 480px;
             padding: 1rem 0;
             margin: 0 auto;
         }
@@ -87,7 +87,7 @@
 
         .reel-window {
             flex: 1;
-            height: 180px;
+            height: 140px;
             background: white;
             border-radius: 10px;
             overflow: hidden;
@@ -103,7 +103,7 @@
         }
 
         .reel-item {
-            height: 180px;
+            height: 140px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -113,7 +113,7 @@
         }
 
         .reel-item .kanji {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: #d00;
             margin-bottom: 5px;
         }
@@ -509,7 +509,7 @@
                 let pos = 0;
                 // Init all reels FAST (20ms)
                 spinIntervals[i] = setInterval(() => {
-                    pos -= 20; if (pos <= -180 * reels[i].length / 3) pos = 0;
+                    pos -= 20; if (pos <= -140 * reels[i].length / 3) pos = 0;
                     reelElements[i].style.top = pos + "px";
                 }, 20);
                 document.getElementById(`stop-${i + 1}`).disabled = false;
@@ -524,7 +524,7 @@
             stopping[i] = true;
             stopCount++;
 
-            const finalPos = Math.round(parseFloat(reelElements[i].style.top) / 180) * 180;
+            const finalPos = Math.round(parseFloat(reelElements[i].style.top) / 140) * 140;
             reelElements[i].style.top = finalPos + "px";
             Utils.playSound('stop');
             document.getElementById(`stop-${i + 1}`).disabled = true;
@@ -539,7 +539,7 @@
                     clearInterval(spinIntervals[lastReelIndex]);
                     let pos = parseFloat(reelElements[lastReelIndex].style.top);
                     spinIntervals[lastReelIndex] = setInterval(() => {
-                        pos -= 20; if (pos <= -180 * reels[lastReelIndex].length / 3) pos = 0;
+                        pos -= 20; if (pos <= -140 * reels[lastReelIndex].length / 3) pos = 0;
                         reelElements[lastReelIndex].style.top = pos + "px";
                     }, 80); // Slow speed
                 }
@@ -550,7 +550,7 @@
                     const getSymbol = (i) => {
                         const r = reels[i];
                         const top = parseFloat(reelElements[i].style.top);
-                        const idx = (Math.abs(Math.round(top / 180)) % r.length);
+                        const idx = (Math.abs(Math.round(top / 140)) % r.length);
                         return r[idx];
                     };
 
@@ -581,7 +581,7 @@
 
         function finishSpin() {
             const results = reels.map((r, i) => {
-                const idx = Math.abs(Math.round(parseFloat(reelElements[i].style.top) / 180));
+                const idx = Math.abs(Math.round(parseFloat(reelElements[i].style.top) / 140));
                 return r[idx];
             });
             const sentence = results.map(r => r.kanji).join(' ');
