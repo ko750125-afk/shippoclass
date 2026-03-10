@@ -1,7 +1,8 @@
 {
     "name": "SHIPPO WORLD",
     "short_name": "SHIPPO",
-    "start_url": "./",
+    "start_url": "/shippoclass/",
+    "scope": "/shippoclass/",
     "display": "standalone",
     "background_color": "#111111",
     "theme_color": "#111111",

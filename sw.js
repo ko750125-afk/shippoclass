@@ -1,10 +1,10 @@
-const CACHE_NAME = "shippo-world-v1";
+const CACHE_NAME = "shippo-world-v2";
 const ASSETS = [
-    "./",
-    "./index.html",
-    "./hiragana.html",
-    "./words.html",
-    "./css/style.css",
+    "/shippoclass/",
+    "/shippoclass/index.html",
+    "/shippoclass/hiragana.html",
+    "/shippoclass/words.html",
+    "/shippoclass/css/style.css",
 ];
 
 self.addEventListener("install", (e) => {
